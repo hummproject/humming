@@ -1,0 +1,29 @@
+1. npm install @react-navigation/native
+2. Installing dependencies
+    npm install react-native-reanimated
+                react-native-gesture-handler
+                react-native-screens
+                react-native-safe-area-context
+                @react-native-community/masked-view
+    ***TWO IMPORTANT STEPS IN NAVIGATION:
+        1. Add these below two lines in dependencies section in android/app/build.gradle
+            implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+            implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
+        2. At the TOP OF THE ROOT FILE i.e. EITHER INDEX.JS OR APP.JS
+            (I added in index.js)
+            import 'react-native-gesture-handler';
+3. The above are the BUIDING BLOCKS&  shared foundations for navigators of the NAVIGATOR FUNCTIONALITY IN REACT-NATIVE
+    For exmaple: React Navigation's stack navigator provides the gestures and animations
+4. We have our basic building blocks ready now we have to choose the NAVIGATOR
+5. Each NAVIGATOR in React Navigation lives in its OWN LIBRARY 
+6. To use the STACK NAVIGATOR, we need to install @react-navigation/stack (LIBRARY)
+    Install: 
+            npm install @react-navigation/stack
+            (THIS STACK navigator depends on @react-native-community/masked-view & all the above modules i.e BUIDING BLOCKS)
+7. createStackNavigator -> return object with 2 properties:
+    (Both are react components)
+    i) Screen
+    ii) Navigator -> should contain Screen elements as its children to define config for ROUTES
+    
+8. NavigationContainer -> Componenet which manages our NAVIGATION TREE like parent AND CONTAINS NAVIGATION STATE.
+    (NavigationContainer component must wrap all navigators structure)
