@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
-import axios from 'react-native-axios';
-import Home from '../Home';
 
 export default class Login extends Component {
     constructor(props) {
@@ -14,27 +13,24 @@ export default class Login extends Component {
             isLoggedIn: ""
         };
     }
-    login = () => {
+    login = async () => {
         const userName = this.state.userName;
         const userPwd = this.state.userPwd;
 
-        fetch('https://humming-psql.herokuapp.com/login', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userName: userName,
-                userpassword: userPwd
-            }),
-        }).then((response) => response.json())
-            .then((responseJson) => {
-                this.props.navigation.navigate('TabBar', { userData: responseJson.data });
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        LoginUser({
+            userName: userName,
+            userpassword: userPwd,
+        }).then((res) => {
+            if (res.status === 200) {
+                this.props.navigation.navigate('TabBar', { userData: res.data });
+            } else {
+                console.log('some info message to user using Toast Android');
+                alert(res.message);
+            }
+        }).catch((err) => {
+            console.log('some info message to user using Toast Android');
+            alert('Something went wrong. Please try again later');
+        });
     }
     goToRegister = () => {
         this.props.navigation.navigate('register');
