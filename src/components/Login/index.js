@@ -3,6 +3,7 @@ import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
 import axios from 'react-native-axios';
+import Home from '../Home';
 
 export default class Login extends Component {
     constructor(props) {
@@ -43,6 +44,7 @@ export default class Login extends Component {
         return (
             <View style={AppStyle.appContainer}>
                 <Logo></Logo>
+                <Home/>
                 <TextInput style={AppStyle.appInput} placeholder="Username12"
                     onChangeText={userName => this.setState({ userName })}></TextInput>
                 <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
