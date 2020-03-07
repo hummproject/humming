@@ -49,7 +49,12 @@ const AppStyle = StyleSheet.create({
         // alignItems: 'center',
         // position: 'absolute',
         // bottom: 0
-    }
+    },
+    activityIndicator: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }
 });
 
 export { AppStyle };
