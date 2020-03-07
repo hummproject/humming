@@ -11,6 +11,8 @@ export default class Profile extends React.Component {
         super(props);
     }
     render() {
+        const { navigation, route } = this.props;
+
         const userData = {
             "userid": "268",
             "firstname": "sudhakar",
