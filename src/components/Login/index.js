@@ -30,8 +30,7 @@ export default class Login extends Component {
             }),
         }).then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson.data);
-                this.props.navigation.navigate('Home');
+                this.props.navigation.navigate('TabBar', { userData: responseJson.data });
             })
             .catch((error) => {
                 console.log(error);
@@ -44,7 +43,7 @@ export default class Login extends Component {
         return (
             <View style={AppStyle.appContainer}>
                 <Logo></Logo>
-                <Home/>
+                {/* <Home/> */}
                 <TextInput style={AppStyle.appInput} placeholder="Username12"
                     onChangeText={userName => this.setState({ userName })}></TextInput>
                 <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
