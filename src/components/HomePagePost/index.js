@@ -1,10 +1,18 @@
 import React, { Component } from 'react';
 import { Text, View, Image, Dimensions } from 'react-native';
 import { styles } from './HomePagePost.style';
+import StickyHeaderFooterScrollView from 'react-native-sticky-header-footer-scroll-view';
 
 export default class HomePagePost extends Component {
     render() {
         return (
+            <StickyHeaderFooterScrollView
+             renderStickyHeader={() => (
+        <View style={styles.headerstyle}>    
+          <Text style={{fontSize:25, marginLeft:10,}}>Humming  </Text>
+          <Image source={require('../../images/logo.png')} style={{ width: '7%', height: 27, paddingTop:35, }}/>
+        </View>
+      )}>
             <View style={styles.container}>
                 <View style={styles.TopContainer}>
                     <Image source={require('../../images/img.jpg')} style={styles.profile_photo} />
@@ -41,6 +49,8 @@ export default class HomePagePost extends Component {
                         </Text>
                 </View>
             </View>
+
+            </StickyHeaderFooterScrollView>
         )
     };
 }

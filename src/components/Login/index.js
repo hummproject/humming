@@ -3,6 +3,9 @@ import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
+import axios from 'react-native-axios';
+import Home from '../Home';
+import Toast from 'react-native-easy-toast'
 
 export default class Login extends Component {
     constructor(props) {
@@ -16,22 +19,31 @@ export default class Login extends Component {
     login = async () => {
         const userName = this.state.userName;
         const userPwd = this.state.userPwd;
-
-        LoginUser({
-            userName: userName,
-            userpassword: userPwd,
-        }).then((res) => {
-            if (res.status === 200) {
-                this.props.navigation.navigate('TabBar', { userData: res.data });
-            } else {
-                console.log('some info message to user using Toast Android');
-                alert(res.message);
+        if (userName != "") {
+            if (userPwd != "") {
+                LoginUser({
+                    userName: userName,
+                    userpassword: userPwd,
+                }).then((res) => {
+                    if (res.status === 200) {
+                        this.props.navigation.navigate('TabBar', { userData: res.data });
+                    } else {
+                        this.refs.toast.show("username or password are incorrect");
+                    }
+                }).catch((err) => {
+                    console.log('some info message to user using Toast Android');
+                    this.refs.toast.show("Something went wrong. Please try again later");
+                });
             }
-        }).catch((err) => {
-            console.log('some info message to user using Toast Android');
-            alert('Something went wrong. Please try again later');
-        });
+            else {
+                this.refs.toast.show("password cannot be Empty");
+            }
+        }
+        else {
+            this.refs.toast.show("Username cannot be Empty");
+        }
     }
+
     goToRegister = () => {
         this.props.navigation.navigate('register');
     }
@@ -56,6 +68,8 @@ export default class Login extends Component {
                         <Text>&nbsp;&nbsp;SignUp</Text>
                     </TouchableOpacity>
                 </View>
+                <Toast ref="toast"
+                    style={{ backgroundColor: 'grey', borderRadius: 20 }} />
             </View>
         )
     };
