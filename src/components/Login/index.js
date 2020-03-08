@@ -4,6 +4,7 @@ import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
 import axios from 'react-native-axios';
 import Home from '../Home';
+import Toast, {DURATION} from 'react-native-easy-toast'
 
 export default class Login extends Component {
     constructor(props) {
@@ -18,7 +19,11 @@ export default class Login extends Component {
         const userName = this.state.userName;
         const userPwd = this.state.userPwd;
 
-        fetch('https://humming-psql.herokuapp.com/login', {
+        if(userName != "")
+        {
+            if(userPwd != "")
+            {
+            fetch('https://humming-psql.herokuapp.com/login', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -30,12 +35,27 @@ export default class Login extends Component {
             }),
         }).then((response) => response.json())
             .then((responseJson) => {
+                if(responseJson.status != 200)
+                {
+                    this.refs.toast.show("username or password is incorrect");
+                }
+                else{
                 this.props.navigation.navigate('TabBar', { userData: responseJson.data });
+                }
             })
             .catch((error) => {
                 console.log(error);
             });
     }
+    else{
+        this.refs.toast.show("Password cannot be empty",500);
+    }
+}
+else{
+    this.refs.toast.show("username cannot be empty",500);
+}
+
+}
     goToRegister = () => {
         this.props.navigation.navigate('register');
     }
@@ -44,7 +64,7 @@ export default class Login extends Component {
             <View style={AppStyle.appContainer}>
                 <Logo></Logo>
                 {/* <Home/> */}
-                <TextInput style={AppStyle.appInput} placeholder="Username12"
+                <TextInput style={AppStyle.appInput} placeholder="Username12" 
                     onChangeText={userName => this.setState({ userName })}></TextInput>
                 <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
                     onChangeText={userPwd => this.setState({ userPwd })}></TextInput>
@@ -60,6 +80,8 @@ export default class Login extends Component {
                         <Text>&nbsp;&nbsp;SignUp</Text>
                     </TouchableOpacity>
                 </View>
+                <Toast ref="toast"
+                style={{backgroundColor:'grey',borderRadius: 20}}/>
             </View>
         )
     };
