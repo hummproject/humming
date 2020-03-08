@@ -1,101 +1,99 @@
 import * as React from 'react';
 import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { AppStyle } from '../../App.style';
+import { UpdateUserDp } from './Profile.service';
 import { ProfileStyles } from './Profile.style';
-import { Logo } from '../Logo';
-import { RNCamera } from 'react-native-camera';
+import ImagePicker from 'react-native-image-picker';
+import AppConfig from '../../config/constants';
 
-
+const options = {
+    title: 'Select Avatar',
+    customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+    storageOptions: {
+        skipBackup: true,
+        path: 'images',
+    }
+};
 export default class Profile extends React.Component {
     constructor(props) {
         super(props);
+        const { navigation, route } = this.props;
+        const userData = route.params.params.userData;
+
+        this.state = {
+            firstname: userData.firstname,
+            lastname: userData.lastname,
+            userid: userData.userid,
+            useremail: userData.useremail,
+            username: userData.username,
+            usermobile: userData.usermobile,
+            userprofession: userData.userprofession,
+            userbio: userData.userbio,
+            userdp: userData.userdp,
+            following: userData.following || 0,
+            followers: userData.followers || 0,
+            isactive: userData.isactive,
+            useraddress: userData.useraddress,
+            token: userData.token,
+        };
     }
     render() {
-        const { navigation, route } = this.props;
-
-        const userData = {
-            "userid": "268",
-            "firstname": "sudhakar",
-            "lastname": "chandana",
-            "useremail": "sudhaece470@gmail.com",
-            "username": "kukkasudha",
-            "usermobile": null,
-            "userprofession": null,
-            "userbio": null,
-            "userdp": null,
-            "following": null,
-            "followers": null,
-            "isactive": 1,
-            "useraddress": null,
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNjgiLCJpYXQiOjE1ODMzNzI4MzMsImV4cCI6MTU4Mzk3NzYzM30.SkJSJnTwEXvpadmcYBi06DMAzfjJZEQgNF6T5zxdUYA"
-        };
-        const firstname = userData.firstname;
-        const lastname = userData.lastname;
-        const userid = userData.userid;
-        const useremail = userData.useremail;
-        const username = userData.username;
-        const usermobile = userData.usermobile;
-        const userprofession = userData.userprofession;
-        const userbio = "I am from bakkupeta and works as Software Engineer at NCR Hyderabad";
-        const userdp = userData.userdp || "https://medium-test1.s3.amazonaws.com/1574722200000";
-        const following = userData.following || 0;
-        const followers = userData.followers || 0;
-        const isactive = userData.isactive;
-        const useraddress = userData.useraddress;
-        const token = userData.token;
-
         return (
             <SafeAreaView style={{ flex: 1, marginVertical: 20 }}>
                 <ScrollView style={{ marginHorizontal: 10 }}>
                     <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
-                        <Text>@{username}</Text>
+                        <Text>@{this.state.username}</Text>
                         <Text>Menu</Text>
                     </View>
-                    {/* <RNCamera style={{position: "absolute", top: 0, right: 0, bottom: 0, left: 0}}></RNCamera> */}
-                    {this.renderLogo(userdp)}
+                    {/* {this.renderLogo()} */}
+                    <View style={{ flex: 1, alignItems: "center", margin: 15, position: "relative" }}>
+                        <TouchableOpacity onPress={() => this.uploadImage()} >
+                            <Image style={ProfileStyles.userDp} source={this.state.userdp == null ? require('../../images/logo.png') : { uri: this.state.userdp }} />
+                        </TouchableOpacity>
+                    </View>
                     <View style={[AppStyle.appAlignItemsCenter]}>
                         <Text style={{
                             fontSize: 18
-                        }}>{firstname + ' ' + lastname}</Text>
+                        }}>{this.state.firstname + ' ' + this.state.lastname}</Text>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter]}>
                         <Text style={[AppStyle.appLabel]}>Works at:</Text>
                         <Text>
-                            {(userprofession == null) || (userprofession == '') ? <Text>not available</Text> : <Text>{userprofession}</Text>}
+                            {(this.state.userprofession == null) || (this.state.userprofession == '') ? <Text>not available</Text> : <Text>{this.state.userprofession}</Text>}
                         </Text>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter]}>
                         <Text style={[AppStyle.appLabel]}>Bio:</Text>
                         <Text style={[ProfileStyles.userBio]}>
-                            {(userbio == null) || (userbio == '') ? <Text>not available</Text> : <Text>{userbio}</Text>}
+                            {(this.state.userbio == null) || (this.state.userbio == '') ? <Text>not available</Text> : <Text>{this.state.userbio}</Text>}
                         </Text>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter, ProfileStyles.followContent]}>
                         <Text>
                             <Text style={[AppStyle.appLabel]}>Followers:</Text>
-                            <Text>{followers}</Text>
+                            <Text>{this.state.followers}</Text>
                         </Text>
                         <Text>
                             <Text style={[AppStyle.appLabel]}>Following:</Text>
-                            <Text>{following}</Text>
+                            <Text>{this.state.following}</Text>
                         </Text>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter]}>
                         <Text style={[AppStyle.appLabel]}>Mobile:</Text>
                         <Text>
-                            {(usermobile == null) || (usermobile == '') ? <Text>not available</Text> : <Text>{usermobile}</Text>}
+                            {(this.state.usermobile == null) || (this.state.usermobile == '') ? <Text>not available</Text> : <Text>{this.state.usermobile}</Text>}
                         </Text>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter]}>
                         <Text style={[AppStyle.appLabel]}>Email:</Text>
                         <Text>
-                            {(useremail == null) || (useremail == '') ? <Text>not available</Text> : <Text>{useremail}</Text>}
+                            {(this.state.useremail == null) || (this.state.useremail == '') ? <Text>not available</Text> : <Text>{this.state.useremail}</Text>}
                         </Text>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter]}>
                         <Text style={[AppStyle.appLabel]}>Address:</Text>
                         <Text>
-                            {(useraddress == null) || (useraddress == '') ? <Text>not available</Text> : <Text>{useraddress}</Text>}
+                            {(this.state.useraddress == null) || (this.state.useraddress == '') ? <Text>not available</Text> : <Text>{this.state.useraddress}</Text>}
                         </Text>
                     </View>
                 </ScrollView>
@@ -103,44 +101,54 @@ export default class Profile extends React.Component {
         )
     }
 
-    renderLogo(userdp) {
-        if (userdp) {
-            return (
-                <View style={{ flex: 1, alignItems: "center", margin: 15, position: "relative" }}>
-                    <Image source={{ uri: userdp }}
-                        style={{ width: 100, height: 100, borderRadius: 100 }} />
-                    <TouchableOpacity style={{
-                        position: "absolute",
-                        bottom: 0,
-                        backgroundColor: "yellow",
-                        color: "red",
-                        padding: 5,
-                        fontWeight: "bold"
-                    }}>
-                        <Text>Edit</Text>
-                    </TouchableOpacity>
-                </View>
-            )
-        } else {
-            return (
-                <View style={{ flex: 1, alignItems: "center", margin: 15, position: "relative" }}>
-                    <Image style={{
-                        width: 120,
-                        height: 120,
-                        resizeMode: 'contain',
-                    }} source={require('../../images/logo.png')} />
-                    <TouchableOpacity style={{
-                        position: "absolute",
-                        bottom: 0,
-                        backgroundColor: "yellow",
-                        color: "red",
-                        padding: 5,
-                        fontWeight: "bold"
-                    }}>
-                        <Text>Upload</Text>
-                    </TouchableOpacity>
-                </View>
-            )
-        }
+    uploadImage = () => {
+        ImagePicker.showImagePicker(options, (response) => {
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                console.log('User tapped custom button: ', response.customButton);
+            } else {
+                const source = response.uri;
+
+                this.setState({
+                    userdp: source
+                });
+
+                // const data = new FormData();
+                // data.append('userdp', {
+                //     uri: response.uri,
+                //     type: response.type,
+                //     name: response.fileName
+                // });
+                // debugger;
+                // fetch(AppConfig.DOMAIN + '/api/v1/awsupdate', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Accept': 'application/json',
+                //         'Content-Type': 'multipart/form-data',
+                //     },
+                //     body: data
+                // }).then((res) => res.json())
+                //     .then(resJson => {
+                //         console.log(resJson);
+                //     }).catch((err) => {
+                //         console.log(err)
+                //     });
+            }
+        });
+    }
+
+    renderLogo() {
+        return (
+            <View style={{ flex: 1, alignItems: "center", margin: 15, position: "relative" }}>
+                <TouchableOpacity onPress={() => this.uploadImage()} >
+                    <Image style={ProfileStyles.userDp} source={this.state.userdp == null ? require('../../images/logo.png') : { uri: this.state.userdp }} />
+                </TouchableOpacity>
+            </View>
+        )
     }
 }

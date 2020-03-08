@@ -9,6 +9,13 @@ const ProfileStyles = StyleSheet.create({
     userBio: {
         paddingLeft: 100,
         paddingRight: 50
+    },
+    userDp: {
+        width: 130,
+        height: 130,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 70
     }
 });
 
