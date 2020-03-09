@@ -14,7 +14,7 @@ const Stack = createStackNavigator();
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator headerMode="none" initialRouteName="postscomments">
+      <Stack.Navigator headerMode="none" initialRouteName="login">
         <Stack.Screen name="postscomments" component={PostsComments} />
         <Stack.Screen name="login" component={Login} />
         <Stack.Screen name="register" component={Register} />
