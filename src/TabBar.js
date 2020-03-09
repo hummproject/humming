@@ -64,7 +64,7 @@ export default class TabBar extends React.Component {
                     showLabel: false
                 }}
             >
-                <Tab.Screen name="Home" component={Home} />
+                <Tab.Screen name="Home"  initialParams={route} component={Home} />
                 <Tab.Screen name="search" component={Search} />
                 <Tab.Screen name="Upload" component={Upload} />
                 <Tab.Screen name="Banter" component={Banter} />

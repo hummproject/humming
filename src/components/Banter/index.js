@@ -4,7 +4,7 @@ import { Text } from 'react-native';
 export default class Banter extends Component {
     render() {
         return (
-            <Text>Hi Banter</Text>
+            <Text>Banter screen</Text>
         )
     };
 }

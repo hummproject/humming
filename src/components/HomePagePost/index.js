@@ -1,29 +1,45 @@
 import React, { Component } from 'react';
-import { Text, View, Image, Dimensions } from 'react-native';
+import { Text, View, Image, TouchableOpacity } from 'react-native';
 import { styles } from './HomePagePost.style';
-import StickyHeaderFooterScrollView from 'react-native-sticky-header-footer-scroll-view';
+// import PostsComments from './src/components/PostsComments'
 
 export default class HomePagePost extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            postDetails: this.props.userData,
+        };
+    }
+
+    GotoPostCommentsPage = () => {
+        console.debug('Posts Comments Page', this.state.postDetails);
+        this.props.navigation.navigate('postscomments');
+    };
+
+    LikeOrUnlikePost = () => {
+        console.debug('Like OR Unlike function', this.state.postDetails);
+    };
+
     render() {
+        const postDetails = this.state.postDetails;
+        console.debug(postDetails);
+        var tagName = postDetails.userTag;
+        var userName = postDetails.userName;
+        var category = postDetails.category;
         return (
             <View style={styles.container}>
                 <View style={styles.TopContainer}>
                     <Image source={require('../../images/img.jpg')} style={styles.profile_photo} />
                     <View style={styles.container_text}>
-                        <Text style={styles.UserName}>
-                            Veerender Shivannagari
-                         </Text>
-                        <Text style={styles.userTag}>
-                            @veeru_s
-<<<<<<< HEAD
-                    </Text>
-                        <View style={styles.categoryContainer}>
-=======
+                        <Text style={styles.UserName,{ textTransform: 'capitalize'}}>
+                            {userName}
                         </Text>
-                        <View style={{ flexDirection: "row", alignItems: 'center', alignSelf: 'baseline', justifyContent: 'flex-start', backgroundColor: '#dedede', padding: 5, paddingLeft: 10, paddingRight: 10, borderRadius: Dimensions.get('window').width }}>
->>>>>>> cbc52e45374f436aab25d202502eb2d0b445d562
+                        <Text style={styles.userTag}>
+                            @{tagName}
+                        </Text>
+                        <View style={styles.categoryContainer}>
                             <Image source={require('../../images/img.jpg')} style={{ height: 15, width: 15 }} />
-                            <Text style={{ marginLeft: 5 }}>food</Text>
+                            <Text style={{ marginLeft: 5 }}>{category}</Text>
                         </View>
                     </View>
                 </View>
@@ -35,28 +51,30 @@ export default class HomePagePost extends Component {
                         </Text>
                 </View>
                 <View style={styles.BottomContainer}>
-<<<<<<< HEAD
-                    <Image source={require('../../images/img.jpg')} resizeMode={'cover'}
-                        style={{ width: 25, height: 25, marginLeft:15}} />
-                    <Text style={styles.userTag, { marginLeft: 10, marginRight: 25 }}>
-                        1658
+                    <TouchableOpacity onPress={this.LikeOrUnlikePost} style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start'
+                    }}>
+                        <Image source={require('../../images/unlike-icon.png')} resizeMode={'cover'}
+                            style={{ width: 32, height: 27, marginLeft: 15 }} resizeMode={'cover'} />
+                        <Text style={styles.userTag, { marginLeft: 10, marginRight: 25 }}>
+                            1658
                         </Text>
-                    <Image source={require('../../images/img.jpg')} resizeMode={'cover'}
-                        style={{ width: 25, height: 25 }} />
-=======
-                    <Image source={require('../../images/unlike-icon.png')} resizeMode={'cover'}
-                        style={{ width: 15, height: 15, marginLeft: 15 }} />
-                    <Text style={styles.userTag, { marginLeft: 10, marginRight: 25 }}>
-                        1658
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.GotoPostCommentsPage} style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start'
+                    }}>
+                        <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
+                            style={{ width: 27, height: 27 }} />
+                        <Text style={styles.userTag, { marginLeft: 10 }}>
+                            129
                         </Text>
-                    <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
-                        style={{ width: 15, height: 15 }} />
->>>>>>> cbc52e45374f436aab25d202502eb2d0b445d562
-                    <Text style={styles.userTag, { marginLeft: 10 }}>
-                        129
-                        </Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         )
     };
-}
+} 
