@@ -18,12 +18,22 @@ export default class Home extends Component {
     componentDidMount() {
         // this.makeRequesttoFetchPosts();
     }
-
+    
     makeRequesttoFetchPosts = () => {
-        const { page } = this.state;
+        // const { page } = this.state;
         const url = `https://randomuser.me/api/?seed=${seed}&page=${page}&results=20`;
         this.setState({ loading: true });
-        fetch(url)
+        fetch(url,{
+        method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userName: userName,
+                userpassword: userPwd
+            }),
+        })
             .then(res => res.json())
             .then(res => {
                 this.setState({

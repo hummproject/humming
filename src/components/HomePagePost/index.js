@@ -15,7 +15,7 @@ export default class HomePagePost extends Component {
                         <Text style={styles.userTag}>
                             @veeru_s
                     </Text>
-                        <View style={{ flexDirection: "row", alignItems: 'center', alignSelf:'baseline',justifyContent: 'flex-start', backgroundColor: '#dedede', padding:5,paddingLeft: 10, paddingRight:10, borderRadius:Dimensions.get('window').width}}>
+                        <View style={styles.categoryContainer}>
                             <Image source={require('../../images/img.jpg')} style={{ height: 15, width: 15 }} />
                             <Text style={{marginLeft:5}}>food</Text>
                         </View>
@@ -30,12 +30,12 @@ export default class HomePagePost extends Component {
                 </View>
                 <View style={styles.BottomContainer}>
                     <Image source={require('../../images/img.jpg')} resizeMode={'cover'}
-                        style={{ width: 15, height: 15, marginLeft:15}} />
+                        style={{ width: 25, height: 25, marginLeft:15}} />
                     <Text style={styles.userTag, { marginLeft: 10, marginRight: 25 }}>
                         1658
                         </Text>
                     <Image source={require('../../images/img.jpg')} resizeMode={'cover'}
-                        style={{ width: 15, height: 15 }} />
+                        style={{ width: 25, height: 25 }} />
                     <Text style={styles.userTag, { marginLeft: 10 }}>
                         129
                         </Text>

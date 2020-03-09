@@ -11,6 +11,18 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
 
+    categoryContainer: {
+        flexDirection: "row", 
+        alignItems: 'center', 
+        alignSelf:'baseline',
+        justifyContent: 'flex-start', 
+        backgroundColor: '#dedede', 
+        padding:5,
+        paddingLeft: 10, 
+        paddingRight:10, 
+        borderRadius:15,
+    },
+
     TopContainer: {
         flex: 1,
         flexDirection: 'row-reverse',
@@ -39,7 +51,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     userTag: {
-        fontSize: 11,
+        fontSize: 14,
         fontStyle: 'normal',
         paddingBottom:5
     },
