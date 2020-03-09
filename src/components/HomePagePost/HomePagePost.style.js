@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
         paddingLeft: 10, 
         paddingRight:10, 
         borderRadius:15,
+        backgroundColor:'#4B0082'
     },
 
     TopContainer: {
@@ -59,7 +60,8 @@ const styles = StyleSheet.create({
         height: 60,
         width: 60,
         borderRadius: 30,
-        marginRight: 15
+        marginRight: 15,
+        backgroundColor:'#FEFEFE'
     },
 });
 

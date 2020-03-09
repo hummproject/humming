@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, TextInput } from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, TextInput, TouchableOpacity } from 'react-native';
 import { AppStyle } from '../../App.style'
 import AppConfig from '../../config/constants';
 import PostsCommentsListComponent from '../PostsCommentsListComponent';
@@ -17,7 +17,7 @@ export default class PostsComments extends Component {
             { userName: 'VeerendER45', userTag: 'Veeru', category: 'Movie' },
             { userName: 'VeerendeR12', userTag: 'Veeru', category: 'Love' }], //this is the array
             error: null,
-            userCommentedText :'',
+            userCommentedText: '',
             refreshing: false,
         };
     }
@@ -25,6 +25,11 @@ export default class PostsComments extends Component {
     componentWillMount() {
         // this.fetchCommentsforPosts();
     }
+
+    PostComment = () => {
+        console.debug('Post comment', this.state.userCommentedText);
+       
+    };
 
     fetchCommentsforPosts = () => {
         const { route } = this.props;
@@ -63,7 +68,7 @@ export default class PostsComments extends Component {
     };
 
     render() {
-        const { commentsListArray, loading , userCommentedText} = this.state;
+        const { commentsListArray, loading, userCommentedText } = this.state;
         return (
             loading ?
                 <View style={{ flex: 1 }}>
@@ -75,7 +80,7 @@ export default class PostsComments extends Component {
                                 style={{ width: 27, height: 27 }} />
                             <Text style={styles.userTag, { marginLeft: 10 }}>
                                 129
-                        </Text>
+                            </Text>
                         </View>
                     </View>
                     <ActivityIndicator
@@ -83,6 +88,22 @@ export default class PostsComments extends Component {
                         style={AppStyle.activityIndicator}
                         size='large'
                     />
+                    <View style={styles.footerstyle}>
+                        <Image source={require('../../images/img.jpg')} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
+                        <TextInput
+                            style={{ height: 40, flex: 2, marginLeft: 15 }}
+                            placeholder="Post a Comment"
+                            onChangeText={(text) => this.setState({ userCommentedText })}
+                        />
+                        <View style={{
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            marginRight: 15,
+                            marginLeft: 10,
+                        }}>
+                            <Text>Post</Text>
+                        </View>
+                    </View>
                 </View>
                 :
                 <View style={{ flex: 1 }}>
@@ -105,14 +126,24 @@ export default class PostsComments extends Component {
                         keyExtractor={(item, index) => index + ""}
                     />
                     <View style={styles.footerstyle}>
-                        <Image source={require('../../images/img.jpg')} style={{ width: 35, height: 35, marginLeft: 15 , borderRadius: 17.5, flex:1}} />
+                        <Image source={require('../../images/img.jpg')} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
                         <TextInput
-                            style={{ height: 40 , flex:3}}
+                            style={{ height: 40, flex: 2, marginLeft: 15 }}
                             placeholder="Post a Comment"
-                            onChangeText={(text) => this.state.userCommentedText}
-                            value={this.state.userCommentedText}
+                            onChangeText={(text) => this.setState({
+                                userCommentedText: text,
+                            })}
                         />
-                        <Text style={{ fontSize: 18, marginLeft: 10, flex:1}}>Post</Text>
+                        <View style={{
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            marginRight: 15,
+                            marginLeft: 10,
+                        }}>
+                            <TouchableOpacity onPress={this.PostComment}>
+                                <Text>Post</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
         )

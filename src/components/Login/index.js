@@ -26,6 +26,7 @@ export default class Login extends Component {
                     userpassword: userPwd,
                 }).then((res) => {
                     if (res.status === 200) {
+                        console.debug('Login Response',res.data)
                         this.props.navigation.navigate('TabBar', { userData: res.data });
                     } else {
                         this.refs.toast.show("username or password are incorrect");

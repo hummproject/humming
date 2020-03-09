@@ -10,26 +10,20 @@ export default class Home extends Component {
         super(props)
         this.state = {
             loading: false,
-            postsListArray: [{userName:'Veerender shivannagari', userTag:'Veeru',category:'Food'}, 
-            {userName:'RAkesh nagula', userTag:'Nagula',category:'Love'},
-            {userName:'P saiteja', userTag:'sai',category:'Movie'},
-            {userName:'veeru', userTag:'Veeru12',category:'Food'},
-            {userName:'PavaN', userTag:'Bakku',category:'Love'},
-            {userName:'VeerendER45', userTag:'Veeru',category:'Movie'},
-            {userName:'VeerendeR12', userTag:'Veeru',category:'Love'}], //this is the array
+            postsListArray: [], //this is the array
             page: 1,
             error: null,
             refreshing: false,
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.makeRequesttoFetchPosts();
     }
     
     makeRequesttoFetchPosts = () => {
         const { page } = this.state;
-        const { navigation, route } = this.props;
+        const { route } = this.props;
         const userData = route.params.params.userData;
         const token = userData.token;
         console.debug('Props in HomeScreen',userData)
@@ -41,19 +35,19 @@ export default class Home extends Component {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
                 'token':token
             },
             body: JSON.stringify({
                 location:'78.4373585,17.4337072',
-                pageno:0
+                pageno:'0'
             })
         })
             .then(response => response.json())
             .then(responseData => {
-                console.debug('Home Posts response:',responseData.data,responseData.error,responseData.results)
+                console.debug('Home Posts response:',responseData.data)
                 this.setState({
-                    postsListArray: responseData.results,
+                    postsListArray: responseData.data,
                     error: responseData.error || null,
                     loading: false,
                     refreshing: false
