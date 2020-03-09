@@ -30,7 +30,7 @@ export default class HomePagePost extends Component {
         var category = postDetails.category;
         var postDesc = postDetails.description;
         var userdpUri = postDetails.userdp !== null ? postDetails.userdp : 'https://medium-test1.s3.amazonaws.com/1577551283046'
-        var postimageUri = postDetails.media;
+        var postimageUri = postDetails.media
         var markerlikeArray = postDetails.markerlike !== null ? postDetails.markerlike : []
         var markercommentArray = postDetails.markercomments !== null ? postDetails.markercomments : []
         return (
