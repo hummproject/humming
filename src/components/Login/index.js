@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, AsyncStorage } from 'react-native';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
@@ -51,7 +51,6 @@ export default class Login extends Component {
         return (
             <View style={AppStyle.appContainer}>
                 <Logo></Logo>
-                {/* <Home/> */}
                 <TextInput style={AppStyle.appInput} placeholder="Username12"
                     onChangeText={userName => this.setState({ userName })}></TextInput>
                 <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}

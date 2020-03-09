@@ -49,12 +49,6 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         marginRight: 15
     },
-    headerstyle:{
-        flexDirection:'row',
-        backgroundColor:'white',
-        height:50,
-        paddingTop:10
-    }
 });
 
 export { styles }
