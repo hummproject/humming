@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, AsyncStorage } from 'react-native';
+import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
 import axios from 'react-native-axios';
 import Home from '../Home';
+import Toast from 'react-native-easy-toast'
 
 export default class Login extends Component {
     constructor(props) {
@@ -14,28 +16,34 @@ export default class Login extends Component {
             isLoggedIn: ""
         };
     }
-    login = () => {
+    login = async () => {
         const userName = this.state.userName;
         const userPwd = this.state.userPwd;
-
-        fetch('https://humming-psql.herokuapp.com/login', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userName: userName,
-                userpassword: userPwd
-            }),
-        }).then((response) => response.json())
-            .then((responseJson) => {
-                this.props.navigation.navigate('TabBar', { userData: responseJson.data });
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        if (userName != "") {
+            if (userPwd != "") {
+                LoginUser({
+                    userName: userName,
+                    userpassword: userPwd,
+                }).then((res) => {
+                    if (res.status === 200) {
+                        this.props.navigation.navigate('TabBar', { userData: res.data });
+                    } else {
+                        this.refs.toast.show("username or password are incorrect");
+                    }
+                }).catch((err) => {
+                    console.log('some info message to user using Toast Android');
+                    this.refs.toast.show("Something went wrong. Please try again later");
+                });
+            }
+            else {
+                this.refs.toast.show("password cannot be Empty");
+            }
+        }
+        else {
+            this.refs.toast.show("Username cannot be Empty");
+        }
     }
+
     goToRegister = () => {
         this.props.navigation.navigate('register');
     }
@@ -43,7 +51,6 @@ export default class Login extends Component {
         return (
             <View style={AppStyle.appContainer}>
                 <Logo></Logo>
-                {/* <Home/> */}
                 <TextInput style={AppStyle.appInput} placeholder="Username12"
                     onChangeText={userName => this.setState({ userName })}></TextInput>
                 <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
@@ -60,6 +67,8 @@ export default class Login extends Component {
                         <Text>&nbsp;&nbsp;SignUp</Text>
                     </TouchableOpacity>
                 </View>
+                <Toast ref="toast"
+                    style={{ backgroundColor: 'grey', borderRadius: 20 }} />
             </View>
         )
     };
