@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse',
         paddingTop: 15,
         paddingBottom: 15,
+        alignItems:'center'
     },
 
     BottomContainer: {
