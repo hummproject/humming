@@ -5,8 +5,8 @@ const UploadPost = (data) => {
 
     return fetch(URL, {
         method: 'POST',
-        headers: AppConfig.HEADERS,
-        body: JSON.stringify(data),
+        headers: AppConfig.HEADERS_UPDATE,
+        body: data,
     }).then((res) => res.json());
 }
 
