@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { UpdateUserDp } from './Profile.service';
 import { ProfileStyles } from './Profile.style';
@@ -17,25 +18,43 @@ const options = {
 export default class Profile extends React.Component {
     constructor(props) {
         super(props);
-        const { navigation, route } = this.props;
-        const userData = route.params.params.userData;
-
         this.state = {
-            firstname: userData.firstname,
-            lastname: userData.lastname,
-            userid: userData.userid,
-            useremail: userData.useremail,
-            username: userData.username,
-            usermobile: userData.usermobile,
-            userprofession: userData.userprofession,
-            userbio: userData.userbio,
-            userdp: userData.userdp,
-            following: userData.following || 0,
-            followers: userData.followers || 0,
-            isactive: userData.isactive,
-            useraddress: userData.useraddress,
-            token: userData.token,
+            firstname: '',
+            lastname: '',
+            userid: '',
+            useremail: '',
+            username: '',
+            usermobile: '',
+            userprofession: '',
+            userbio: '',
+            userdp: '',
+            following: 0,
+            followers: 0,
+            isactive: '',
+            useraddress: '',
+            token: ''
         };
+
+        AsyncStorage.getItem("userData").then(value => {
+            const userData = JSON.parse(value);
+
+            this.setState({
+                firstname: userData.firstname,
+                lastname: userData.lastname,
+                userid: userData.userid,
+                useremail: userData.useremail,
+                username: userData.username,
+                usermobile: userData.usermobile,
+                userprofession: userData.userprofession,
+                userbio: userData.userbio,
+                userdp: userData.userdp,
+                following: userData.following || 0,
+                followers: userData.followers || 0,
+                isactive: userData.isactive,
+                useraddress: userData.useraddress,
+                token: userData.token
+            });
+        });
     }
     render() {
         return (

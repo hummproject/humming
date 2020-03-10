@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Keyboard } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { RegisterUser } from './Register.service';
 import Logo from '../Logo';
@@ -78,6 +79,15 @@ export default class Register extends Component {
             return;
         }
 
+        Geolocation.getCurrentPosition((position) => {
+            this.callRegisterApi(position);
+        }, (error) => {
+            console.log(error.code, error.message);
+            this.callRegisterApi();
+        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
+    }
+    callRegisterApi(position) {
+        var locationData = position;
         var registrationData = {
             firstName: this.state.firstname,
             lastName: this.state.lastname,
@@ -85,37 +95,35 @@ export default class Register extends Component {
             pwd: this.state.password,
             userName: this.state.username
         };
+        var latlang = "0.000,0.000";
 
-        Geolocation.getCurrentPosition((position) => {
-            var locationData = position;
-            var latlang;
+        if (locationData && locationData.coords) {
+            var coords = locationData.coords;
+            latlang = coords.latitude + "," + coords.longitude;
+        }
 
-            if (locationData && locationData.coords) {
-                var coords = locationData.coords;
-                latlang = coords.latitude + "," + coords.longitude;
+        registrationData.latlang = latlang;
+
+        RegisterUser(registrationData).then((res) => {
+            if (res.status === 200) {
+                const userData = res && res.data;
+
+                AsyncStorage.setItem("userData", JSON.stringify(userData));
+                this.props.navigation.navigate('TabBar', { userData: res.data });
+            } if (res.message === "User already existed, please login.") {
+                this.refs.toast.show("Username already existed. Please choose another.");
             } else {
-                latlang = "0.000,0.000";
-            }
-
-            registrationData.latlang = latlang;
-
-            RegisterUser(registrationData).then((res) => {
-                if (res.status === 200) {
-                    this.props.navigation.navigate('TabBar', { userData: res.data });
-                } if (res.message === "User already existed, please login.") {
-                    this.refs.toast.show("Username already existed. Please choose another.");
-                } else {
-                    this.refs.toast.show("Something went wrong. Please try again later");
-                }
-                setTimeout(() => {
-                    this.setState({ showLoader: false });
-                }, 1000);
-            }).catch((err) => {
                 this.refs.toast.show("Something went wrong. Please try again later");
-            });
-        }, (error) => {
-            console.log(error.code, error.message);
-        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
+            }
+            setTimeout(() => {
+                this.setState({ showLoader: false });
+            }, 1000);
+        }).catch((err) => {
+            this.refs.toast.show("Something went wrong. Please try again later");
+            setTimeout(() => {
+                this.setState({ showLoader: false });
+            }, 1000);
+        });
     }
     render() {
         return (
