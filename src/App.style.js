@@ -53,10 +53,13 @@ const AppStyle = StyleSheet.create({
     },
     activityIndicator: {
         flex: 1,
-        flexDirection:'row',
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-      }
+        position: "absolute",
+        top: '20%',
+        left: '30%'
+    }
 });
 
 export { AppStyle };
