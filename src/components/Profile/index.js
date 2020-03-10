@@ -118,26 +118,28 @@ export default class Profile extends React.Component {
                     userdp: source
                 });
 
-                // const data = new FormData();
-                // data.append('userdp', {
-                //     uri: response.uri,
-                //     type: response.type,
-                //     name: response.fileName
-                // });
-                // debugger;
-                // fetch(AppConfig.DOMAIN + '/api/v1/awsupdate', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Accept': 'application/json',
-                //         'Content-Type': 'multipart/form-data',
-                //     },
-                //     body: data
-                // }).then((res) => res.json())
-                //     .then(resJson => {
-                //         console.log(resJson);
-                //     }).catch((err) => {
-                //         console.log(err)
-                //     });
+                const data = new FormData();
+                data.append('userdp', {
+                    uri: response.uri,
+                    type: response.type,
+                    name: response.fileName
+                });
+                data.append('firstname', 'karsudha');
+
+                fetch(AppConfig.DOMAIN + '/api/v1/awsupdate', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'multipart/form-data',
+                        'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNjgiLCJpYXQiOjE1ODM4MjY5MDMsImV4cCI6MTU4NDQzMTcwM30.pOS3aMhTAqcveMmMVb4i1FdiwN4lnltcmmZSTlFJWOQ'
+                    },
+                    body: data
+                }).then((res) => res.json())
+                    .then(resJson => {
+                        console.log(resJson);
+                    }).catch((err) => {
+                        console.log(err)
+                    });
             }
         });
     }

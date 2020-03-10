@@ -8,6 +8,10 @@ const AppConfig = {
     HEADERS: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+    },
+    HEADERS_UPDATE: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
     }
 };
 

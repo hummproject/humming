@@ -5,7 +5,7 @@ const UpdateUserDp = (data) => {
 
     return fetch(URL, {
         method: 'POST',
-        headers: AppConfig.HEADERS,
+        headers: AppConfig.HEADERS_UPDATE,
         body: JSON.stringify(data),
     }).then((res) => res.json());
 }
