@@ -12,6 +12,8 @@ const AppConfig = {
     HEADERS_UPDATE: {
         'Accept': 'application/json',
         'Content-Type': 'multipart/form-data',
+        'token' : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyNjgiLCJpYXQiOjE1ODM4MzczMTksImV4cCI6MTU4NDQ0MjExOX0.HzFp43qpD61IAS05CY__zmvROj0B7uVydfblaxm_ODE',
+        
     }
 };
 
