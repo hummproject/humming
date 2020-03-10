@@ -167,7 +167,7 @@ export default class Register extends Component {
                 }
                 {
                     this.state.showStepThree ?
-                        <View>
+                        <View style = {{flex:1}}>
                             <Text>Create Unique Username</Text>
                             <TextInput style={AppStyle.appInput} placeholder="Username"
                                 onChangeText={(username) => this.setState({ username })}></TextInput>

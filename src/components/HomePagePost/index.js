@@ -86,7 +86,7 @@ export default class HomePagePost extends Component {
                                 )
                             } else {
                                 return (
-                                    <View></View>
+                                     null//<View></View>
                                 )
                             }
                         }}

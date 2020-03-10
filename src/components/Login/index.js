@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
@@ -14,7 +14,8 @@ export default class Login extends Component {
         this.state = {
             userName: "",
             userPwd: "",
-            isLoggedIn: ""
+            isLoggedIn: "",
+            loading: false,
         };
     }
     login = () => {
@@ -22,10 +23,12 @@ export default class Login extends Component {
         const userPwd = this.state.userPwd;
         if (userName != "") {
             if (userPwd != "") {
+                this.setState({ loading: true })
                 LoginUser({
                     userName: userName,
                     userpassword: userPwd,
                 }).then((res) => {
+                    this.setState({ loading: false })
                     if (res.status === 200) {
                         const userData = res && res.data;
                         AsyncStorage.setItem("userData", JSON.stringify(userData));
@@ -34,6 +37,7 @@ export default class Login extends Component {
                         this.refs.toast.show("username or password are incorrect");
                     }
                 }).catch((err) => {
+                    this.setState({ loading: false })
                     console.log('some info message to user using Toast Android');
                     this.refs.toast.show("Something went wrong. Please try again later");
                 });
@@ -51,29 +55,38 @@ export default class Login extends Component {
         this.props.navigation.navigate('register');
     }
     render() {
+        const loading = this.state.loading;
         return (
-            <View style={AppStyle.appContainer}>
-                <Logo></Logo>
-                {/* <Home/> */}
-                <TextInput style={AppStyle.appInput} placeholder="Username"
-                    onChangeText={userName => this.setState({ userName })}></TextInput>
-                <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
-                    onChangeText={userPwd => this.setState({ userPwd })}></TextInput>
-                <TouchableOpacity onPress={this.login}>
-                    <Text style={AppStyle.appButton}>Sign in</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Text style={AppStyle.appMarginTop}>Forgot Password?</Text>
-                </TouchableOpacity>
-                <View style={AppStyle.appFooter}>
-                    <Text>Don't have an account?</Text>
-                    <TouchableOpacity onPress={this.goToRegister}>
-                        <Text>&nbsp;&nbsp;SignUp</Text>
+                <View style={AppStyle.appContainer}>
+                    <Logo></Logo>
+                    {/* <Home/> */}
+                    <TextInput style={AppStyle.appInput} placeholder="Username"
+                        onChangeText={userName => this.setState({ userName })}></TextInput>
+                    <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
+                        onChangeText={userPwd => this.setState({ userPwd })}></TextInput>
+                    <TouchableOpacity onPress={this.login}>
+                        <Text style={AppStyle.appButton}>Sign in</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity>
+                        <Text style={AppStyle.appMarginTop}>Forgot Password?</Text>
+                    </TouchableOpacity>
+                    <View style={AppStyle.appFooter}>
+                        <Text>Don't have an account?</Text>
+                        <TouchableOpacity onPress={this.goToRegister}>
+                            <Text>&nbsp;&nbsp;SignUp</Text>
+                        </TouchableOpacity>
+                    </View>
+                    {
+                        this.state.loading ?
+                            <ActivityIndicator
+                                animating={true}
+                                style={AppStyle.activityIndicator}
+                                size='large'
+                            /> : null
+                    }
+                    <Toast ref="toast"
+                        style={{ backgroundColor: 'grey', borderRadius: 20 }} />
                 </View>
-                <Toast ref="toast"
-                    style={{ backgroundColor: 'grey', borderRadius: 20 }} />
-            </View>
         )
     };
 }
