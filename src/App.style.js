@@ -19,7 +19,7 @@ const AppStyle = StyleSheet.create({
         color: "#4682B4"
     },
     appInput: {
-        width: '80%',
+        width: 300,
         height: 40,
         backgroundColor: '#e2e2e25e',
         borderRadius: 25,
@@ -27,6 +27,7 @@ const AppStyle = StyleSheet.create({
         marginVertical: 10
     },
     appButton: {
+        width: 300,
         borderRadius: 5,
         backgroundColor: '#6454F0',
         color: 'white',
@@ -52,10 +53,13 @@ const AppStyle = StyleSheet.create({
     },
     activityIndicator: {
         flex: 1,
-        flexDirection:'row',
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-      }
+        position: "absolute",
+        top: '20%',
+        left: '30%'
+    }
 });
 
 export { AppStyle };

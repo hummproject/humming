@@ -1,15 +1,15 @@
 import AppConfig from '../../config/constants';
 
-const UpdateUserDp = (data) => {
-    const URL = AppConfig.DOMAIN + '/api/v1/awsupdate';
+const RegisterUser = (data) => {
+    const URL = AppConfig.DOMAIN + AppConfig.REGISTER;
 
     return fetch(URL, {
         method: 'POST',
-        headers: AppConfig.HEADERS_UPDATE,
+        headers: AppConfig.HEADERS,
         body: JSON.stringify(data),
     }).then((res) => res.json());
 }
 
 export {
-    UpdateUserDp
+    RegisterUser
 }

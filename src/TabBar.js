@@ -68,7 +68,7 @@ export default class TabBar extends React.Component {
                 <Tab.Screen name="search" component={Search} />
                 <Tab.Screen name="Upload" component={Upload} />
                 <Tab.Screen name="Banter" component={Banter} />
-                <Tab.Screen name="Profile" initialParams={route} component={Profile} />
+                <Tab.Screen name="Profile" component={Profile} />
             </Tab.Navigator>
         );
     };
