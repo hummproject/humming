@@ -5,7 +5,7 @@ import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
 import axios from 'react-native-axios';
 import Home from '../Home';
-import Toast from 'react-native-easy-toast'
+import Toast from 'react-native-easy-toast';
 
 export default class Login extends Component {
     constructor(props) {
@@ -16,7 +16,7 @@ export default class Login extends Component {
             isLoggedIn: ""
         };
     }
-    login = async () => {
+    login = () => {
         const userName = this.state.userName;
         const userPwd = this.state.userPwd;
         if (userName != "") {
@@ -52,7 +52,8 @@ export default class Login extends Component {
         return (
             <View style={AppStyle.appContainer}>
                 <Logo></Logo>
-                <TextInput style={AppStyle.appInput} placeholder="Username12"
+                {/* <Home/> */}
+                <TextInput style={AppStyle.appInput} placeholder="Username"
                     onChangeText={userName => this.setState({ userName })}></TextInput>
                 <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
                     onChangeText={userPwd => this.setState({ userPwd })}></TextInput>
@@ -60,10 +61,10 @@ export default class Login extends Component {
                     <Text style={AppStyle.appButton}>Sign in</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>
-                    <Text style={AppStyle.appMarginTop}>Forgotten Password?</Text>
+                    <Text style={AppStyle.appMarginTop}>Forgot Password?</Text>
                 </TouchableOpacity>
                 <View style={AppStyle.appFooter}>
-                    <Text>Don't you have an account?</Text>
+                    <Text>Don't have an account?</Text>
                     <TouchableOpacity onPress={this.goToRegister}>
                         <Text>&nbsp;&nbsp;SignUp</Text>
                     </TouchableOpacity>
