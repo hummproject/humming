@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, AsyncStorage } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
@@ -26,7 +27,8 @@ export default class Login extends Component {
                     userpassword: userPwd,
                 }).then((res) => {
                     if (res.status === 200) {
-                        console.debug('Login Response',res.data)
+                        const userData = res && res.data;
+                        AsyncStorage.setItem("userData", JSON.stringify(userData));
                         this.props.navigation.navigate('TabBar', { userData: res.data });
                     } else {
                         this.refs.toast.show("username or password are incorrect");
