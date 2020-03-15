@@ -16,7 +16,16 @@ const ProfileStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 70
-    }
+    },
+    headerstyle: {
+        flexDirection: 'row',
+        backgroundColor: 'white',
+        height: 60,
+        elevation: 2,
+        borderBottomColor: '#ECECEC',
+        borderBottomWidth: 1,
+        alignItems: 'center',
+    },
 });
 
 export { ProfileStyles }

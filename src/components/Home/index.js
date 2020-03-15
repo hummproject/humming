@@ -23,15 +23,20 @@ export default class Home extends Component {
     async componentDidMount() {
         await AsyncStorage.getItem("userData").then(value => {
             const userData = JSON.parse(value);
-            this.setState({ 
-                userData: userData 
+            this.setState({
+                userData: userData
             });
         });
         this.makeRequesttoFetchPosts();
     }
 
+    // async componentDidAppear() {
+    //     console.debug("component Did Appear")
+    //     this.makeRequesttoFetchPosts();
+    // }
+
     makeRequesttoFetchPosts = () => {
-        const { page,userData } = this.state;
+        const { page, userData } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.GET_MARKERS
         console.debug(url);
         this.setState({ loading: true });
@@ -96,7 +101,7 @@ export default class Home extends Component {
                         <FlatList
                             data={postsListArray}
                             renderItem={
-                                ({ item }) => <HomePagePost userData={item} navigation={this.props.navigation}/>
+                                ({ item }) => <HomePagePost userData={item} navigation={this.props.navigation} />
                             }
                             keyExtractor={(item, index) => index + ""}
                         />

@@ -8,8 +8,8 @@ import ImagePicker from 'react-native-image-picker';
 import AppConfig from '../../config/constants';
 
 const options = {
-    title: 'Select Avatar',
-    customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+    title: 'Select Option',
+    customButtons: [],
     storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -28,10 +28,10 @@ export default class Upload extends Component {
             gallery: ""
         };
     }
-    
+
     uploadImage = () => {
         ImagePicker.showImagePicker(options, (response) => {
-           // console.log('Response = ', response);
+            // console.log('Response = ', response);
 
             if (response.didCancel) {
                 console.log('User cancelled image picker');
@@ -42,16 +42,16 @@ export default class Upload extends Component {
             } else {
                 const source = response.uri;
                 console.log("string checking" + JSON.stringify(response));
-                    data.append('markermedia',{
-                        uri: response.uri,
-                        type: response.type,
-                        name: response.fileName
-                    });
-                    data.append('markermedia',{
-                        uri: response.uri,
-                        type: response.type,
-                        name: response.fileName
-                    });
+                data.append('markermedia', {
+                    uri: response.uri,
+                    type: response.type,
+                    name: response.fileName
+                });
+                data.append('markermedia', {
+                    uri: response.uri,
+                    type: response.type,
+                    name: response.fileName
+                });
 
                 console.log(data);
                 this.setState({
@@ -98,14 +98,16 @@ export default class Upload extends Component {
                 behavior="position">
                 <ScrollView>
                     <View style={styles.up1}>
-                        <Text style={styles.up2}> Say Something</Text>
+                        <View style={styles.headerstyle}>
+                            <Text style={{ fontSize: 18, marginLeft: 15 }}>Say Something</Text>
+                        </View>
                         <View style={styles.up3}>
-                            <TouchableOpacity style={styles.up4} onPress={() => this.uploadImage()}> 
-                                <Text style={styles.up4}>Hiiiiiiiiiiiiii</Text>
+                            <TouchableOpacity onPress={() => this.uploadImage()}>
+                                <Text>UPLOAD IMAGE</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.up4} onPress={() => this.uploadImage()}>
-                                <Text style={styles.up4_1}>Hii</Text>
-                            </TouchableOpacity>
+                            {/* <TouchableOpacity style={styles.up4} onPress={() => this.uploadImage()}>
+                                <Text style={styles.up4_1}>Hi</Text>
+                            </TouchableOpacity> */}
                         </View>
                         <View style={styles.up5}></View>
                         <View style={{ flex: 3 }} >
@@ -117,9 +119,16 @@ export default class Upload extends Component {
                                     onValueChange={(itemValue, itemPosition) =>
                                         this.setState({ category: itemValue, choosenIndex: itemPosition })}
                                 >
-                                    <Picker.Item label="Java" value="Java" />
-                                    <Picker.Item label="JavaScript" value="JavaScript" />
-                                    <Picker.Item label="React Native" value="React Native" />
+                                    <Picker.Item label="Movies" value="Movies" />
+                                    <Picker.Item label="Music" value="Music" />
+                                    <Picker.Item label="Sports" value="Sports" />
+                                    <Picker.Item label="Travel" value="Travel" />
+                                    <Picker.Item label="Politics" value="Politics" />
+                                    <Picker.Item label="Art" value="Art" />
+                                    <Picker.Item label="Entertainment" value="Entertainment" />
+                                    <Picker.Item label="Technology" value="Technology" />
+                                    <Picker.Item label="Fashion" value="Fashion" />
+                                    <Picker.Item label="Food" value="Food" />
                                 </Picker>
                             </View>
                             <TouchableOpacity style={styles.up8} onPress={this.upload}><Text style={AppStyle.appButton}>HUMM IT </Text></TouchableOpacity>

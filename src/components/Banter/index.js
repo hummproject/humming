@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 
 export default class Banter extends Component {
     render() {
         return (
-            <Text>Banter screen</Text>
+            <View style={{flex:1, alignItems: 'center', justifyContent:'center'}}>
+                <Text>Banter comming soon</Text>
+            </View>
         )
     };
 }

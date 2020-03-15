@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView ,Keyboard} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
@@ -17,7 +17,12 @@ export default class Login extends Component {
         };
     }
     
+    dismissKeyboard() {
+        Keyboard.dismiss();
+    }
+    
     login = () => {
+        this.dismissKeyboard();
         const userName = this.state.userName;
         const userPwd = this.state.userPwd;
         if (userName != "") {

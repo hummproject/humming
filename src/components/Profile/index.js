@@ -58,12 +58,20 @@ export default class Profile extends React.Component {
     }
     render() {
         return (
-            <SafeAreaView style={{ flex: 1, marginVertical: 20 }}>
-                <ScrollView style={{ marginHorizontal: 10 }}>
-                    <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
-                        <Text>@{this.state.username}</Text>
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={ProfileStyles.headerstyle}>
+                <Text style={{ marginLeft: 15 }}>@{this.state.username}</Text>
+                    <View style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        marginRight: 15,
+                    }}>
                         <Text>Menu</Text>
                     </View>
+                </View>
+                <ScrollView style={{ marginHorizontal: 10 }}>
                     {/* {this.renderLogo()} */}
                     <View style={{ flex: 1, alignItems: "center", margin: 15, position: "relative" }}>
                         <TouchableOpacity onPress={() => this.uploadImage()} >
