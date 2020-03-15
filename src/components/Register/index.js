@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Keyboard } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { RegisterUser } from './Register.service';
@@ -127,7 +127,7 @@ export default class Register extends Component {
     }
     render() {
         return (
-            <View style={AppStyle.appContainer}>
+            <SafeAreaView style={AppStyle.appContainer}>
                 <Logo></Logo>
                 {
                     this.state.showStepOne ?
@@ -193,7 +193,7 @@ export default class Register extends Component {
                 </View>
                 <Toast ref="toast"
                     style={{ backgroundColor: 'grey', borderRadius: 20 }} />
-            </View>
+            </SafeAreaView>
         )
     }
 }

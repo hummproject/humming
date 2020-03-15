@@ -10,7 +10,7 @@ export default class Logo extends Component {
             <View style={{
                 flex: 1,
                 alignItems: 'center',
-                marginVertical: 25
+                marginVertical: 40
             }}>
                 <Image style={{
                     width: 80,

@@ -4,6 +4,7 @@ import HomePagePost from '../HomePagePost';
 import { AppStyle } from '../../App.style'
 import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default class Home extends Component {
     constructor(props) {
@@ -69,33 +70,37 @@ export default class Home extends Component {
         const { postsListArray, loading } = this.state;
         return (
             loading ?
-                <View style={{ flex: 1 }}>
-                    <View style={styles.headerstyle}>
-                        <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
-                        <Text style={{ fontSize: 18, marginLeft: 10, }}>HUMMING</Text>
+                <SafeAreaView style={{ flex: 1 }}>
+                    <View style={{ flex: 1 }}>
+                        <View style={styles.headerstyle}>
+                            <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
+                            <Text style={{ fontSize: 18, marginLeft: 10, }}>HUMMING</Text>
+                        </View>
+                        <ActivityIndicator
+                            animating={true}
+                            style={AppStyle.activityIndicator}
+                            size='large'
+                        />
+                        <Toast ref="toast" />
                     </View>
-                    <ActivityIndicator
-                        animating={true}
-                        style={AppStyle.activityIndicator}
-                        size='large'
-                    />
-                    <Toast ref="toast" />
-                </View>
+                </SafeAreaView>
                 :
-                <View style={{ flex: 1 }}>
-                    <View style={styles.headerstyle}>
-                        <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
-                        <Text style={{ fontSize: 18, marginLeft: 10, }}>HUMMING</Text>
+                <SafeAreaView style={{ flex: 1 }}>
+                    <View style={{ flex: 1 }}>
+                        <View style={styles.headerstyle}>
+                            <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
+                            <Text style={{ fontSize: 18, marginLeft: 10, }}>HUMMING</Text>
+                        </View>
+                        <FlatList
+                            data={postsListArray}
+                            renderItem={
+                                ({ item }) => <HomePagePost userData={item} />
+                            }
+                            keyExtractor={(item, index) => index + ""}
+                        />
+                        <Toast ref="toast" />
                     </View>
-                    <FlatList
-                        data={postsListArray}
-                        renderItem={
-                            ({ item }) => <HomePagePost userData={item} />
-                        }
-                        keyExtractor={(item, index) => index + ""}
-                    />
-                    <Toast ref="toast" />
-                </View>
+                </SafeAreaView>
         )
     };
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
@@ -57,7 +57,7 @@ export default class Login extends Component {
     render() {
         const loading = this.state.loading;
         return (
-                <View style={AppStyle.appContainer}>
+            <SafeAreaView style={AppStyle.appContainer}> 
                     <Logo></Logo>
                     {/* <Home/> */}
                     <TextInput style={AppStyle.appInput} placeholder="Username"
@@ -86,7 +86,7 @@ export default class Login extends Component {
                     }
                     <Toast ref="toast"
                         style={{ backgroundColor: 'grey', borderRadius: 20 }} />
-                </View>
+            </SafeAreaView>
         )
     };
 }
