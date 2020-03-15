@@ -5,6 +5,8 @@ const AppConfig = {
     GET_MARKERS:"/api/v1/getmarker",
     UPDATE_USER_DP: "/api/v1/awsupdate",
     SAVE_MARKER: "/api/v1/savemarker",
+    GET_MARKER_COMMENTS: "/api/v1/commentsbymarker",
+    ADD_COMMENTS_TO_MARKER: "/api/v1/addcomments",
     HEADERS: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

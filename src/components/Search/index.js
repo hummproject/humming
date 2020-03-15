@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { Searchbar} from 'react-native-elements'
 import { styles } from './search.styles';
 

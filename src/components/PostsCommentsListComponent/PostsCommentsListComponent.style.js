@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         marginLeft: 15,
+        marginTop: 5,
         justifyContent: 'flex-start',
     },
 
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
     text_light: {
         fontSize: 12,
         fontStyle: 'normal',
-        color: '#808080',
+        color: '#9E9E9E',
     },
 
     profile_photo: {

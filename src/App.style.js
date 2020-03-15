@@ -22,7 +22,7 @@ const AppStyle = StyleSheet.create({
         width: 300,
         height: 40,
         backgroundColor: '#e2e2e25e',
-        borderRadius: 25,
+        borderRadius: 20,
         textAlign: "center",
         marginVertical: 10
     },
@@ -57,7 +57,16 @@ const AppStyle = StyleSheet.create({
         position: 'absolute', 
         top: 0, left: 0, 
         right: 0, bottom: 0,
-    }
+    },
+
+    light_TextColor:{
+        color:"#9E9E9E"
+    },
+
+    dark_TextColor:{
+        color:"#000000"
+    },
+
 });
 
 export { AppStyle };

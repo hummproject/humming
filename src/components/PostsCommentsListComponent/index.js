@@ -12,7 +12,6 @@ export default class PostsCommentsListComponent extends Component {
 
     ReplytoComment = () => {
         console.debug('Post comment : ReplytoComment', this.state.commentData);
-        // this.props.navigation.navigate('');
     };
 
     LikeOrUnlikeComment = () => {
@@ -22,12 +21,17 @@ export default class PostsCommentsListComponent extends Component {
     render() {
         const commentDetails = this.state.commentData;
         console.debug(commentDetails);
-        var userName = commentDetails.userName;
-        // var category = postDetails.category;
+        var userName = commentDetails.firstname + ' ' + commentDetails.lastname
+        var commntedUserdp = commentDetails.userdp !== null ? commentDetails.userdp : '';
+        let comment = commentDetails.comment;
+
+//         var date = new Date("2015-08-25T15:35:58.000Z");
+// var seconds = date.getTime() / 1000; 
+
         return (
             <View style={styles.container}>
                 <View style={styles.TopContainer}>
-                    <Image source={require('../../images/img.jpg')} style={styles.profile_photo} />
+                    <Image source={{uri:commntedUserdp}} style={styles.profile_photo} />
                     <View style={styles.container_text}>
                         <View style={{
                             flexDirection: 'row',
@@ -35,12 +39,12 @@ export default class PostsCommentsListComponent extends Component {
                             justifyContent: 'space-between',
                         }}>
                             <Text style={styles.UserName, { textTransform: 'capitalize' }}>{userName}</Text>
-                            <Text style={styles.text_light, { marginRight: 15 }}>6 Days ago</Text>
+                            <Text style={styles.text_light, { marginRight: 15 ,color: "#9E9E9E"}}>6 Days ago</Text>
                         </View>
                         <Text style={styles.text_description, { marginTop: 10, marginBottom: 10, marginRight: 15 }}>
-                            Loreum epsum is text Loreum epsum is text Loreum epsum is text Loreum epsum is text Loreum epsum is text
+                            {comment}
                         </Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                        {/* <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                             <TouchableOpacity onPress={this.LikeOrUnlikeComment} style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
@@ -57,7 +61,7 @@ export default class PostsCommentsListComponent extends Component {
                                     Reply
                                 </Text>
                             </TouchableOpacity>
-                        </View>
+                        </View> */}
                     </View>
                 </View>
             </View>

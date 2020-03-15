@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, TextInput, TouchableOpacity } from 'react-native';
 import { AppStyle } from '../../App.style'
 import AppConfig from '../../config/constants';
+import AsyncStorage from '@react-native-community/async-storage';
 import PostsCommentsListComponent from '../PostsCommentsListComponent';
 
 export default class PostsComments extends Component {
@@ -9,77 +10,145 @@ export default class PostsComments extends Component {
         super(props)
         this.state = {
             loading: false,
-            commentsListArray: [{ userName: 'Veerender shivannagari', userTag: 'Veeru', category: 'Food' },
-            { userName: 'RAkesh nagula', userTag: 'Nagula', category: 'Love' },
-            { userName: 'P saiteja', userTag: 'sai', category: 'Movie' },
-            { userName: 'veeru', userTag: 'Veeru12', category: 'Food' },
-            { userName: 'PavaN', userTag: 'Bakku', category: 'Love' },
-            { userName: 'VeerendER45', userTag: 'Veeru', category: 'Movie' },
-            { userName: 'VeerendeR12', userTag: 'Veeru', category: 'Love' }], //this is the array
+            commentsListArray: [], //this is the array
             error: null,
             userCommentedText: '',
             refreshing: false,
+            userData: {},
+            postDetails: this.props.route.params.postDetails
         };
     }
 
-    componentWillMount() {
-        // this.fetchCommentsforPosts();
+    async componentDidMount() {
+        await AsyncStorage.getItem("userData").then(value => {
+            const userData = JSON.parse(value);
+            this.setState({
+                userData: userData,
+            });
+        });
+        this.fetchCommentsforPosts();
     }
 
     PostComment = () => {
         console.debug('Post comment', this.state.userCommentedText);
-       
+        this.PostCommentOfUser();
     };
 
-    fetchCommentsforPosts = () => {
-        const { route } = this.props;
-        const userData = route.params.params.userData;
+    returnBack = () => {
+        console.debug('Go back function', this.props.route.params.postDetails);
+        this.props.navigation.goBack();
+    };
+
+    PostCommentOfUser = () => {
+        console.debug('post Details : Fetch', this.state.postDetails);
+        const { userData } = this.state;
         const token = userData.token;
-        console.debug('Props in PostsComments', userData)
-        console.debug('Token:', token)
-        const url = AppConfig.DOMAIN + AppConfig.GET_MARKERS;
+        const url = AppConfig.DOMAIN + AppConfig.ADD_COMMENTS_TO_MARKER;
+        console.debug(url);
         this.setState({ loading: true });
         fetch(url, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
                 'token': token,
             },
             body: JSON.stringify({
-                location: '78.4373585,17.4337072',
-                pageno: 0,
+                markerid: this.state.postDetails.marker_id,
+                content: this.state.userCommentedText,
             }),
         })
             .then(response => response.json())
             .then(responseData => {
-                console.debug('Home Posts response:', responseData.data, responseData.error, responseData.results)
-                this.setState({
-                    postsListArray: responseData.results,
-                    error: responseData.error || null,
-                    loading: false,
-                    refreshing: false
-                });
+                console.debug('comments Page comment response:', responseData)
+                if (responseData.status === 200) {
+                    var data =  responseData.data
+                    data["firstname"] = userData.firstname;
+                    data["lastname"] = userData.lastname;
+                    data["userdp"] = userData.userdp;
+                    let commentListAry = this.state.commentsListArray;
+                    commentListAry.unshift(data);
+                    this.setState({
+                        commentsListArray: commentListAry,
+                        error: responseData.error || null,
+                        loading: false,
+                        refreshing: false
+                    });
+                } else {
+                    this.refs.toast.show(responseData.message);
+                }
             })
             .catch(error => {
-                console.debug('Home Posts response ERROR:', error);
+                console.debug('comments Page response ERROR:', error);
                 this.setState({ error, loading: false });
+                this.refs.toast.show("Something went wrong. Please try again later");
+            });
+    };
+
+    fetchCommentsforPosts = () => {
+        console.debug('post Details : Fetch', this.state.postDetails);
+        const token = this.state.userData.token;
+        const url = AppConfig.DOMAIN + AppConfig.GET_MARKER_COMMENTS;
+        console.debug(url);
+        this.setState({ loading: true });
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'token': token,
+            },
+            body: JSON.stringify({
+                markerid: this.state.postDetails.marker_id,
+            }),
+        })
+            .then(response => response.json())
+            .then(responseData => {
+                console.debug('comments Page response:', responseData)
+                if (responseData.status === 200) {
+                    if(Array.isArray(responseData.data)){
+                        this.setState({
+                            commentsListArray: responseData.data,
+                            error: responseData.error || null,
+                            loading: false,
+                            refreshing: false
+                        });
+                    }else{
+                        this.setState({
+                            commentsListArray: [],
+                            error: responseData.error || null,
+                            loading: false,
+                            refreshing: false
+                        });
+                    }
+                } else {
+                    this.refs.toast.show(responseData.message);
+                }
+                
+            })
+            .catch(error => {
+                console.debug('comments Page response ERROR:', error);
+                this.setState({ error, loading: false });
+                this.refs.toast.show("Something went wrong. Please try again later");
             });
     };
 
     render() {
-        const { commentsListArray, loading, userCommentedText } = this.state;
+        const { commentsListArray, loading, userCommentedText, postDetails,userData } = this.state;
+        console.debug("user details : post comments",userData)
+        let userdp = userData.userdp !== null ? userData.userdp : ''
+        let markercommentArray = postDetails.markercomments !== null ? postDetails.markercomments : []
         return (
             loading ?
                 <View style={{ flex: 1 }}>
                     <View style={styles.headerstyle}>
-                        <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
+                        <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
                         <Text style={{ fontSize: 18, marginLeft: 10, }}>Comments</Text>
                         <View style={styles.commentsCountcontainer}>
                             <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
                                 style={{ width: 27, height: 27 }} />
                             <Text style={styles.userTag, { marginLeft: 10 }}>
-                                129
+                                {markercommentArray.length}
                             </Text>
                         </View>
                     </View>
@@ -88,33 +157,19 @@ export default class PostsComments extends Component {
                         style={AppStyle.activityIndicator}
                         size='large'
                     />
-                    <View style={styles.footerstyle}>
-                        <Image source={require('../../images/img.jpg')} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
-                        <TextInput
-                            style={{ height: 40, flex: 2, marginLeft: 15 }}
-                            placeholder="Post a Comment"
-                            onChangeText={(text) => this.setState({ userCommentedText })}
-                        />
-                        <View style={{
-                            alignItems: 'center',
-                            justifyContent: 'flex-end',
-                            marginRight: 15,
-                            marginLeft: 10,
-                        }}>
-                            <Text>Post</Text>
-                        </View>
-                    </View>
                 </View>
                 :
                 <View style={{ flex: 1 }}>
                     <View style={styles.headerstyle}>
-                        <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
+                        <TouchableOpacity onPress={this.returnBack} >
+                            <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
+                        </TouchableOpacity>
                         <Text style={{ fontSize: 18, marginLeft: 10, }}>Comments</Text>
                         <View style={styles.commentsCountcontainer}>
                             <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
                                 style={{ width: 27, height: 27 }} />
                             <Text style={styles.userTag, { marginLeft: 10 }}>
-                                129
+                                {markercommentArray.length}
                             </Text>
                         </View>
                     </View>
@@ -126,7 +181,7 @@ export default class PostsComments extends Component {
                         keyExtractor={(item, index) => index + ""}
                     />
                     <View style={styles.footerstyle}>
-                        <Image source={require('../../images/img.jpg')} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
+                        <Image source={{uri:userdp}} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
                         <TextInput
                             style={{ height: 40, flex: 2, marginLeft: 15 }}
                             placeholder="Post a Comment"

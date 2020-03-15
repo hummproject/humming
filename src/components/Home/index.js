@@ -5,6 +5,7 @@ import { AppStyle } from '../../App.style'
 import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default class Home extends Component {
     constructor(props) {
@@ -15,20 +16,22 @@ export default class Home extends Component {
             page: 1,
             error: null,
             refreshing: false,
+            userData: {},
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        await AsyncStorage.getItem("userData").then(value => {
+            const userData = JSON.parse(value);
+            this.setState({ 
+                userData: userData 
+            });
+        });
         this.makeRequesttoFetchPosts();
     }
 
     makeRequesttoFetchPosts = () => {
-        const { page } = this.state;
-        const { route } = this.props;
-        const userData = route.params.params.userData;
-        const token = userData.token;
-        console.debug('Props in HomeScreen', userData)
-        console.debug('Token:', token)
+        const { page,userData } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.GET_MARKERS
         console.debug(url);
         this.setState({ loading: true });
@@ -37,7 +40,7 @@ export default class Home extends Component {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'token': token
+                'token': userData.token
             },
             body: JSON.stringify({
                 location: '78.4373585,17.4337072',
@@ -47,7 +50,6 @@ export default class Home extends Component {
             .then(response => response.json())
             .then(responseData => {
                 console.debug('Home Posts response:', responseData)
-                console.debug('Home Posts response:', responseData.message)
                 if (responseData.status === 200) {
                     this.setState({
                         postsListArray: responseData.data,
@@ -94,7 +96,7 @@ export default class Home extends Component {
                         <FlatList
                             data={postsListArray}
                             renderItem={
-                                ({ item }) => <HomePagePost userData={item} />
+                                ({ item }) => <HomePagePost userData={item} navigation={this.props.navigation}/>
                             }
                             keyExtractor={(item, index) => index + ""}
                         />

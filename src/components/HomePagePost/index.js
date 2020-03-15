@@ -13,8 +13,8 @@ export default class HomePagePost extends Component {
     }
 
     GotoPostCommentsPage = () => {
-        console.debug('Posts Comments Page', this.state.postDetails);
-        this.props.navigation.navigate('postscomments', { postDetails: this.state.postDetails });
+        const {navigation} = this.props
+        navigation.navigate('postscomments', { postDetails: this.state.postDetails });
     };
 
     LikeOrUnlikePost = () => {
@@ -66,7 +66,7 @@ export default class HomePagePost extends Component {
                             @{tagName}
                         </Text>
                         <View style={styles.categoryContainer}>
-                            <Image source={require('../../images/img.jpg')} style={{ height: 15, width: 15 }} />
+                            <Image source={require('../../images/category_marker_icon.png')} style={{ height: 15, width: 15 }} />
                             <Text style={{ marginLeft: 5, color: 'white' }}>{category}</Text>
                         </View>
                     </View>
@@ -102,8 +102,8 @@ export default class HomePagePost extends Component {
                         alignItems: 'center',
                         justifyContent: 'flex-start'
                     }}>
-                        <Image source={likeorUnlikeImgUri} resizeMode={'cover'}
-                            style={{ width: 32, height: 27, marginLeft: 15 }} resizeMode={'cover'} />
+                        <Image source={likeorUnlikeImgUri}
+                            style={{ width: 32, height: 27, marginLeft: 15 }} resizeMode={'contain'} />
                         <Text style={styles.userTag, { marginLeft: 10, marginRight: 25 }}>
                             {markerLikesCount}
                         </Text>
@@ -113,7 +113,7 @@ export default class HomePagePost extends Component {
                         alignItems: 'center',
                         justifyContent: 'flex-start'
                     }}>
-                        <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
+                        <Image source={require('../../images/comment-icon.png')} resizeMode={'contain'}
                             style={{ width: 27, height: 27 }} />
                         <Text style={styles.userTag, { marginLeft: 10 }}>
                             {markercommentArray.length}
