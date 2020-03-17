@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Picker } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Picker, SafeAreaView } from 'react-native';
 import { AppStyle } from '../../App.style';
 import { styles } from './upload.styles';
 import { UploadPost } from './upload.service';
@@ -47,11 +47,7 @@ export default class Upload extends Component {
                     type: response.type,
                     name: response.fileName
                 });
-                data.append('markermedia', {
-                    uri: response.uri,
-                    type: response.type,
-                    name: response.fileName
-                });
+                
 
                 console.log(data);
                 this.setState({
@@ -96,47 +92,49 @@ export default class Upload extends Component {
         return (
             <KeyboardAvoidingView
                 behavior="position">
-                <ScrollView>
-                    <View style={styles.up1}>
-                        <View style={styles.headerstyle}>
-                            <Text style={{ fontSize: 18, marginLeft: 15 }}>Say Something</Text>
-                        </View>
-                        <View style={styles.up3}>
-                            <TouchableOpacity onPress={() => this.uploadImage()}>
-                                <Text>UPLOAD IMAGE</Text>
-                            </TouchableOpacity>
-                            {/* <TouchableOpacity style={styles.up4} onPress={() => this.uploadImage()}>
+                <SafeAreaView>
+                    <View style={styles.headerstyle}>
+                        <Text style={{ fontSize: 18, marginLeft: 15 }}>Say Something</Text>
+                    </View>
+                    <ScrollView>
+                        <View style={styles.up1}>
+                            <View style={styles.up3}>
+                                <TouchableOpacity onPress={() => this.uploadImage()}>
+                                    <Text>UPLOAD IMAGE</Text>
+                                </TouchableOpacity>
+                                {/* <TouchableOpacity style={styles.up4} onPress={() => this.uploadImage()}>
                                 <Text style={styles.up4_1}>Hi</Text>
                             </TouchableOpacity> */}
-                        </View>
-                        <View style={styles.up5}></View>
-                        <View style={{ flex: 3 }} >
-                            <TextInput multiline={true} style={styles.up6} placeholder="Write Something"
-                                onChangeText={hummDescription => this.setState({ hummDescription })}></TextInput>
-                            <View style={styles.up7} >
-                                <Picker style={styles.pickerStyle} itemStyle={{ alignItems: 'center', }}
-                                    selectedValue={this.state.category}
-                                    onValueChange={(itemValue, itemPosition) =>
-                                        this.setState({ category: itemValue, choosenIndex: itemPosition })}
-                                >
-                                    <Picker.Item label="Movies" value="Movies" />
-                                    <Picker.Item label="Music" value="Music" />
-                                    <Picker.Item label="Sports" value="Sports" />
-                                    <Picker.Item label="Travel" value="Travel" />
-                                    <Picker.Item label="Politics" value="Politics" />
-                                    <Picker.Item label="Art" value="Art" />
-                                    <Picker.Item label="Entertainment" value="Entertainment" />
-                                    <Picker.Item label="Technology" value="Technology" />
-                                    <Picker.Item label="Fashion" value="Fashion" />
-                                    <Picker.Item label="Food" value="Food" />
-                                </Picker>
                             </View>
-                            <TouchableOpacity style={styles.up8} onPress={this.upload}><Text style={AppStyle.appButton}>HUMM IT </Text></TouchableOpacity>
+                            <View style={styles.up5}></View>
+                            <View style={{ flex: 3 }} >
+                                <TextInput multiline={true} style={styles.up6} placeholder="Write Something"
+                                    onChangeText={hummDescription => this.setState({ hummDescription })}></TextInput>
+                                <View style={styles.up7} >
+                                    <Picker style={styles.pickerStyle} itemStyle={{ alignItems: 'center', }}
+                                        selectedValue={this.state.category}
+                                        onValueChange={(itemValue, itemPosition) =>
+                                            this.setState({ category: itemValue, choosenIndex: itemPosition })}
+                                    >
+                                        <Picker.Item label="Movies" value="Movies" />
+                                        <Picker.Item label="Music" value="Music" />
+                                        <Picker.Item label="Sports" value="Sports" />
+                                        <Picker.Item label="Travel" value="Travel" />
+                                        <Picker.Item label="Politics" value="Politics" />
+                                        <Picker.Item label="Art" value="Art" />
+                                        <Picker.Item label="Entertainment" value="Entertainment" />
+                                        <Picker.Item label="Technology" value="Technology" />
+                                        <Picker.Item label="Fashion" value="Fashion" />
+                                        <Picker.Item label="Food" value="Food" />
+                                    </Picker>
+                                </View>
+                                <TouchableOpacity style={styles.up8} onPress={this.upload}><Text style={AppStyle.appButton}>HUMM IT </Text></TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-                    <Toast ref="toast"
-                        style={{ backgroundColor: 'grey', borderRadius: 20 }} />
-                </ScrollView>
+                        <Toast ref="toast"
+                            style={{ backgroundColor: 'grey', borderRadius: 20 }} />
+                    </ScrollView>
+                </SafeAreaView>
             </KeyboardAvoidingView>
         );
     }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, TextInput, SafeAreaView } from 'react-native';
 // import { Searchbar} from 'react-native-elements'
-// import { styles } from './search.styles';
+import { styles } from './search.styles';
 
 export default class Search extends Component {
     // state = {
@@ -20,9 +20,11 @@ export default class Search extends Component {
             //     />
 
             // </View>
-            <View style={{flex:1, alignItems: 'center',justifyContent:'center'}}>
-                <Text>Search Screen</Text>
-            </View>
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={styles.headerstyle}>
+                    <Text style={{ fontSize: 18, marginLeft: 15, }}>Search</Text>
+                </View>
+            </SafeAreaView>
         );
     }
 }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
 import { styles } from './PostsCommentsListComponent.style';
+import { cos } from 'react-native-reanimated';
 
 export default class PostsCommentsListComponent extends Component {
     constructor(props) {
@@ -20,18 +21,29 @@ export default class PostsCommentsListComponent extends Component {
 
     render() {
         const commentDetails = this.state.commentData;
-        console.debug(commentDetails);
-        var userName = commentDetails.firstname + ' ' + commentDetails.lastname
-        var commntedUserdp = commentDetails.userdp !== null ? commentDetails.userdp : '';
+        // console.debug(commentDetails);
+        let userName = commentDetails.firstname + ' ' + commentDetails.lastname
+        let commntedUserdp = commentDetails.userdp;
         let comment = commentDetails.comment;
-
-//         var date = new Date("2015-08-25T15:35:58.000Z");
-// var seconds = date.getTime() / 1000; 
-
+        var today = new Date();
+        var commentedDate = new Date(commentDetails.date_created);
+        const timeDiffinSeconds = (Math.abs(today - commentedDate)) / 1000;
+        // console.debug('time diff in seconds', timeDiffinSeconds);
+        var commentedTime = '';
+        if (timeDiffinSeconds < 60) {
+            commentedTime =  Math.trunc(timeDiffinSeconds) + ' seconds ago';
+        }else if(timeDiffinSeconds >= 60 && timeDiffinSeconds < 3600){
+            commentedTime =  Math.trunc((timeDiffinSeconds/60)) + ' minutes ago';
+        }else if(timeDiffinSeconds >= 3600 && timeDiffinSeconds < 86400) {
+            commentedTime =  Math.trunc((timeDiffinSeconds/(60*60))) + ' hours ago';
+        }else{
+            commentedTime =  Math.trunc((timeDiffinSeconds/(60*60*24))) + ' days ago';
+        }
+        // console.debug('Commented Date value:',commentedTime);
         return (
             <View style={styles.container}>
                 <View style={styles.TopContainer}>
-                    <Image source={{uri:commntedUserdp}} style={styles.profile_photo} />
+                    <Image source={commntedUserdp == null ? require('../../images/logo.png') : { uri: commntedUserdp }} resizeMode={'contain'} style={styles.profile_photo} />
                     <View style={styles.container_text}>
                         <View style={{
                             flexDirection: 'row',
@@ -39,7 +51,7 @@ export default class PostsCommentsListComponent extends Component {
                             justifyContent: 'space-between',
                         }}>
                             <Text style={styles.UserName, { textTransform: 'capitalize' }}>{userName}</Text>
-                            <Text style={styles.text_light, { marginRight: 15 ,color: "#9E9E9E"}}>6 Days ago</Text>
+                            <Text style={styles.text_light, { marginRight: 15, color: "#9E9E9E" }}>{commentedTime}</Text>
                         </View>
                         <Text style={styles.text_description, { marginTop: 10, marginBottom: 10, marginRight: 15 }}>
                             {comment}

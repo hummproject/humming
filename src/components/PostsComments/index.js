@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import { AppStyle } from '../../App.style'
 import AppConfig from '../../config/constants';
 import AsyncStorage from '@react-native-community/async-storage';
 import PostsCommentsListComponent from '../PostsCommentsListComponent';
+import Toast from 'react-native-easy-toast'
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default class PostsComments extends Component {
     constructor(props) {
@@ -13,7 +15,7 @@ export default class PostsComments extends Component {
             commentsListArray: [], //this is the array
             error: null,
             userCommentedText: '',
-            refreshing: false,
+            clearInput: false,
             userData: {},
             postDetails: this.props.route.params.postDetails
         };
@@ -30,17 +32,22 @@ export default class PostsComments extends Component {
     }
 
     PostComment = () => {
-        console.debug('Post comment', this.state.userCommentedText);
+        // console.debug('Post comment', this.state.userCommentedText);
         this.PostCommentOfUser();
     };
 
     returnBack = () => {
-        console.debug('Go back function', this.props.route.params.postDetails);
+        // console.debug('Go back function', this.props.route.params.postDetails);
         this.props.navigation.goBack();
     };
 
+    dismissKeyboard() {
+        Keyboard.dismiss();
+    }
+
     PostCommentOfUser = () => {
-        console.debug('post Details : Fetch', this.state.postDetails);
+        this.dismissKeyboard();
+        // console.debug('post Details : Fetch', this.state.postDetails);
         const { userData } = this.state;
         const token = userData.token;
         const url = AppConfig.DOMAIN + AppConfig.ADD_COMMENTS_TO_MARKER;
@@ -60,9 +67,9 @@ export default class PostsComments extends Component {
         })
             .then(response => response.json())
             .then(responseData => {
-                console.debug('comments Page comment response:', responseData)
+                // console.debug('comments Page comment response:', responseData)
                 if (responseData.status === 200) {
-                    var data =  responseData.data
+                    var data = responseData.data
                     data["firstname"] = userData.firstname;
                     data["lastname"] = userData.lastname;
                     data["userdp"] = userData.userdp;
@@ -72,7 +79,7 @@ export default class PostsComments extends Component {
                         commentsListArray: commentListAry,
                         error: responseData.error || null,
                         loading: false,
-                        refreshing: false
+                        clearInput : true
                     });
                 } else {
                     this.refs.toast.show(responseData.message);
@@ -86,7 +93,7 @@ export default class PostsComments extends Component {
     };
 
     fetchCommentsforPosts = () => {
-        console.debug('post Details : Fetch', this.state.postDetails);
+        // console.debug('post Details : Fetch', this.state.postDetails);
         const token = this.state.userData.token;
         const url = AppConfig.DOMAIN + AppConfig.GET_MARKER_COMMENTS;
         console.debug(url);
@@ -104,27 +111,24 @@ export default class PostsComments extends Component {
         })
             .then(response => response.json())
             .then(responseData => {
-                console.debug('comments Page response:', responseData)
+                // console.debug('comments Page response:', responseData)
                 if (responseData.status === 200) {
-                    if(Array.isArray(responseData.data)){
+                    if (Array.isArray(responseData.data)) {
                         this.setState({
                             commentsListArray: responseData.data,
                             error: responseData.error || null,
-                            loading: false,
-                            refreshing: false
+                            loading: false
                         });
-                    }else{
+                    } else {
                         this.setState({
                             commentsListArray: [],
                             error: responseData.error || null,
-                            loading: false,
-                            refreshing: false
+                            loading: false
                         });
                     }
                 } else {
                     this.refs.toast.show(responseData.message);
                 }
-                
             })
             .catch(error => {
                 console.debug('comments Page response ERROR:', error);
@@ -134,16 +138,24 @@ export default class PostsComments extends Component {
     };
 
     render() {
-        const { commentsListArray, loading, userCommentedText, postDetails,userData } = this.state;
-        console.debug("user details : post comments",userData)
-        let userdp = userData.userdp !== null ? userData.userdp : ''
-        let markercommentArray = postDetails.markercomments !== null ? postDetails.markercomments : []
+        const { commentsListArray, loading, userCommentedText, postDetails, userData } = this.state;
+        // console.debug("user details : post comments", userData)
+        console.debug("Post comments : List Ary", commentsListArray)
+        let userdp = userData.userdp
+        var markercommentArray;
+        if (commentsListArray.length === 0) {
+            markercommentArray = postDetails.markercomments !== null ? postDetails.markercomments : []
+        } else {
+            markercommentArray = commentsListArray;
+        }
         return (
             loading ?
-                <View style={{ flex: 1 }}>
+                <SafeAreaView style={{ flex: 1 }}>
                     <View style={styles.headerstyle}>
-                        <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
-                        <Text style={{ fontSize: 18, marginLeft: 10, }}>Comments</Text>
+                        <TouchableOpacity onPress={this.returnBack} >
+                            <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
+                        </TouchableOpacity>
+                        <Text style={{ fontSize: 18, marginLeft: 20, }}>Comments</Text>
                         <View style={styles.commentsCountcontainer}>
                             <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
                                 style={{ width: 27, height: 27 }} />
@@ -157,14 +169,14 @@ export default class PostsComments extends Component {
                         style={AppStyle.activityIndicator}
                         size='large'
                     />
-                </View>
+                </SafeAreaView>
                 :
-                <View style={{ flex: 1 }}>
+                <SafeAreaView style={{ flex: 1 }}>
                     <View style={styles.headerstyle}>
                         <TouchableOpacity onPress={this.returnBack} >
                             <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
                         </TouchableOpacity>
-                        <Text style={{ fontSize: 18, marginLeft: 10, }}>Comments</Text>
+                        <Text style={{ fontSize: 18, marginLeft: 20, }}>Comments</Text>
                         <View style={styles.commentsCountcontainer}>
                             <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
                                 style={{ width: 27, height: 27 }} />
@@ -181,10 +193,11 @@ export default class PostsComments extends Component {
                         keyExtractor={(item, index) => index + ""}
                     />
                     <View style={styles.footerstyle}>
-                        <Image source={{uri:userdp}} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
+                        <Image source={userdp == null ? require('../../images/logo.png') : { uri: userdp }} resizeMode={'contain'} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
                         <TextInput
                             style={{ height: 40, flex: 2, marginLeft: 15 }}
                             placeholder="Post a Comment"
+                            value={!this.state.clearInput ? this.state.userCommentedText : null}
                             onChangeText={(text) => this.setState({
                                 userCommentedText: text,
                             })}
@@ -200,7 +213,8 @@ export default class PostsComments extends Component {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </View>
+                    <Toast ref="toast" />
+                </SafeAreaView>
         )
     };
 }

@@ -76,38 +76,29 @@ export default class Home extends Component {
     render() {
         const { postsListArray, loading } = this.state;
         return (
-            loading ?
-                <SafeAreaView style={{ flex: 1 }}>
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.headerstyle}>
-                            <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
-                            <Text style={{ fontSize: 18, marginLeft: 10, }}>HUMMING</Text>
-                        </View>
-                        <ActivityIndicator
+            <SafeAreaView style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
+                    <View style={styles.headerstyle}>
+                        <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
+                        <Text style={{ fontSize: 18, marginLeft: 20, }}>HUMMING</Text>
+                    </View>
+                    <FlatList
+                        data={postsListArray}
+                        renderItem={
+                            ({ item }) => <HomePagePost userData={item} navigation={this.props.navigation} />
+                        }
+                        keyExtractor={(item, index) => index + ""}
+                    />
+                    {
+                        loading ? <ActivityIndicator
                             animating={true}
                             style={AppStyle.activityIndicator}
                             size='large'
-                        />
-                        <Toast ref="toast" />
-                    </View>
-                </SafeAreaView>
-                :
-                <SafeAreaView style={{ flex: 1 }}>
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.headerstyle}>
-                            <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
-                            <Text style={{ fontSize: 18, marginLeft: 10, }}>HUMMING</Text>
-                        </View>
-                        <FlatList
-                            data={postsListArray}
-                            renderItem={
-                                ({ item }) => <HomePagePost userData={item} navigation={this.props.navigation} />
-                            }
-                            keyExtractor={(item, index) => index + ""}
-                        />
-                        <Toast ref="toast" />
-                    </View>
-                </SafeAreaView>
+                        /> : null
+                    }
+                    <Toast ref="toast" />
+                </View>
+            </SafeAreaView>
         )
     };
 }

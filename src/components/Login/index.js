@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView ,Keyboard} from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
@@ -16,11 +16,11 @@ export default class Login extends Component {
             loading: false,
         };
     }
-    
+
     dismissKeyboard() {
         Keyboard.dismiss();
     }
-    
+
     login = () => {
         this.dismissKeyboard();
         const userName = this.state.userName;
@@ -82,11 +82,12 @@ export default class Login extends Component {
                 </View>
                 {
                     this.state.loading ?
-                            <ActivityIndicator
-                                animating={true}
-                                style={AppStyle.activityIndicator}
-                                size='large'
-                            /> : null
+                        <ActivityIndicator
+                            animating={true}
+                            style={AppStyle.activityIndicator}
+                            size='large'
+                        /> 
+                        : null
                 }
                 <Toast ref="toast"
                     style={{ backgroundColor: 'grey', borderRadius: 20 }} />

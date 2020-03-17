@@ -8,7 +8,15 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         borderRadius:5,
     },
-
+    headerstyle: {
+        flexDirection: 'row',
+        backgroundColor: 'white',
+        height: 60,
+        elevation: 2,
+        borderBottomColor: '#ECECEC',
+        borderBottomWidth: 1,
+        alignItems: 'center',
+    },
 });
    
-export{ styles, }
+export{ styles }
