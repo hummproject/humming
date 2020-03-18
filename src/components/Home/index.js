@@ -28,11 +28,14 @@ export default class Home extends Component {
             });
         });
         this.makeRequesttoFetchPosts();
+        // this.subscribe = this.props.navigation.addListener('focus', () => {
+        //     console.debug('Screen focused')
+        //     this.makeRequesttoFetchPosts();
+        // });
     }
 
-    // async componentDidAppear() {
-    //     console.debug("component Did Appear")
-    //     this.makeRequesttoFetchPosts();
+    // componentWillUnmount() {
+    //     this.subscribe;
     // }
 
     makeRequesttoFetchPosts = () => {

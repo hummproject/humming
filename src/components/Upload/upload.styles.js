@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#ECECEC',
     alignItems: 'center'
-
   },
 
   up7: {

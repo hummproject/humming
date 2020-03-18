@@ -8,8 +8,8 @@ import ImagePicker from 'react-native-image-picker';
 import AppConfig from '../../config/constants';
 
 const options = {
-    title: 'Select Avatar',
-    customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+    title: 'Select Option',
+    customButtons: [],
     storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -32,7 +32,8 @@ export default class Profile extends React.Component {
             followers: 0,
             isactive: '',
             useraddress: '',
-            token: ''
+            token: '',
+            showMenuOptions: false,
         };
 
         AsyncStorage.getItem("userData").then(value => {
@@ -56,11 +57,12 @@ export default class Profile extends React.Component {
             });
         });
     }
+
     render() {
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={ProfileStyles.headerstyle}>
-                <Text style={{ marginLeft: 15 }}>@{this.state.username}</Text>
+                    <Text style={{ fontSize: 18, marginLeft: 15 }}>@{this.state.username}</Text>
                     <View style={{
                         flex: 1,
                         flexDirection: 'row',
@@ -68,9 +70,26 @@ export default class Profile extends React.Component {
                         justifyContent: 'flex-end',
                         marginRight: 15,
                     }}>
-                        <Text>Menu</Text>
+                        <TouchableOpacity onPress={() => this.showMenu()}>
+                            <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 30, marginLeft: 25 }} resizeMode={'contain'}/>
+                        </TouchableOpacity>
                     </View>
                 </View>
+                {
+                    this.state.showMenuOptions ?
+                        <View style={ProfileStyles.MenuOptionStyle}>
+                            <TouchableOpacity onPress={() => this.showUpdateProfile()}>
+                                <Text style={{ padding: 8 }}>Update Profile</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.signOutfromApp()}>
+                                <Text style={{ padding: 8 }}>Sign out</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.DeactivateProfile()}>
+                                <Text style={{ padding: 8 }}>Deactivate Account</Text>
+                            </TouchableOpacity>
+                        </View>
+                        : null
+                }
                 <ScrollView style={{ marginHorizontal: 10 }}>
                     {/* {this.renderLogo()} */}
                     <View style={{ flex: 1, alignItems: "center", margin: 15, position: "relative" }}>
@@ -126,6 +145,26 @@ export default class Profile extends React.Component {
                 </ScrollView>
             </SafeAreaView >
         )
+    }
+
+    showMenu = () => {
+        this.setState({
+            showMenuOptions: !this.state.showMenuOptions
+        })
+    }
+
+    showUpdateProfile = () => {
+        console.debug('showUpdateProfile');
+    }
+
+    signOutfromApp = () => {
+        console.debug('signOutfromApp');
+        this.props.navigation.navigate('login')
+    }
+
+    DeactivateProfile = () => {
+        console.debug('DeactivateProfile');
+        this.props.navigation.navigate('login')
     }
 
     uploadImage = () => {
