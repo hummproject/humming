@@ -1,22 +1,17 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
 const ProfileStyles = StyleSheet.create({
     followContent: {
         flexDirection: "row",
         justifyContent: "space-evenly"
     },
-    userBio: {
-        paddingLeft: 100,
-        paddingRight: 50
-    },
     userDp: {
-        width: 120,
-        height: 120,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 60
+        width: Dimensions.get('window').width - 30,
+        height: 200,
+        borderRadius: 5,
     },
+    
     headerstyle: {
         flexDirection: 'row',
         backgroundColor: 'white',

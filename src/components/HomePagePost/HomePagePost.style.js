@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         borderBottomColor: '#ECECEC',
         borderBottomWidth: 1,
-        borderRadius: 5,
+        // borderRadius: 5,
         backgroundColor: '#FFFFFF',
         elevation: 2,
     },

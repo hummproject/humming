@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 const AppStyle = StyleSheet.create({
     appContainer: {
         flexGrow: 1,
+        flexDirection:'column',
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
@@ -15,30 +16,34 @@ const AppStyle = StyleSheet.create({
         marginBottom: 5
     },
     appLabel: {
-        fontWeight: "bold",
-        color: "#4682B4"
+        fontSize:17,
+        color: "#9B9B9B"
     },
     appInput: {
         width: 300,
-        height: 40,
-        backgroundColor: '#e2e2e25e',
-        borderRadius: 20,
+        height: 45,
+        backgroundColor: '#F5F5F5',
+        borderRadius: 22.5,
         textAlign: "center",
         marginVertical: 10
     },
+    
     appButton: {
-        width: 300,
-        borderRadius: 5,
+        width: 150,
+        height:40,
+        borderRadius: 20,
         backgroundColor: '#6454F0',
         color: 'white',
         textAlign: "center",
         padding: 10,
         textTransform: "uppercase",
-        marginTop: 15
+        marginTop: 20
     },
+
     appMarginTop: {
         marginTop: 20
     },
+
     appFooter: {
         flexGrow: 1,
         justifyContent: 'center',
@@ -61,7 +66,7 @@ const AppStyle = StyleSheet.create({
     },
 
     light_TextColor:{
-        color:"#9E9E9E"
+        color:"#9B9B9B"
     },
 
     dark_TextColor:{

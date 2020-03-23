@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Picker, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Picker, SafeAreaView, FlatList } from 'react-native';
 import { AppStyle } from '../../App.style';
 import { styles } from './upload.styles';
 import { UploadPost } from './upload.service';
@@ -16,8 +16,6 @@ const options = {
     }
 };
 
-const data = new FormData();
-
 export default class Upload extends Component {
     constructor(props) {
         super(props);
@@ -25,14 +23,15 @@ export default class Upload extends Component {
             choosenIndex: 0,
             hummDescription: "",
             category: "",
-            gallery: ""
+            isImageUploaded: false,
+            uploadImageArray: [],
+            userData: {}
         };
     }
 
     uploadImage = () => {
         ImagePicker.showImagePicker(options, (response) => {
             // console.log('Response = ', response);
-
             if (response.didCancel) {
                 console.log('User cancelled image picker');
             } else if (response.error) {
@@ -40,24 +39,28 @@ export default class Upload extends Component {
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
-                const source = response.uri;
+                // const source = response.uri;
                 console.log("string checking" + JSON.stringify(response));
-                data.append('markermedia', {
-                    uri: response.uri,
-                    type: response.type,
-                    name: response.fileName
-                });
-                
-
-                console.log(data);
+                let imagesAry = this.state.uploadImageArray;
+                imagesAry.push(response)
                 this.setState({
-                    gallery: source
+                    isImageUploaded: true,
+                    uploadImageArray: imagesAry,
                 });
             }
         });
     }
 
     upload = async () => {
+        const data = new FormData();
+        for (let obj of this.state.uploadImageArray) {
+            data.append('markermedia', {
+                uri: obj.uri,
+                type: obj.type,
+                name: obj.fileName
+            });
+        }
+        console.log(data);
         const hummDescription = this.state.hummDescription;
         const category = this.state.category;
         data.append('description', hummDescription);
@@ -89,6 +92,7 @@ export default class Upload extends Component {
 
     }
     render() {
+        const { isImageUploaded, uploadImageArray } = this.state;
         return (
             <KeyboardAvoidingView
                 behavior="position">
@@ -99,9 +103,29 @@ export default class Upload extends Component {
                     <ScrollView>
                         <View style={styles.up1}>
                             <View style={styles.up3}>
-                                <TouchableOpacity onPress={() => this.uploadImage()}>
-                                    <Text>UPLOAD IMAGE</Text>
-                                </TouchableOpacity>
+                                {
+                                    isImageUploaded ?
+                                        <FlatList
+                                            horizontal
+                                            pagingEnabled={true}
+                                            data={uploadImageArray}
+                                            renderItem={({ item }) => {
+                                                return (
+                                                    <View style={{ width: 130 }}>
+                                                        <Image source={{ uri: item.uri }} resizeMode='cover' style={{ width: 130 }} />
+                                                        <TouchableOpacity onPress={this.OpenPost}>
+                                                            <Text style={{ position: "absolute", bottom: 0, right: 0, margin: 15, }}>Upload</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                )
+                                            }}
+                                            keyExtractor={(item, index) => index + ""}
+                                        />
+                                        :
+                                        <TouchableOpacity onPress={() => this.uploadImage()}>
+                                            <Text>Click here to Upload Image</Text>
+                                        </TouchableOpacity>
+                                }
                                 {/* <TouchableOpacity style={styles.up4} onPress={() => this.uploadImage()}>
                                 <Text style={styles.up4_1}>Hi</Text>
                             </TouchableOpacity> */}

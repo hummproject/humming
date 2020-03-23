@@ -16,6 +16,18 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ECECEC',
         borderBottomWidth: 1,
         alignItems: 'center',
+        justifyContent:'center',
+    },
+
+    searchView: {
+        flexDirection: 'row',
+        height: 40,
+        width:'90%',
+        backgroundColor: '#F5F5F5',
+        borderRadius: 20,
+        alignItems:'center',
+        justifyContent:'space-between',
+        overflow: 'hidden'
     },
 });
    

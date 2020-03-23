@@ -49,7 +49,7 @@ export default class HomePagePost extends Component {
         var userName = firstName + ' ' + lastName
         var category = postDetails.category;
         var postDesc = postDetails.description;
-        var userdpUri = postDetails.userdp !== null ? postDetails.userdp : 'https://medium-test1.s3.amazonaws.com/1577551283046'
+        var userdpUri = postDetails.userdp;
         var postimageUri = postDetails.media
         var markerlikeArray = this.state.postLikesArray
         var markercommentArray = postDetails.markercomments !== null ? postDetails.markercomments : []
@@ -57,7 +57,7 @@ export default class HomePagePost extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.TopContainer}>
-                    <Image source={{ uri: userdpUri }} style={styles.profile_photo} />
+                    <Image source={userdpUri == null ? require('../../images/logo.png') : { uri: userdpUri }} style={styles.profile_photo} resizeMode={userdpUri == null ? 'contain' : 'cover'} />
                     <View style={styles.container_text}>
                         <Text style={styles.UserName, { textTransform: 'capitalize' }}>
                             {userName}

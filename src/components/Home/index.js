@@ -86,6 +86,8 @@ export default class Home extends Component {
                         <Text style={{ fontSize: 18, marginLeft: 20, }}>HUMMING</Text>
                     </View>
                     <FlatList
+                        contentInset={{ top: 0, bottom: -20, left: 0, right: 0 }}
+                        contentInsetAdjustmentBehavior="automatic"
                         data={postsListArray}
                         renderItem={
                             ({ item }) => <HomePagePost userData={item} navigation={this.props.navigation} />

@@ -131,7 +131,7 @@ export default class Register extends Component {
                 <Logo></Logo>
                 {
                     this.state.showStepOne ?
-                        <View>
+                        <View style = {{alignItems:'center'}}>
                             <TextInput style={AppStyle.appInput} placeholder="Firstname"
                                 onChangeText={(firstname) => this.setState({ firstname })}></TextInput>
                             <TextInput style={AppStyle.appInput} placeholder="Lastname"
@@ -154,7 +154,7 @@ export default class Register extends Component {
                 }
                 {
                     this.state.showStepTwo ?
-                        <View>
+                        <View style = {{alignItems:'center'}}>
                             <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
                                 onChangeText={(password) => this.setState({ password })}></TextInput>
                             <TextInput style={AppStyle.appInput} placeholder="Confirm password" secureTextEntry={true}
@@ -167,8 +167,8 @@ export default class Register extends Component {
                 }
                 {
                     this.state.showStepThree ?
-                        <View style = {{flex:1}}>
-                            <Text>Create Unique Username</Text>
+                        <View style = {{flex:1, alignItems:'center'}}>
+                            <Text>Create Username</Text>
                             <TextInput style={AppStyle.appInput} placeholder="Username"
                                 onChangeText={(username) => this.setState({ username })}></TextInput>
                             <TouchableOpacity onPress={() => this.registerStepThree()}>
