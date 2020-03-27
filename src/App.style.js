@@ -17,7 +17,8 @@ const AppStyle = StyleSheet.create({
     },
     appLabel: {
         fontSize:17,
-        color: "#9B9B9B"
+        color: "#9B9B9B",
+        fontFamily:'Roboto-Regular',
     },
     appInput: {
         width: 300,
@@ -25,7 +26,8 @@ const AppStyle = StyleSheet.create({
         backgroundColor: '#F5F5F5',
         borderRadius: 22.5,
         textAlign: "center",
-        marginVertical: 10
+        marginVertical: 10,
+        fontFamily:'Roboto-Regular',
     },
     
     appButton: {
@@ -37,7 +39,8 @@ const AppStyle = StyleSheet.create({
         textAlign: "center",
         padding: 10,
         textTransform: "uppercase",
-        marginTop: 20
+        marginTop: 20,
+        fontFamily: 'Roboto-Regular'//'Roboto-Light',
     },
 
     appMarginTop: {
@@ -49,13 +52,8 @@ const AppStyle = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
-        // width: '100%',
-        // height: 50,
-        // justifyContent: 'center',
-        // alignItems: 'center',
-        // position: 'absolute',
-        // bottom: 0
     },
+
     activityIndicator: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -72,6 +70,10 @@ const AppStyle = StyleSheet.create({
     dark_TextColor:{
         color:"#000000"
     },
+
+    app_font:{
+        fontFamily:'Roboto-Regular'
+    }
 
 });
 

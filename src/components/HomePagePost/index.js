@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import { styles } from './HomePagePost.style';
+import { AppStyle } from '../../App.style';
 
 export default class HomePagePost extends Component {
     constructor(props) {
@@ -59,15 +60,15 @@ export default class HomePagePost extends Component {
                 <View style={styles.TopContainer}>
                     <Image source={userdpUri == null ? require('../../images/logo.png') : { uri: userdpUri }} style={styles.profile_photo} resizeMode={userdpUri == null ? 'contain' : 'cover'} />
                     <View style={styles.container_text}>
-                        <Text style={styles.UserName, { textTransform: 'capitalize' }}>
+                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 16, paddingBottom:0, textTransform: 'capitalize' }]}>
                             {userName}
                         </Text>
-                        <Text style={styles.userTag}>
+                        <Text style={[AppStyle.light_TextColor,AppStyle.app_font,{fontSize: 14,paddingBottom:5}]}>
                             @{tagName}
                         </Text>
                         <View style={styles.categoryContainer}>
                             <Image source={require('../../images/category_marker_icon.png')} style={{ height: 15, width: 15 }} />
-                            <Text style={{ marginLeft: 5, color: 'white' }}>{category}</Text>
+                            <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15, marginLeft: 5, color: 'white' }]}>{category}</Text>
                         </View>
                     </View>
                 </View>
@@ -92,7 +93,7 @@ export default class HomePagePost extends Component {
                         }}
                         keyExtractor={(item, index) => index + ""}
                     />
-                    <Text style={styles.userTag, { marginLeft: 15, marginRight: 15, marginTop: 15 }}>
+                    <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15, marginLeft: 14, marginRight: 15, marginTop: 15}]}>
                         {postDesc}
                     </Text>
                 </View>
@@ -104,7 +105,7 @@ export default class HomePagePost extends Component {
                     }}>
                         <Image source={likeorUnlikeImgUri}
                             style={{ width: 32, height: 27, marginLeft: 15 }} resizeMode={'contain'} />
-                        <Text style={styles.userTag, { marginLeft: 10, marginRight: 25 }}>
+                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14, marginLeft: 10, marginRight: 25}]}>
                             {markerLikesCount}
                         </Text>
                     </TouchableOpacity>
@@ -115,7 +116,7 @@ export default class HomePagePost extends Component {
                     }}>
                         <Image source={require('../../images/comment-icon.png')} resizeMode={'contain'}
                             style={{ width: 27, height: 27 }} />
-                        <Text style={styles.userTag, { marginLeft: 10 }}>
+                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font, {fontSize: 14, marginLeft: 10}]}>
                             {markercommentArray.length}
                         </Text>
                     </TouchableOpacity>

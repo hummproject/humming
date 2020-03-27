@@ -21,6 +21,7 @@ const ProfileStyles = StyleSheet.create({
         borderBottomWidth: 1,
         alignItems: 'center',
     },
+    
     MenuOptionStyle:{
         zIndex: 1,
         position: 'absolute', 

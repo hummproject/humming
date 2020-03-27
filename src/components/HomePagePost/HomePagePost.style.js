@@ -39,22 +39,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-start'
     },
-
-    UserName: {
-        fontSize: 16,
-        color: '#000000',
-        paddingBottom:0
-    },
+  
     container_text: {
         flex: 1,
         flexDirection: 'column',
         marginLeft: 15,
         justifyContent: 'flex-start',
-    },
-    userTag: {
-        fontSize: 14,
-        fontStyle: 'normal',
-        paddingBottom:5
     },
     profile_photo: {
         height: 60,

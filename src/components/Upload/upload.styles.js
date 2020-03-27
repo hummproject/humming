@@ -13,24 +13,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  up1: {
-    flex: 3,
-  },
-
   up2: {
     height: 40,
     fontSize: 25,
-    marginVertical: 10,
+    // marginVertical: 10,
     marginLeft: 20
   },
 
-  up3: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent:'center',
-    marginVertical: 130,
-  },
 
   up4_1: {
     width: '50%',
@@ -42,21 +31,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   
-  up6: {
-    marginVertical: 25,
-    fontSize: 20,
-    marginLeft: 10,
-    width: '100%'
-
-  },
-
-  pickerStyle: {
-    color: '#9E9E9E',
-    justifyContent: 'center',
-    backgroundColor: '#ECECEC',
-    alignItems: 'center'
-  },
-
   up7: {
     marginVertical: 20,
     borderRadius: 20,
@@ -66,12 +40,6 @@ const styles = StyleSheet.create({
     marginLeft: "10%",
     backgroundColor: '#D3D3D3',
   },
-  up8: {
-    marginVertical: 15,
-    alignItems: 'center',
-    height: 50,
-  }
-
 
 });
 

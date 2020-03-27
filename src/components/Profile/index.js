@@ -123,7 +123,7 @@ export default class Profile extends React.Component {
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={ProfileStyles.headerstyle}>
-                    <Text style={{ fontSize: 18, marginLeft: 15 }}>@{username}</Text>
+                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 15 }]}>@{username}</Text>
                     <View style={{
                         flex: 1,
                         flexDirection: 'row',
@@ -140,44 +140,44 @@ export default class Profile extends React.Component {
                     this.state.showMenuOptions ?
                         <View style={ProfileStyles.MenuOptionStyle}>
                             <TouchableOpacity onPress={() => this.showUpdateProfile()}>
-                                <Text style={{ padding: 8 }}>Update Profile</Text>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Update Profile</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => this.signOutfromApp()}>
-                                <Text style={{ padding: 8 }}>Sign out</Text>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Sign out</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => this.DeactivateProfile()}>
-                                <Text style={{ padding: 8 }}>Deactivate Account</Text>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Deactivate Account</Text>
                             </TouchableOpacity>
                         </View>
                         : null
                 }
                 <ScrollView style={{ backgroundColor: 'white' }}>
                     <View style={[ProfileStyles.userDp, { alignSelf: 'center', borderColor: '#F5F5F5', borderWidth: 0.5, marginTop: 10 }]}>
-                        <TouchableOpacity onPress={() => this.uploadImage()}>
-                            <Image style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={userdp == null ? 'contain' : 'cover'} />
-                            <Text style={{ position: "absolute", bottom: 0, right: 0, margin: 15, }}>EDIT</Text>
+                        <Image style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={userdp == null ? 'contain' : 'cover'} />
+                        <TouchableOpacity onPress={() => this.uploadImage()} style={{ position: "absolute", bottom: 0, right: 0, margin: 10 }}>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>EDIT</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={{ flex: 1, alignItems: "center", marginTop: 20, }}>
-                        <Text style={{ fontSize: 18, textTransform: 'capitalize' }}>{firstname + ' ' + lastname}</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 18, textTransform: 'capitalize' }]}>{firstname + ' ' + lastname}</Text>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter, { marginBottom: 20 }]}>
-                        <Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                             {(userprofession == null) || (userprofession == '') ? <Text>Profession : Not Available</Text> : <Text>{userprofession}</Text>}
                         </Text>
                     </View>
                     <View style={[{ flex: 1, alignItems: "center", }, ProfileStyles.followContent]}>
                         <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                             <Text style={[AppStyle.appLabel]}>FOLLOWERS</Text>
-                            <Text>{followers || 0}</Text>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>{followers || 0}</Text>
                         </View>
                         <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                             <Text style={[AppStyle.appLabel]}>FOLLOWING</Text>
-                            <Text>{following || 0}</Text>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>{following || 0}</Text>
                         </View>
                     </View>
                     <View style={{ flex: 1, alignItems: "center", }}>
-                        <Text style={{ textAlign: 'center', marginLeft: 15, marginRight: 15, marginTop: 20 }}>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, textAlign: 'center', marginLeft: 15, marginRight: 15, marginTop: 20 }]}>
                             {(userbio == null) || (userbio == '') ? <Text>Bio : Not Available</Text> : <Text>{userbio}</Text>}
                         </Text>
                     </View>
@@ -188,7 +188,7 @@ export default class Profile extends React.Component {
                                 flexDirection: 'column',
                                 marginTop: 20,
                             }]}>
-                                <Text style={{ paddingLeft: 15, paddingBottom: 10 }}>Previous Posts</Text>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, paddingLeft: 15, paddingBottom: 10 }]}>Previous Posts</Text>
                                 <FlatList
                                     horizontal
                                     pagingEnabled={true}
@@ -216,20 +216,20 @@ export default class Profile extends React.Component {
                             </View>
                     }
                     <View style={[AppStyle.appAlignItemsCenter, { marginTop: 20 }]}>
-                        <Text style={{ fontSize: 16, color: "#9B9B9B" }}>PHONE NUMBER</Text>
-                        <Text>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 16 }]}>PHONE NUMBER</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                             {(usermobile == null) || (usermobile == '') ? <Text>Not Available</Text> : <Text>{usermobile}</Text>}
                         </Text>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter, { paddingTop: 20, paddingBottom: 20 }]}>
-                        <Text style={{ fontSize: 16, color: "#9B9B9B" }}>EMAIL</Text>
-                        <Text>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 16 }]}>EMAIL</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                             {(useremail == null) || (useremail == '') ? <Text>Not Available</Text> : <Text>{useremail}</Text>}
                         </Text>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter, { paddingBottom: 20 }]}>
-                        <Text style={{ fontSize: 16, color: "#9B9B9B" }}>ADDRESS</Text>
-                        <Text>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 16 }]}>ADDRESS</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                             {(useraddress == null) || (useraddress == '') ? <Text>Not Available</Text> : <Text>{useraddress}</Text>}
                         </Text>
                     </View>

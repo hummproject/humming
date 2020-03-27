@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { AppStyle } from '../../App.style'
 
 export default class SearchPosts extends Component {
     constructor(props) {
@@ -25,7 +26,7 @@ export default class SearchPosts extends Component {
                 <View style = {{paddingLeft: 15, paddingBottom: 10}}>
                 <View style={styles.categoryContainer}>
                     <Image source={require('../../images/category_marker_icon.png')} style={{ height: 15, width: 15 }} />
-                    <Text style={{ marginLeft: 5, color: 'white' , textTransform: 'capitalize' }}>{category}</Text>
+                    <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15, marginLeft: 5, color: 'white' , textTransform: 'capitalize' }]}>{category}</Text>
                     </View>
                 </View>
                     <FlatList

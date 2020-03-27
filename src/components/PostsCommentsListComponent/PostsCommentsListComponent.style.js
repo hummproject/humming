@@ -26,23 +26,12 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start'
     },
 
-    UserName: {
-        fontSize: 16,
-        color: '#000000',
-    },
-
     container_text: {
         flex: 1,
         flexDirection: 'column',
         marginLeft: 15,
         marginTop: 5,
         justifyContent: 'flex-start',
-    },
-
-    text_description: {
-        fontSize: 13,
-        fontStyle: 'normal',
-        color: '#000000',
     },
 
     text_light: {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
 import { styles } from './PostsCommentsListComponent.style';
-import { cos } from 'react-native-reanimated';
+import { AppStyle } from '../../App.style'
 
 export default class PostsCommentsListComponent extends Component {
     constructor(props) {
@@ -50,10 +50,10 @@ export default class PostsCommentsListComponent extends Component {
                             alignItems: 'center',
                             justifyContent: 'space-between',
                         }}>
-                            <Text style={styles.UserName, { textTransform: 'capitalize' }}>{userName}</Text>
-                            <Text style={styles.text_light, { marginRight: 15, color: "#9E9E9E" }}>{commentedTime}</Text>
+                            <Text style={[AppStyle.dark_TextColor,AppStyle.app_font, {fontSize: 16, textTransform: 'capitalize' }]}>{userName}</Text>
+                            <Text style={[AppStyle.light_TextColor,AppStyle.app_font,{fontSize: 14, marginRight: 15 }]}>{commentedTime}</Text>
                         </View>
-                        <Text style={styles.text_description, { marginTop: 10, marginBottom: 10, marginRight: 15 }}>
+                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15, marginTop: 10, marginBottom: 10, marginRight: 15}]}>
                             {comment}
                         </Text>
                         {/* <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>

@@ -27,15 +27,20 @@ export default class Home extends Component {
                 userData: userData
             });
         });
+        // this._componentFocused();
+        // this._sub = this.props.navigation.addListener(
+        //     'didFocus',
+        //     this._componentFocused
+        // );
         this.makeRequesttoFetchPosts();
-        // this.subscribe = this.props.navigation.addListener('focus', () => {
-        //     console.debug('Screen focused')
-        //     this.makeRequesttoFetchPosts();
-        // });
     }
 
     // componentWillUnmount() {
-    //     this.subscribe;
+    //     this._sub.remove();
+    // }
+
+    // _componentFocused = () => {
+    //     console.debug('Screen focused')
     // }
 
     makeRequesttoFetchPosts = () => {
@@ -58,6 +63,7 @@ export default class Home extends Component {
             .then(response => response.json())
             .then(responseData => {
                 console.debug('Home Posts response:', responseData)
+                AsyncStorage.setItem("PostsData", JSON.stringify(responseData.data));
                 if (responseData.status === 200) {
                     this.setState({
                         postsListArray: responseData.data,
@@ -83,7 +89,7 @@ export default class Home extends Component {
                 <View style={{ flex: 1 }}>
                     <View style={styles.headerstyle}>
                         <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
-                        <Text style={{ fontSize: 18, marginLeft: 20, }}>HUMMING</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>HUMMING</Text>
                     </View>
                     <FlatList
                         contentInset={{ top: 0, bottom: -20, left: 0, right: 0 }}

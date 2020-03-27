@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
 import { styles } from '../HomePagePost/HomePagePost.style';
+import { AppStyle } from '../../App.style'
 
 export default class BanterPagePosts extends Component {
     constructor(props) {
@@ -60,7 +61,7 @@ export default class BanterPagePosts extends Component {
                     <FlatList
                         horizontal
                         pagingEnabled={true}
-                        data={[],[]}
+                        data={[], []}
                         renderItem={({ item }) => {
                             console.debug(item);
                             let imageUri = item != null ? item : ''
@@ -71,15 +72,15 @@ export default class BanterPagePosts extends Component {
                                 )
                             } else {
                                 return (
-                                     null
+                                    null
                                 )
                             }
                         }}
                         keyExtractor={(item, index) => index + ""}
                     />
-                    <Text style={styles.userTag, { marginLeft: 15, marginRight: 15, marginTop: 15 }}>
+                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 15, marginRight: 15, marginTop: 15 }]}>
                         {/* {postDesc} */}
-                        Lorem epusm loreum epsum 
+                        Lorem epusm loreum epsum
                     </Text>
                 </View>
                 <View style={styles.BottomContainer}>
@@ -90,7 +91,7 @@ export default class BanterPagePosts extends Component {
                     }}>
                         <Image source={require('../../images/unlike-icon.png')}
                             style={{ width: 32, height: 27, marginLeft: 15 }} resizeMode={'contain'} />
-                        <Text style={styles.userTag, { marginLeft: 10, marginRight: 25 }}>
+                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14, marginLeft: 10, marginRight: 25}]}>
                             {/* {markerLikesCount} */}
                             100
                         </Text>
@@ -102,7 +103,7 @@ export default class BanterPagePosts extends Component {
                     }}>
                         <Image source={require('../../images/comment-icon.png')} resizeMode={'contain'}
                             style={{ width: 27, height: 27 }} />
-                        <Text style={styles.userTag, { marginLeft: 10 }}>
+                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font, {fontSize: 14, marginLeft: 10}]}>
                             {/* {markercommentArray.length} */} 100
                         </Text>
                     </TouchableOpacity>

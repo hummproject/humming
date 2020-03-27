@@ -72,12 +72,12 @@ export default class Login extends Component {
                     <Text style={AppStyle.appButton}>Sign in</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>
-                    <Text style={[{marginTop: 25, fontSize: 15},AppStyle.light_TextColor]}>Forgot Password?</Text>
+                    <Text style={[AppStyle.app_font,{marginTop: 25, fontSize: 15},AppStyle.light_TextColor]}>Forgot your password?</Text>
                 </TouchableOpacity>
                 <View style={AppStyle.appFooter}>
-                    <Text style={[AppStyle.light_TextColor,{fontSize: 15}]}>Don't have an account?</Text>
+                    <Text style={[AppStyle.light_TextColor,AppStyle.app_font,{fontSize: 15}]}>Don't have an account?</Text>
                     <TouchableOpacity onPress={this.goToRegister}>
-                        <Text style={[AppStyle.dark_TextColor,{fontSize: 15}]}>&nbsp;&nbsp;Sign Up</Text>
+                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15}]}>&nbsp;&nbsp;Sign up</Text>
                     </TouchableOpacity>
                 </View>
                 {

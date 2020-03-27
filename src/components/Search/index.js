@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, SafeAreaView, Image, SectionList, ActivityIndicator } from 'react-native';
+import { Text, View, TextInput, SafeAreaView, Image, SectionList, ActivityIndicator, TouchableOpacity, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { styles } from './search.styles';
 import SearchPosts from '../SearchPosts';
@@ -30,11 +30,11 @@ export default class Search extends Component {
     }
 
     SearchPosts = (text) => {
-        this.setState({
-            searchedText: text
-        })
-        this.makeRequesttoFetchSearchedMarkers();
+        Keyboard.dismiss();
+        // if (this.state.searchedText >= 3) {
         console.debug('Search Text is:', text)
+        this.makeRequesttoFetchSearchedMarkers();
+        // }
     };
 
     makeRequesttoFetchSearchedMarkers = () => {
@@ -64,7 +64,7 @@ export default class Search extends Component {
                             categoriesAry.push(obj.category);
                         }
                     }
-                    console.debug('category array', categoriesAry);
+                    // console.debug('category array', categoriesAry);
                     var searchResultdataAry = new Array();
                     for (var i = 0; i < categoriesAry.length; i++) {
                         let category = categoriesAry[i];
@@ -78,12 +78,22 @@ export default class Search extends Component {
                         // console.debug('categorywiseMarkers data Array', categorywiseMarkersAry);
                         searchResultdataAry.push({ 'category': category, 'data': categorywiseMarkersAry });
                     }
-                    console.debug('Categories sorted DATA Array', searchResultdataAry);
-                    let dataObj = { 'title': 'Search results', 'data': searchResultdataAry };
                     var dataArray = this.state.dataArray;
-                    console.debug('Data Array State',dataArray)
-                    dataArray.unshift(dataObj);
-                    console.debug('Data Array Final',dataArray)
+                    for (var i = 0; i < dataArray.length; i++) {
+                        if (dataArray[i].title && dataArray[i].title === "Search Results") {
+                            dataArray.splice(i, 1);
+                            break;
+                        }
+                    }
+                    if (searchResultdataAry && searchResultdataAry.length) {
+                        // not empty 
+                        let dataObj = { 'title': 'Search Results', 'data': searchResultdataAry };
+                        dataArray.unshift(dataObj);
+                        // console.debug('Data Array Final', dataArray)
+                    } else {
+                        // empty
+                        this.refs.toast.show('No search results found');
+                    }
                     this.setState({
                         dataArray: dataArray,
                         error: responseData.error || null,
@@ -159,12 +169,16 @@ export default class Search extends Component {
                 <View style={styles.headerstyle}>
                     <View style={styles.searchView}>
                         <TextInput
-                            style={{ marginLeft: 10, marginRight: 0, width: '88%' }}
+                            style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14, marginLeft: 10, marginRight: 0, width: '88%'}]}
                             placeholder="Search anything"
                             value={this.state.searchedText}
-                            onChangeText={(text) => this.SearchPosts(text)}>
+                            onChangeText={(text) => this.setState({
+                                searchedText: text
+                            })} >
                         </TextInput>
-                        <Image style={{ width: 20, height: 20, marginRight: 10 }} source={require('../../images/TabBar/search-icon-inactive.png')} resizeMode={'contain'} />
+                        <TouchableOpacity onPress={() => this.SearchPosts()}>
+                            <Image style={{ width: 20, height: 20, marginRight: 10 }} source={require('../../images/TabBar/search-icon-inactive.png')} resizeMode={'contain'} />
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <SectionList
@@ -172,8 +186,8 @@ export default class Search extends Component {
                     keyExtractor={(item, index) => item + index}
                     renderItem={({ item }) => <SearchPosts postData={item} />}
                     renderSectionHeader={({ section: { title } }) => (
-                        <View style={{ height: 50, backgroundColor: '#FFFFFF', flex: 1, justifyContent: 'center' }}>
-                            <Text style={{ fontSize: 16, paddingLeft: 15 }}>{title}</Text>
+                        <View style={{height: 50, backgroundColor: '#FFFFFF', flex: 1, justifyContent: 'center'}}>
+                            <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 16, paddingLeft: 15}]}>{title}</Text>
                         </View>
                     )}
                 />
