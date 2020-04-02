@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator, Alert, Modal, TouchableHighlight, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { ProfileStyles } from './Profile.style';
 import ImagePicker from 'react-native-image-picker';
 import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
+import { TextInput } from 'react-native-paper';
 
 const options = {
     title: 'Select Option',
@@ -22,8 +23,10 @@ export default class Profile extends React.Component {
         this.state = {
             loading: false,
             showMenuOptions: false,
+            showUploadModal: false,
             userData: {},
             error: null,
+            showToast: false,
             userPostsAry: [],
             username: '',
             userdp: '',
@@ -36,6 +39,10 @@ export default class Profile extends React.Component {
             usermobile: '',
             useremail: '',
             useraddress: '',
+            professionInputText: '',
+            phoneInputText: '',
+            addressInputText: '',
+            bioInputText: '',
         };
     }
 
@@ -55,6 +62,10 @@ export default class Profile extends React.Component {
                 usermobile: userData.usermobile,
                 useremail: userData.useremail,
                 useraddress: userData.useraddress,
+                professionInputText: userData.userprofession === null ? '' : userData.userprofession,
+                phoneInputText: userData.usermobile === null ? '' : userData.usermobile,
+                addressInputText: userData.useraddress === null ? '' : userData.useraddress,
+                bioInputText: userData.userbio === null ? '' : userData.userbio
             });
         });
         this.makeRequesttoFetchUserMarkers();
@@ -79,18 +90,17 @@ export default class Profile extends React.Component {
             .then(response => response.json())
             .then(responseData => {
                 console.debug('Profile Page response:', responseData)
+                this.setState({ loading: false });
                 if (responseData.status === 200) {
                     if (Array.isArray(responseData.data)) {
                         this.setState({
                             userPostsAry: responseData.data,
                             error: responseData.error || null,
-                            loading: false
                         });
                     } else {
                         this.setState({
                             userPostsAry: [],
                             error: responseData.error || null,
-                            loading: false
                         });
                     }
                 } else {
@@ -234,6 +244,107 @@ export default class Profile extends React.Component {
                         </Text>
                     </View>
                 </ScrollView>
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={this.state.showUploadModal}
+                >
+                    <TouchableHighlight style={{ flex: 1, }} onPress={() => {
+                        this.setState({
+                            showUploadModal: !this.state.showUploadModal,
+                        })
+                        console.debug("pressed on TouchableFeedback")
+                    }} >
+                        <View />
+                    </TouchableHighlight>
+                    <View style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                    }}>
+                        <View style={ProfileStyles.modalView}>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 18 }]}>Update Profile</Text>
+                            <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
+                                <TextInput
+                                    style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
+                                    placeholder="Profession"
+                                    underlineColor='transparent'
+                                    theme={{ colors: { primary: 'transparent' } }}
+                                    value={this.state.professionInputText}
+                                    onChangeText={(text) => this.setState({
+                                        professionInputText: text
+                                    })} />
+                            </View>
+                            <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
+                                <TextInput
+                                    style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
+                                    placeholder="Phone"
+                                    underlineColor='transparent'
+                                    theme={{ colors: { primary: 'transparent' } }}
+                                    value={this.state.phoneInputText}
+                                    onChangeText={(text) => this.setState({
+                                        phoneInputText: text
+                                    })} />
+                            </View>
+                            <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
+                                <TextInput
+                                    style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
+                                    placeholder="Address"
+                                    underlineColor='transparent'
+                                    theme={{ colors: { primary: 'transparent' } }}
+                                    value={this.state.addressInputText}
+                                    onChangeText={(text) => this.setState({
+                                        addressInputText: text
+                                    })} />
+                            </View>
+                            <View style={{ borderRadius: 10, width: '100%', height: 60, marginTop: 15, backgroundColor: '#F5F5F5', }}>
+                                <TextInput
+                                    style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 60, backgroundColor: 'transparent' }]}
+                                    placeholder="Bio"
+                                    underlineColor='transparent'
+                                    theme={{ colors: { primary: 'transparent' } }}
+                                    value={this.state.bioInputText}
+                                    onChangeText={(text) => this.setState({
+                                        bioInputText: text
+                                    })} />
+                            </View>
+                            <TouchableOpacity style={{ alignSelf: 'center', paddingTop: 10, paddingBottom: 10 }} onPress={() => {
+                                const data = new FormData();
+                                this.setState({
+                                    showToast: true,
+                                })
+                                if (this.state.professionInputText === '') {
+                                    this.refs.toast.show("Profession cannot be empty");
+                                    return;
+                                }
+                                if (this.state.phoneInputText === '') {
+                                    this.refs.toast.show("Mobile number cannot be empty");
+                                    return;
+                                }
+                                if (this.state.addressInputText === '') {
+                                    this.refs.toast.show("Address cannot be empty");
+                                    return;
+                                }
+                                if (this.state.bioInputText === '') {
+                                    this.refs.toast.show("Bio cannot be empty");
+                                    return;
+                                }
+                                data.append('userprofession', this.state.professionInputText);
+                                data.append('usermobile', this.state.phoneInputText);
+                                data.append('useraddress', this.state.addressInputText);
+                                data.append('userbio', this.state.bioInputText);
+                                Keyboard.dismiss();
+                                this.UpdateProfile(data, true);
+                            }}><Text style={AppStyle.appButton}>Update</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
                 {
                     loading ?
                         <ActivityIndicator
@@ -242,7 +353,7 @@ export default class Profile extends React.Component {
                             size='large'
                         /> : null
                 }
-                <Toast ref="toast" />
+                <Toast ref="toast" style={AppStyle.toast_style} />
             </SafeAreaView >
         )
     }
@@ -254,17 +365,40 @@ export default class Profile extends React.Component {
     }
 
     showUpdateProfile = () => {
-        console.debug('showUpdateProfile');
+        this.setState({
+            showUploadModal: !this.state.showUploadModal,
+            showMenuOptions: !this.state.showMenuOptions
+        })
     }
 
-    signOutfromApp = () => {
-        console.debug('signOutfromApp');
-        this.props.navigation.navigate('login')
+    async signOutfromApp() {
+        this.setState({
+            showMenuOptions: !this.state.showMenuOptions
+        })
+        try {
+            await AsyncStorage.removeItem("userData")
+            // console.debug('signOutfromApp: data removed');
+            this.props.navigation.navigate('login')
+        } catch (err) {
+            console.log(`signOutfromApp:The error is: ${err}`)
+        }
     }
 
     DeactivateProfile = () => {
-        console.debug('DeactivateProfile');
-        this.props.navigation.navigate('login')
+        this.setState({
+            showMenuOptions: !this.state.showMenuOptions
+        })
+        // console.debug('DeactivateProfile');
+        Alert.alert(
+            'Account Deactivation',
+            'Do you want to deactivate your account? You can reactivate only after 14 days',
+            [
+                { text: 'CANCEL', onPress: () => { console.log('Cancel Pressed') }, style: 'cancel' },
+                { text: 'DEACTIVATE', onPress: () => { console.log('OK Pressed') } },
+            ],
+            { cancelable: false }
+        )
+        // this.props.navigation.navigate('login')
     }
 
     uploadImage = () => {
@@ -291,8 +425,10 @@ export default class Profile extends React.Component {
         });
     }
 
-    UpdateProfile = (data, userData) => {
+    UpdateProfile = (data, isfromModal) => {
+        const { userData } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.UPDATE_USER_PROFILE
+        console.debug('URL:', url);
         this.setState({ loading: true });
         fetch(url, {
             method: 'POST',
@@ -305,10 +441,17 @@ export default class Profile extends React.Component {
         }).then((res) => res.json())
             .then(resJson => {
                 console.debug('Update profile response', resJson);
+                this.setState({
+                    loading: false,
+                })
                 if (resJson.status === 200) {
+                    if (isfromModal) {
+                        this.setState({
+                            showUploadModal: !this.state.showUploadModal,
+                        })
+                    }
                     this.setState({
                         error: resJson.error || null,
-                        loading: false,
                         username: resJson.data.username,
                         userdp: resJson.data.userdp,
                         firstname: resJson.data.firstname,
@@ -319,7 +462,11 @@ export default class Profile extends React.Component {
                         userbio: resJson.data.userbio,
                         usermobile: resJson.data.usermobile,
                         useremail: resJson.data.useremail,
-                        useraddress: resJson.data.useraddress
+                        useraddress: resJson.data.useraddress,
+                        professionInputText: resJson.data.userprofession === null ? '' : resJson.data.userprofession,
+                        phoneInputText: resJson.data.usermobile === null ? '' : resJson.data.usermobile,
+                        addressInputText: resJson.data.useraddress === null ? '' : resJson.data.useraddress,
+                        bioInputText: resJson.data.userbio === null ? '' : resJson.data.userbio
                     });
                     this.refs.toast.show("Profile updated successfully");
                 } else {
@@ -331,13 +478,4 @@ export default class Profile extends React.Component {
                 this.refs.toast.show("Something went wrong. Please try again later");
             });
     };
-    // renderLogo() {
-    //     return (
-    //         <View style={{ flex: 1, alignItems: "center", margin: 15, position: "relative" }}>
-    //             <TouchableOpacity onPress={() => this.uploadImage()} >
-    //                 <Image style={ProfileStyles.userDp} source={this.state.userdp == null ? require('../../images/logo.png') : { uri: this.state.userdp }} />
-    //             </TouchableOpacity>
-    //         </View>
-    //     )
-    // }
 }

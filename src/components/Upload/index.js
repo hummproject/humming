@@ -6,7 +6,7 @@ import Toast from 'react-native-easy-toast';
 import AsyncStorage from '@react-native-community/async-storage';
 import ImagePicker from 'react-native-image-picker';
 import AppConfig from '../../config/constants';
-import { cos } from 'react-native-reanimated';
+// import { cos } from 'react-native-reanimated';
 
 const options = {
     title: 'Select Option',
@@ -108,18 +108,18 @@ export default class Upload extends Component {
             },
             body: data
         }).then((res) => {
+            this.setState({
+                loading: false,
+            })
             console.debug('Post marker response', res)
             if (res.status === 200) {
                 this.refs.toast.show("Uploaded Successfully");
-                this.setState({
-                    loading: false,
-                })
                 this.props.navigation.navigate('TabBar');
             } else {
                 this.refs.toast.show(res.message);
             }
         }).catch((err) => {
-            console.log('some info message to user using Toast Android');
+            console.log('Post marker response error',err);
             this.refs.toast.show("Something went wrong. Please try again later");
         });
     }
@@ -202,7 +202,7 @@ export default class Upload extends Component {
                         /> : null
                     }
                     <Toast ref="toast"
-                        style={{ backgroundColor: 'grey', borderRadius: 20 }} />
+                        style={AppStyle.toast_style} />
                 </SafeAreaView>
             </KeyboardAvoidingView>
         );

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView, Keyboard } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView, Keyboard, BackHandler, Alert } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
@@ -58,6 +58,28 @@ export default class Login extends Component {
     goToRegister = () => {
         this.props.navigation.navigate('register');
     }
+
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        Alert.alert(
+            '',
+            'Are you sure you want to exit the app?',
+            [
+                { text: 'CANCEL', onPress: () => { }, style: 'cancel' },
+                { text: 'YES', onPress: () => { BackHandler.exitApp() } },
+            ],
+            { cancelable: false }
+        )
+        return true;
+    };
+
     render() {
         const loading = this.state.loading;
         return (
@@ -72,12 +94,12 @@ export default class Login extends Component {
                     <Text style={AppStyle.appButton}>Sign in</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>
-                    <Text style={[AppStyle.app_font,{marginTop: 25, fontSize: 15},AppStyle.light_TextColor]}>Forgot your password?</Text>
+                    <Text style={[AppStyle.app_font, { marginTop: 25, fontSize: 15 }, AppStyle.light_TextColor]}>Forgot your password?</Text>
                 </TouchableOpacity>
                 <View style={AppStyle.appFooter}>
-                    <Text style={[AppStyle.light_TextColor,AppStyle.app_font,{fontSize: 15}]}>Don't have an account?</Text>
+                    <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 15 }]}>Don't have an account?</Text>
                     <TouchableOpacity onPress={this.goToRegister}>
-                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15}]}>&nbsp;&nbsp;Sign up</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15 }]}>&nbsp;&nbsp;Sign up</Text>
                     </TouchableOpacity>
                 </View>
                 {
@@ -86,11 +108,11 @@ export default class Login extends Component {
                             animating={true}
                             style={AppStyle.activityIndicator}
                             size='large'
-                        /> 
+                        />
                         : null
                 }
                 <Toast ref="toast"
-                    style={{ backgroundColor: 'grey', borderRadius: 20 }} />
+                    style={AppStyle.toast_style} />
             </SafeAreaView>
         )
     };

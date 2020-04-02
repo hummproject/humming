@@ -17,9 +17,9 @@ export default class TabBar extends React.Component {
     constructor(props) {
         super(props);
     }
+
     render() {
         // const { navigation, route } = this.props;
-
         return (
             <Tab.Navigator
                 screenOptions={({ route }) => ({
@@ -60,6 +60,7 @@ export default class TabBar extends React.Component {
                 //     activeTintColor: '#8B0000',
                 //     inactiveTintColor: '#D3D3D3',
                 // }}
+                // initialPage={3}
                 tabBarOptions={{
                     showLabel: false
                 }}

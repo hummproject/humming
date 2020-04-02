@@ -169,7 +169,7 @@ export default class Search extends Component {
                 <View style={styles.headerstyle}>
                     <View style={styles.searchView}>
                         <TextInput
-                            style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14, marginLeft: 10, marginRight: 0, width: '88%'}]}
+                            style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10, marginRight: 0, width: '88%' }]}
                             placeholder="Search anything"
                             value={this.state.searchedText}
                             onChangeText={(text) => this.setState({
@@ -186,8 +186,8 @@ export default class Search extends Component {
                     keyExtractor={(item, index) => item + index}
                     renderItem={({ item }) => <SearchPosts postData={item} />}
                     renderSectionHeader={({ section: { title } }) => (
-                        <View style={{height: 50, backgroundColor: '#FFFFFF', flex: 1, justifyContent: 'center'}}>
-                            <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 16, paddingLeft: 15}]}>{title}</Text>
+                        <View style={{ height: 50, backgroundColor: '#FFFFFF', flex: 1, justifyContent: 'center' }}>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 16, paddingLeft: 15 }]}>{title}</Text>
                         </View>
                     )}
                 />
@@ -198,7 +198,7 @@ export default class Search extends Component {
                         size='large'
                     /> : null
                 }
-                <Toast ref="toast" />
+                <Toast ref="toast" style={AppStyle.toast_style} />
             </SafeAreaView>
         );
     }

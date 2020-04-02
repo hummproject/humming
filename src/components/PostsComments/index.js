@@ -68,6 +68,9 @@ export default class PostsComments extends Component {
             .then(response => response.json())
             .then(responseData => {
                 // console.debug('comments Page comment response:', responseData)
+                this.setState({
+                    loading: false,
+                })
                 if (responseData.status === 200) {
                     var data = responseData.data
                     data["firstname"] = userData.firstname;
@@ -78,8 +81,7 @@ export default class PostsComments extends Component {
                     this.setState({
                         commentsListArray: commentListAry,
                         error: responseData.error || null,
-                        loading: false,
-                        clearInput : true
+                        clearInput: true
                     });
                 } else {
                     this.refs.toast.show(responseData.message);
@@ -155,11 +157,11 @@ export default class PostsComments extends Component {
                         <TouchableOpacity onPress={this.returnBack} >
                             <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
                         </TouchableOpacity>
-                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 20, marginLeft: 20}]}>Comments</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>Comments</Text>
                         <View style={styles.commentsCountcontainer}>
                             <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
                                 style={{ width: 27, height: 27 }} />
-                            <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14, marginLeft: 10}]}>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10 }]}>
                                 {markercommentArray.length}
                             </Text>
                         </View>
@@ -176,11 +178,11 @@ export default class PostsComments extends Component {
                         <TouchableOpacity onPress={this.returnBack} >
                             <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
                         </TouchableOpacity>
-                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 20, marginLeft: 20}]}>Comments</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>Comments</Text>
                         <View style={styles.commentsCountcontainer}>
                             <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
                                 style={{ width: 27, height: 27 }} />
-                            <Text style={[AppStyle.dark_TextColor,AppStyle.app_font, {fontSize: 14, marginLeft: 10 }]}>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10 }]}>
                                 {markercommentArray.length}
                             </Text>
                         </View>
@@ -195,7 +197,7 @@ export default class PostsComments extends Component {
                     <View style={styles.footerstyle}>
                         <Image source={userdp == null ? require('../../images/logo.png') : { uri: userdp }} resizeMode={'contain'} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
                         <TextInput
-                            style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14, height: 40, flex: 2, marginLeft: 15}]}
+                            style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 40, flex: 2, marginLeft: 15 }]}
                             placeholder="Post a Comment"
                             value={!this.state.clearInput ? this.state.userCommentedText : null}
                             onChangeText={(text) => this.setState({
@@ -209,11 +211,11 @@ export default class PostsComments extends Component {
                             marginLeft: 10,
                         }}>
                             <TouchableOpacity onPress={this.PostComment}>
-                                <Text style = {[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14}]}>Post</Text>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Post</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <Toast ref="toast" />
+                    <Toast ref="toast" style={AppStyle.toast_style} />
                 </SafeAreaView>
         )
     };

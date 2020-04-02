@@ -1,43 +1,115 @@
 import React, { Component } from 'react';
-import { Text, View, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { Text, View, Image, TouchableOpacity, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { styles } from './HomePagePost.style';
 import { AppStyle } from '../../App.style';
+import AppConfig from '../../config/constants';
+import Toast from 'react-native-easy-toast'
 
 export default class HomePagePost extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            postDetails: this.props.userData,
+            loading: false,
+            error: null,
+            postDetails: this.props.markerData,
+            userData: this.props.userData,
+            isMarkerAlreadyLiked: null,
             likeorUnlikeImgUri: require('../../images/unlike-icon.png'),
-            postLikesCount: this.props.userData.markerlike !== null ? this.props.userData.markerlike.length : 0
+            postLikesCount: this.props.markerData.markerlike !== null ? this.props.markerData.markerlike.length : 0
         };
     }
 
     GotoPostCommentsPage = () => {
-        const {navigation} = this.props
+        const { navigation } = this.props
         navigation.navigate('postscomments', { postDetails: this.state.postDetails });
     };
 
-    LikeOrUnlikePost = () => {
-        console.debug('Like OR Unlike function', this.state.postDetails);
-        var isAlreadyLiked = false;
-        var likeorUnlikeImgUri = this.state.likeorUnlikeImgUri;
-        var markerlikeArray = this.state.postDetails.markerlike !== null ? this.state.postDetails.markerlike : []
-        var markerLikesCount = this.state.postLikesCount;
-        // for(){
+    GotoPostUserProfile = () => {
+        const { navigation } = this.props
+        console.debug('go to post user profile');
+        navigation.navigate('postuserprofile', { postDetails: this.state.postDetails });
+    }
 
-        // }
-        if (!isAlreadyLiked) {
-            markerLikesCount = markerLikesCount + 1
-            likeorUnlikeImgUri = require('../../images/like-icon.png');
-        } else {
-            markerLikesCount = markerLikesCount - 1
-            likeorUnlikeImgUri = require('../../images/unlike-icon.png');
+    componentDidMount() {
+        var isAlreadyLiked = false;
+        const { postDetails, userData } = this.state;
+        // console.debug("constructor markerlike array OBJ", postDetails.markerlike)
+        if (postDetails.markerlike !== null) {
+            for (let markerlikeObj of postDetails.markerlike) {
+                if (markerlikeObj.userid === userData.userid) {
+                    isAlreadyLiked = true;
+                }
+            }
         }
         this.setState({
-            likeorUnlikeImgUri: likeorUnlikeImgUri,
-            postLikesCount: markerLikesCount
+            isMarkerAlreadyLiked: isAlreadyLiked,
+            likeorUnlikeImgUri: isAlreadyLiked ? require('../../images/like-icon.png') : require('../../images/unlike-icon.png'),
         })
+    }
+
+    LikeOrUnlikePost = () => {
+        // this.makeRequesttoLikeorUnlikethePost();
+    };
+
+
+    makeRequesttoLikeorUnlikethePost = () => {
+        const { postDetails, userData, likeorUnlikeImgUri, postLikesCount, isMarkerAlreadyLiked } = this.state
+        console.debug('Like OR Unlike function:Marker Details', postDetails);
+        console.debug('Like OR Unlike function:User Deatils', userData);
+        // var likeorunlikeImgUri = likeorUnlikeImgUri;
+        // var markerlikeArray = postDetails.markerlike !== null ? postDetails.markerlike : []
+        // var markerLikesCount = postLikesCount;
+
+        const url = AppConfig.DOMAIN + AppConfig.LIKE_OR_UNLIKE_MARKER
+        console.debug(url);
+        console.debug("is Already liked", isMarkerAlreadyLiked);
+        console.debug("Request for like", {
+            markerid: postDetails.marker_id,
+            isLiked: !isMarkerAlreadyLiked
+        });
+        this.setState({ loading: true });
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'token': userData.token
+            },
+            body: JSON.stringify({
+                markerid: postDetails.marker_id,
+                isLiked: !isMarkerAlreadyLiked
+            })
+        })
+            .then(response => response.json())
+            .then(responseData => {
+                console.debug('Home Posts lIKE Response:', responseData)
+                if (responseData.status === 200) {
+                    // if (!isAlreadyLiked) {
+                    //     markerLikesCount = markerLikesCount + 1
+                    //     likeorunlikeImgUri = require('../../images/like-icon.png');
+                    // } else {
+                    //     markerLikesCount = markerLikesCount - 1
+                    //     likeorunlikeImgUri = require('../../images/unlike-icon.png');
+                    // }
+                    // this.setState({
+                    //     likeorUnlikeImgUri: likeorunlikeImgUri,
+                    //     postLikesCount: markerLikesCount
+                    // })
+                    // this.setState({
+                    //     postsListArray: responseData.data,
+                    //     error: responseData.error || null,
+                    //     loading: false,
+                    //     refreshing: false
+                    // });
+                } else {
+                    this.refs.toast.show(responseData.message);
+                }
+            })
+            .catch(error => {
+                console.debug('Home Posts lIKE response ERROR:', error);
+                this.setState({ error, loading: false });
+                this.refs.toast.show("Something went wrong. Please try again later");
+            });
     };
 
     render() {
@@ -58,17 +130,19 @@ export default class HomePagePost extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.TopContainer}>
-                    <Image source={userdpUri == null ? require('../../images/logo.png') : { uri: userdpUri }} style={styles.profile_photo} resizeMode={userdpUri == null ? 'contain' : 'cover'} />
+                    <TouchableOpacity onPress={this.GotoPostUserProfile} style={styles.profile_photo}>
+                        <Image source={userdpUri == null ? require('../../images/logo.png') : { uri: userdpUri }} style={styles.profile_photo} resizeMode={userdpUri == null ? 'contain' : 'cover'} />
+                    </TouchableOpacity>
                     <View style={styles.container_text}>
-                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 16, paddingBottom:0, textTransform: 'capitalize' }]}>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 16, paddingBottom: 0, textTransform: 'capitalize' }]}>
                             {userName}
                         </Text>
-                        <Text style={[AppStyle.light_TextColor,AppStyle.app_font,{fontSize: 14,paddingBottom:5}]}>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14, paddingBottom: 5 }]}>
                             @{tagName}
                         </Text>
                         <View style={styles.categoryContainer}>
                             <Image source={require('../../images/category_marker_icon.png')} style={{ height: 15, width: 15 }} />
-                            <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15, marginLeft: 5, color: 'white' }]}>{category}</Text>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 5, color: 'white' }]}>{category}</Text>
                         </View>
                     </View>
                 </View>
@@ -87,13 +161,13 @@ export default class HomePagePost extends Component {
                                 )
                             } else {
                                 return (
-                                     null//<View></View>
+                                    null//<View></View>
                                 )
                             }
                         }}
                         keyExtractor={(item, index) => index + ""}
                     />
-                    <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15, marginLeft: 14, marginRight: 15, marginTop: 15}]}>
+                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 14, marginRight: 15, marginTop: 15 }]}>
                         {postDesc}
                     </Text>
                 </View>
@@ -105,7 +179,7 @@ export default class HomePagePost extends Component {
                     }}>
                         <Image source={likeorUnlikeImgUri}
                             style={{ width: 32, height: 27, marginLeft: 15 }} resizeMode={'contain'} />
-                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14, marginLeft: 10, marginRight: 25}]}>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10, marginRight: 25 }]}>
                             {markerLikesCount}
                         </Text>
                     </TouchableOpacity>
@@ -116,11 +190,19 @@ export default class HomePagePost extends Component {
                     }}>
                         <Image source={require('../../images/comment-icon.png')} resizeMode={'contain'}
                             style={{ width: 27, height: 27 }} />
-                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font, {fontSize: 14, marginLeft: 10}]}>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10 }]}>
                             {markercommentArray.length}
                         </Text>
                     </TouchableOpacity>
                 </View>
+                {
+                    this.state.loading ? <ActivityIndicator
+                        animating={true}
+                        style={AppStyle.activityIndicator}
+                        size='large'
+                    /> : null
+                }
+                <Toast ref="toast" style={AppStyle.toast_style} />
             </View>
         )
     };

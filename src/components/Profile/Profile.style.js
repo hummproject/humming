@@ -11,7 +11,7 @@ const ProfileStyles = StyleSheet.create({
         height: 200,
         borderRadius: 5,
     },
-    
+
     headerstyle: {
         flexDirection: 'row',
         backgroundColor: 'white',
@@ -21,22 +21,31 @@ const ProfileStyles = StyleSheet.create({
         borderBottomWidth: 1,
         alignItems: 'center',
     },
-    
-    MenuOptionStyle:{
+
+    MenuOptionStyle: {
         zIndex: 1,
-        position: 'absolute', 
+        position: 'absolute',
         top: 55,
         right: 0,
-        flexDirection: 'column', 
-        flexWrap: 'wrap', 
-        backgroundColor: '#FFFFFF', 
-        alignSelf: 'flex-end', 
+        flexDirection: 'column',
+        flexWrap: 'wrap',
+        backgroundColor: '#FFFFFF',
+        alignSelf: 'flex-end',
         padding: 10,
-        borderBottomLeftRadius: 5, 
+        borderBottomLeftRadius: 5,
         elevation: 2,
-        borderColor:'#ececec',
+        borderColor: '#ececec',
         borderWidth: 0.5,
         borderTopWidth: 0,
+    },
+
+    modalView: {
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 15,
+        width : '75%',
+        alignItems: 'center',
+        elevation: 2
     },
 });
 

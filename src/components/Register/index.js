@@ -131,7 +131,7 @@ export default class Register extends Component {
                 <Logo></Logo>
                 {
                     this.state.showStepOne ?
-                        <View style = {{alignItems:'center'}}>
+                        <View style={{ alignItems: 'center' }}>
                             <TextInput style={AppStyle.appInput} placeholder="Firstname"
                                 onChangeText={(firstname) => this.setState({ firstname })}></TextInput>
                             <TextInput style={AppStyle.appInput} placeholder="Lastname"
@@ -154,7 +154,7 @@ export default class Register extends Component {
                 }
                 {
                     this.state.showStepTwo ?
-                        <View style = {{alignItems:'center'}}>
+                        <View style={{ alignItems: 'center' }}>
                             <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
                                 onChangeText={(password) => this.setState({ password })}></TextInput>
                             <TextInput style={AppStyle.appInput} placeholder="Confirm password" secureTextEntry={true}
@@ -167,8 +167,8 @@ export default class Register extends Component {
                 }
                 {
                     this.state.showStepThree ?
-                        <View style = {{flex:1, alignItems:'center'}}>
-                            <Text style ={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize:15}]}>Create Username</Text>
+                        <View style={{ flex: 1, alignItems: 'center' }}>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15 }]}>Create Username</Text>
                             <TextInput style={AppStyle.appInput} placeholder="Username"
                                 onChangeText={(username) => this.setState({ username })}></TextInput>
                             <TouchableOpacity onPress={() => this.registerStepThree()}>
@@ -186,13 +186,13 @@ export default class Register extends Component {
                         : null
                 }
                 <View style={AppStyle.appFooter}>
-                    <Text style ={[AppStyle.light_TextColor,AppStyle.app_font,{fontSize:15}]}>Existing User?</Text>
+                    <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 15 }]}>Existing User?</Text>
                     <TouchableOpacity onPress={() => this.props.navigation.navigate('login')}>
-                        <Text style ={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize:15}]}>&nbsp;&nbsp;Sign in</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15 }]}>&nbsp;&nbsp;Sign in</Text>
                     </TouchableOpacity>
                 </View>
                 <Toast ref="toast"
-                    style={{ backgroundColor: 'grey', borderRadius: 20 }} />
+                    style={AppStyle.toast_style} />
             </SafeAreaView>
         )
     }

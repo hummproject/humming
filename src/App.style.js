@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 const AppStyle = StyleSheet.create({
     appContainer: {
         flexGrow: 1,
-        flexDirection:'column',
+        flexDirection: 'column',
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
@@ -16,9 +16,9 @@ const AppStyle = StyleSheet.create({
         marginBottom: 5
     },
     appLabel: {
-        fontSize:17,
+        fontSize: 17,
         color: "#9B9B9B",
-        fontFamily:'Roboto-Regular',
+        fontFamily: 'Roboto-Regular',
     },
     appInput: {
         width: 300,
@@ -27,12 +27,12 @@ const AppStyle = StyleSheet.create({
         borderRadius: 22.5,
         textAlign: "center",
         marginVertical: 10,
-        fontFamily:'Roboto-Regular',
+        fontFamily: 'Roboto-Regular',
     },
-    
+
     appButton: {
         width: 150,
-        height:40,
+        height: 40,
         borderRadius: 20,
         backgroundColor: '#6454F0',
         color: 'white',
@@ -57,22 +57,27 @@ const AppStyle = StyleSheet.create({
     activityIndicator: {
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'absolute', 
-        top: 0, left: 0, 
+        position: 'absolute',
+        top: 0, left: 0,
         right: 0, bottom: 0,
-        backgroundColor :'#F5FCFF88'
+        backgroundColor: '#F5FCFF88'
     },
 
-    light_TextColor:{
-        color:"#9B9B9B"
+    toast_style: {
+        backgroundColor: 'grey',
+        borderRadius: 20
     },
 
-    dark_TextColor:{
-        color:"#000000"
+    light_TextColor: {
+        color: "#9B9B9B"
     },
 
-    app_font:{
-        fontFamily:'Roboto-Regular'
+    dark_TextColor: {
+        color: "#000000"
+    },
+
+    app_font: {
+        fontFamily: 'Roboto-Regular'
     }
 
 });

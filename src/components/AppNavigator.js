@@ -5,21 +5,25 @@ import Login from './Login';
 import Register from './Register';
 import TabBar from '../TabBar';
 import PostsComments from './PostsComments'
+import PostUserProfile from './PostUserProfile'
 
 const Stack = createStackNavigator()
 
-function AppNavigator() {
+function AppNavigator(props) {
+    console.debug("Props im Navigator",props.initalScreen)
     return (
         <NavigationContainer>
             <Stack.Navigator
-            screenOptions={{
-                headerShown: false
-              }}
+                screenOptions={{
+                    headerShown: false
+                }}
+                initialRouteName={props.initalScreen}
             >
                 <Stack.Screen name='login' component={Login} />
                 <Stack.Screen name='register' component={Register} />
                 <Stack.Screen name='TabBar' component={TabBar} />
                 <Stack.Screen name='postscomments' component={PostsComments} />
+                <Stack.Screen name='postuserprofile' component={PostUserProfile} />
             </Stack.Navigator>
         </NavigationContainer>
     )

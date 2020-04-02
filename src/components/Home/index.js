@@ -64,11 +64,13 @@ export default class Home extends Component {
             .then(responseData => {
                 console.debug('Home Posts response:', responseData)
                 AsyncStorage.setItem("PostsData", JSON.stringify(responseData.data));
+                this.setState({
+                    loading: false,
+                })
                 if (responseData.status === 200) {
                     this.setState({
                         postsListArray: responseData.data,
                         error: responseData.error || null,
-                        loading: false,
                         refreshing: false
                     });
                 } else {
@@ -83,7 +85,7 @@ export default class Home extends Component {
     };
 
     render() {
-        const { postsListArray, loading } = this.state;
+        const { postsListArray, loading, userData } = this.state;
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
@@ -96,7 +98,7 @@ export default class Home extends Component {
                         contentInsetAdjustmentBehavior="automatic"
                         data={postsListArray}
                         renderItem={
-                            ({ item }) => <HomePagePost userData={item} navigation={this.props.navigation} />
+                            ({ item }) => <HomePagePost markerData={item} userData={userData} navigation={this.props.navigation} />
                         }
                         keyExtractor={(item, index) => index + ""}
                     />
@@ -107,7 +109,7 @@ export default class Home extends Component {
                             size='large'
                         /> : null
                     }
-                    <Toast ref="toast" />
+                    <Toast ref="toast" style={AppStyle.toast_style} />
                 </View>
             </SafeAreaView>
         )

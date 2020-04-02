@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Image, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import { styles } from '../HomePagePost/HomePagePost.style';
 import { AppStyle } from '../../App.style'
 
@@ -7,9 +7,7 @@ export default class BanterPagePosts extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            // postDetails: this.props.userData,
-            // likeorUnlikeImgUri: require('../../images/unlike-icon.png'),
-            // postLikesCount: this.props.userData.markerlike !== null ? this.props.userData.markerlike.length : 0
+            postDetails: this.props.postsData,
         };
     }
 
@@ -41,34 +39,26 @@ export default class BanterPagePosts extends Component {
     // };
 
     render() {
-        // const postDetails = this.state.postDetails;
-        // const likeorUnlikeImgUri = this.state.likeorUnlikeImgUri;
+        const postDetails = this.state.postDetails;
         // console.debug(postDetails);
-        // var tagName = postDetails.username;
-        // var firstName = postDetails['firstname'];
-        // var lastName = postDetails['lastname'];
-        // var userName = firstName + ' ' + lastName
-        // var category = postDetails.category;
-        // var postDesc = postDetails.description;
-        // var userdpUri = postDetails.userdp !== null ? postDetails.userdp : 'https://medium-test1.s3.amazonaws.com/1577551283046'
-        // var postimageUri = postDetails.media
-        // var markerlikeArray = this.state.postLikesArray
-        // var markercommentArray = postDetails.markercomments !== null ? postDetails.markercomments : []
-        // var markerLikesCount = this.state.postLikesCount;
+        var postDesc = postDetails.description;
+        var postimageUri = postDetails.media;
+        var markerlikeArray = postDetails.markerlike !== null ? postDetails.markerlike : []
+        var markercommentArray = postDetails.markercomments !== null ? postDetails.markercomments : []
         return (
             <View style={styles.container}>
                 <View style={{ flexDirection: 'column' }}>
                     <FlatList
                         horizontal
                         pagingEnabled={true}
-                        data={[], []}
+                        data={postimageUri}
                         renderItem={({ item }) => {
                             console.debug(item);
                             let imageUri = item != null ? item : ''
                             console.debug(imageUri);
                             if (imageUri != '') {
                                 return (
-                                    < Image source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width, height: 200 }} />
+                                    < Image source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width, height: 250 }} />
                                 )
                             } else {
                                 return (
@@ -79,8 +69,7 @@ export default class BanterPagePosts extends Component {
                         keyExtractor={(item, index) => index + ""}
                     />
                     <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 15, marginRight: 15, marginTop: 15 }]}>
-                        {/* {postDesc} */}
-                        Lorem epusm loreum epsum
+                        {postDesc}
                     </Text>
                 </View>
                 <View style={styles.BottomContainer}>
@@ -91,9 +80,8 @@ export default class BanterPagePosts extends Component {
                     }}>
                         <Image source={require('../../images/unlike-icon.png')}
                             style={{ width: 32, height: 27, marginLeft: 15 }} resizeMode={'contain'} />
-                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14, marginLeft: 10, marginRight: 25}]}>
-                            {/* {markerLikesCount} */}
-                            100
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10, marginRight: 25 }]}>
+                            {markerlikeArray.length}
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={this.GotoPostCommentsPage} style={{
@@ -103,8 +91,8 @@ export default class BanterPagePosts extends Component {
                     }}>
                         <Image source={require('../../images/comment-icon.png')} resizeMode={'contain'}
                             style={{ width: 27, height: 27 }} />
-                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font, {fontSize: 14, marginLeft: 10}]}>
-                            {/* {markercommentArray.length} */} 100
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10 }]}>
+                            {markercommentArray.length} 
                         </Text>
                     </TouchableOpacity>
                 </View>
