@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator, Alert } from 'react-native';
+import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator, Alert, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { ProfileStyles } from '../Profile/Profile.style';
@@ -18,6 +18,7 @@ export default class PostUserProfile extends React.Component {
             postDetails: postDetails,
             error: null,
             isUserAlreadyFollowing: false,
+            showFolloworUnfollowButton: false,
             userPostsAry: [],
             userdp: postDetails.userdp,
             username: postDetails.username,
@@ -36,12 +37,32 @@ export default class PostUserProfile extends React.Component {
     async componentDidMount() {
         await AsyncStorage.getItem("userData").then(value => {
             const userData = JSON.parse(value);
-            this.setState({
-                userData: userData,
-            });
+            const { postDetails } = this.state;
+            console.debug("userdetails: post user profile", userData);
+            if (userData.userid === postDetails.userid) {
+                this.setState({
+                    showFolloworUnfollowButton: false,
+                    userData: userData,
+                })
+            } else {
+                this.setState({
+                    showFolloworUnfollowButton: true,
+                    userData: userData,
+                })
+            }
         });
         this.makeRequesttoFetchPostUserDetails();
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        this.props.navigation.goBack();
+        return true;
+    };
 
     makeRequesttoFetchUserMarkers = () => {
         const { userData, postDetails } = this.state;
@@ -189,7 +210,7 @@ export default class PostUserProfile extends React.Component {
                 console.debug('Postuser Profile Page follow or unfollow response ERROR:', error);
                 this.setState({ error: error, loading: false });
                 this.refs.toast.show("Something went wrong. Please try again later");
-            });             
+            });
     };
 
     render() {
@@ -206,7 +227,8 @@ export default class PostUserProfile extends React.Component {
             usermobile,
             useremail,
             useraddress,
-            isUserAlreadyFollowing
+            isUserAlreadyFollowing,
+            showFolloworUnfollowButton
         } = this.state;
         console.debug("user followers,", followers);
         return (
@@ -224,7 +246,7 @@ export default class PostUserProfile extends React.Component {
                         marginRight: 15,
                     }}>
                         <TouchableOpacity onPress={() => this.showMenu()}>
-                            <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 30, marginLeft: 25 }} resizeMode={'contain'} />
+                            <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 35, marginLeft: 25 }} resizeMode={'center'} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -264,9 +286,13 @@ export default class PostUserProfile extends React.Component {
                             {(userbio == null) || (userbio == '') ? <Text>Bio : Not Available</Text> : <Text>{userbio}</Text>}
                         </Text>
                     </View>
-                    <TouchableOpacity style={{ alignSelf: 'center', paddingTop: 10, paddingBottom: 10 }} onPress={() => { this.makeRequesttoFollowOrUnFollowPostUser() }}>
-                        <Text style={AppStyle.appButton}>{isUserAlreadyFollowing ? "UN FOLLOW" : "FOLLOW"}</Text>
-                    </TouchableOpacity>
+                    {
+                        showFolloworUnfollowButton ?
+                            <TouchableOpacity style={{ alignSelf: 'center', paddingTop: 10, paddingBottom: 10 }} onPress={() => { this.makeRequesttoFollowOrUnFollowPostUser() }}>
+                                <Text style={AppStyle.appButton}>{isUserAlreadyFollowing ? "UN FOLLOW" : "FOLLOW"}</Text>
+                            </TouchableOpacity>
+                            : null
+                    }
                     {
                         userPostsAry.length === 0 ? null
                             :
@@ -302,22 +328,31 @@ export default class PostUserProfile extends React.Component {
                             </View>
                     }
                     <View style={[AppStyle.appAlignItemsCenter, { marginTop: 20 }]}>
-                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 16 }]}>PHONE NUMBER</Text>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
-                            {(usermobile == null) || (usermobile == '') ? <Text>Not Available</Text> : <Text>{usermobile}</Text>}
-                        </Text>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>PHONE NUMBER</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../images/phone_filled.png')} resizeMode={'center'} />
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
+                                {(usermobile == null) || (usermobile == '') ? <Text>Not Available</Text> : <Text>{usermobile}</Text>}
+                            </Text>
+                        </View>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter, { paddingTop: 20, paddingBottom: 20 }]}>
-                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 16 }]}>EMAIL</Text>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
-                            {(useremail == null) || (useremail == '') ? <Text>Not Available</Text> : <Text>{useremail}</Text>}
-                        </Text>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>EMAIL</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../images/email_filled.png')} resizeMode={'center'} />
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
+                                {(useremail == null) || (useremail == '') ? <Text>Not Available</Text> : <Text>{useremail}</Text>}
+                            </Text>
+                        </View>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter, { paddingBottom: 20 }]}>
-                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 16 }]}>ADDRESS</Text>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
-                            {(useraddress == null) || (useraddress == '') ? <Text>Not Available</Text> : <Text>{useraddress}</Text>}
-                        </Text>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>ADDRESS</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../images/location.png')} resizeMode={'center'} />
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
+                                {(useraddress == null) || (useraddress == '') ? <Text>Not Available</Text> : <Text>{useraddress}</Text>}
+                            </Text>
+                        </View>
                     </View>
                 </ScrollView>
                 {

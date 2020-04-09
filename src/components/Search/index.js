@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, SafeAreaView, Image, SectionList, ActivityIndicator, TouchableOpacity, Keyboard } from 'react-native';
+import { Text, View, TextInput, SafeAreaView, Image, SectionList, ActivityIndicator, TouchableOpacity, Keyboard, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { styles } from './search.styles';
 import SearchPosts from '../SearchPosts';
@@ -27,7 +27,17 @@ export default class Search extends Component {
             });
         });
         this.makeRequesttoFetchTopMarkers();
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        this.props.navigation.goBack();
+        return true;
+    };
 
     SearchPosts = (text) => {
         Keyboard.dismiss();

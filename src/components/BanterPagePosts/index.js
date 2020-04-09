@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import { styles } from '../HomePagePost/HomePagePost.style';
 import { AppStyle } from '../../App.style'
+import ProgressiveImage from '../../ProgressiveImage'
 
 export default class BanterPagePosts extends Component {
     constructor(props) {
@@ -11,10 +12,10 @@ export default class BanterPagePosts extends Component {
         };
     }
 
-    // GotoPostCommentsPage = () => {
-    //     const {navigation} = this.props
-    //     navigation.navigate('postscomments', { postDetails: this.state.postDetails });
-    // };
+    GotoPostCommentsPage = () => {
+        const {navigation} = this.props
+        navigation.navigate('postscomments', { postDetails: this.state.postDetails });
+    };
 
     // LikeOrUnlikePost = () => {
     //     console.debug('Like OR Unlike function', this.state.postDetails);
@@ -53,12 +54,12 @@ export default class BanterPagePosts extends Component {
                         pagingEnabled={true}
                         data={postimageUri}
                         renderItem={({ item }) => {
-                            console.debug(item);
+                            // console.debug(item);
                             let imageUri = item != null ? item : ''
-                            console.debug(imageUri);
+                            // console.debug(imageUri);
                             if (imageUri != '') {
                                 return (
-                                    < Image source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width, height: 250 }} />
+                                    < ProgressiveImage source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width, height: 250 }} />
                                 )
                             } else {
                                 return (

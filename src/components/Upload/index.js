@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Picker, SafeAreaView, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Picker, SafeAreaView, FlatList, Dimensions, ActivityIndicator, BackHandler } from 'react-native';
 import { AppStyle } from '../../App.style';
 import { styles } from './upload.styles';
 import Toast from 'react-native-easy-toast';
@@ -39,7 +39,17 @@ export default class Upload extends Component {
                 userData: userData,
             });
         });
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        this.props.navigation.goBack();
+        return true;
+    };
 
     uploadImage = () => {
         ImagePicker.showImagePicker(options, (response) => {
@@ -113,19 +123,25 @@ export default class Upload extends Component {
             })
             console.debug('Post marker response', res)
             if (res.status === 200) {
-                this.refs.toast.show("Uploaded Successfully");
+                this.setState({
+                    isImageUploaded: false,
+                    uploadImageArray: [],
+                    hummDescription: '',
+                    category: '',
+                })
+                this.refs.toast.show("Marker uploaded successfully");
                 this.props.navigation.navigate('TabBar');
             } else {
                 this.refs.toast.show(res.message);
             }
         }).catch((err) => {
-            console.log('Post marker response error',err);
+            console.log('Post marker response error', err);
             this.refs.toast.show("Something went wrong. Please try again later");
         });
     }
 
     render() {
-        const { isImageUploaded, uploadImageArray, loading } = this.state;
+        const { isImageUploaded, uploadImageArray, loading, hummDescription } = this.state;
         return (
             <KeyboardAvoidingView
                 behavior="position">
@@ -162,10 +178,10 @@ export default class Upload extends Component {
                         </View>
                         <View style={{ paddingTop: 20 }}>
                             <TextInput multiline={true} style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, minHeight: 50, overflow: 'hidden', marginLeft: 15, marginRight: 15 }]} placeholder="Write Something"
-                                onChangeText={hummDescription => this.setState({ hummDescription })}></TextInput>
+                                onChangeText={hummDescription => this.setState({ hummDescription })} value={hummDescription}></TextInput>
                             <View style={{ paddingTop: 30 }}>
-                                <View style={{ width: '90%', alignSelf: 'center', height: 50, borderRadius: 25, backgroundColor: '#ECECEC' }} >
-                                    <Picker style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, width: '100%' }]} itemStyle={{ alignItems: 'center', textAlign: 'center', color: '#9B9B9B' }}
+                                <View style={{ width: '90%', alignSelf: 'center', borderRadius: 25, backgroundColor: '#ECECEC' }} >
+                                    <Picker style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, width: '100%', height: 50, }]} itemStyle={{ alignItems: 'center', textAlign: 'center', color: '#9B9B9B' }}
                                         selectedValue={this.state.category}
                                         onValueChange={(itemValue, itemPosition) => {
                                             console.debug('itemValue:', itemValue)

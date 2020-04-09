@@ -36,7 +36,7 @@ export default class Login extends Component {
                     if (res.status === 200) {
                         const userData = res && res.data;
                         AsyncStorage.setItem("userData", JSON.stringify(userData));
-                        this.props.navigation.navigate('TabBar');
+                        this.props.navigation.navigate('TabBar', { isfromLogin: true });
                     } else {
                         this.refs.toast.show("username or password are incorrect");
                     }
@@ -57,6 +57,10 @@ export default class Login extends Component {
 
     goToRegister = () => {
         this.props.navigation.navigate('register');
+    }
+
+    goToForgotPassword = () => {
+        this.props.navigation.navigate('forgotpassword');
     }
 
     componentDidMount() {
@@ -93,7 +97,7 @@ export default class Login extends Component {
                 <TouchableOpacity onPress={this.login}>
                     <Text style={AppStyle.appButton}>Sign in</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={this.goToForgotPassword}>
                     <Text style={[AppStyle.app_font, { marginTop: 25, fontSize: 15 }, AppStyle.light_TextColor]}>Forgot your password?</Text>
                 </TouchableOpacity>
                 <View style={AppStyle.appFooter}>

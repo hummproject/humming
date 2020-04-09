@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator, Alert, Modal, TouchableHighlight, Keyboard } from 'react-native';
+import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator, Alert, Modal, TouchableHighlight, Keyboard, Platform, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { ProfileStyles } from './Profile.style';
@@ -7,6 +7,7 @@ import ImagePicker from 'react-native-image-picker';
 import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
 import { TextInput } from 'react-native-paper';
+import ProgressiveImage from '../../ProgressiveImage'
 
 const options = {
     title: 'Select Option',
@@ -69,7 +70,17 @@ export default class Profile extends React.Component {
             });
         });
         this.makeRequesttoFetchUserMarkers();
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        this.props.navigation.goBack();
+        return true;
+    };
 
     makeRequesttoFetchUserMarkers = () => {
         const { userData } = this.state;
@@ -142,13 +153,13 @@ export default class Profile extends React.Component {
                         marginRight: 15,
                     }}>
                         <TouchableOpacity onPress={() => this.showMenu()}>
-                            <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 30, marginLeft: 25 }} resizeMode={'contain'} />
+                            <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 35, marginLeft: 25 }} resizeMode={'center'} />
                         </TouchableOpacity>
                     </View>
                 </View>
                 {
                     this.state.showMenuOptions ?
-                        <View style={ProfileStyles.MenuOptionStyle}>
+                        <View style={Platform.OS === 'ios' ? ProfileStyles.MenuOptionStyleIOS : ProfileStyles.MenuOptionStyle}>
                             <TouchableOpacity onPress={() => this.showUpdateProfile()}>
                                 <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Update Profile</Text>
                             </TouchableOpacity>
@@ -163,7 +174,7 @@ export default class Profile extends React.Component {
                 }
                 <ScrollView style={{ backgroundColor: 'white' }}>
                     <View style={[ProfileStyles.userDp, { alignSelf: 'center', borderColor: '#F5F5F5', borderWidth: 0.5, marginTop: 10 }]}>
-                        <Image style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={userdp == null ? 'contain' : 'cover'} />
+                        <ProgressiveImage style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={userdp == null ? 'contain' : 'cover'} />
                         <TouchableOpacity onPress={() => this.uploadImage()} style={{ position: "absolute", bottom: 0, right: 0, margin: 10 }}>
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>EDIT</Text>
                         </TouchableOpacity>
@@ -226,28 +237,43 @@ export default class Profile extends React.Component {
                             </View>
                     }
                     <View style={[AppStyle.appAlignItemsCenter, { marginTop: 20 }]}>
-                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 16 }]}>PHONE NUMBER</Text>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
-                            {(usermobile == null) || (usermobile == '') ? <Text>Not Available</Text> : <Text>{usermobile}</Text>}
-                        </Text>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>PHONE NUMBER</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../images/phone_filled.png')} resizeMode={'center'} />
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
+                                {(usermobile == null) || (usermobile == '') ? <Text>Not Available</Text> : <Text>+91 {usermobile}</Text>}
+                            </Text>
+                        </View>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter, { paddingTop: 20, paddingBottom: 20 }]}>
-                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 16 }]}>EMAIL</Text>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
-                            {(useremail == null) || (useremail == '') ? <Text>Not Available</Text> : <Text>{useremail}</Text>}
-                        </Text>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>EMAIL</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../images/email_filled.png')} resizeMode={'center'} />
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
+                                {(useremail == null) || (useremail == '') ? <Text>Not Available</Text> : <Text>{useremail}</Text>}
+                            </Text>
+                        </View>
                     </View>
                     <View style={[AppStyle.appAlignItemsCenter, { paddingBottom: 20 }]}>
-                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 16 }]}>ADDRESS</Text>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
-                            {(useraddress == null) || (useraddress == '') ? <Text>Not Available</Text> : <Text>{useraddress}</Text>}
-                        </Text>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>ADDRESS</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Image source={require('../../images/location.png')} resizeMode={'center'} />
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
+                                {(useraddress == null) || (useraddress == '') ? <Text>Not Available</Text> : <Text>{useraddress}</Text>}
+                            </Text>
+                        </View>
                     </View>
                 </ScrollView>
                 <Modal
                     animationType='fade'
                     transparent={true}
                     visible={this.state.showUploadModal}
+                    onRequestClose={() => {
+                        // Alert.alert('Modal has been closed.');
+                        this.setState({
+                            showUploadModal: !this.state.showUploadModal,
+                        })
+                    }}
                 >
                     <TouchableHighlight style={{ flex: 1, }} onPress={() => {
                         this.setState({

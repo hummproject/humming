@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { AppStyle } from '../../App.style'
+import ProgressiveImage from '../../ProgressiveImage'
 
 export default class SearchPosts extends Component {
     constructor(props) {
@@ -25,8 +26,8 @@ export default class SearchPosts extends Component {
             <View style={styles.container}>
                 <View style = {{paddingLeft: 15, paddingBottom: 10}}>
                 <View style={styles.categoryContainer}>
-                    <Image source={require('../../images/category_marker_icon.png')} style={{ height: 15, width: 15 }} />
-                    <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15, marginLeft: 5, color: 'white' , textTransform: 'capitalize' }]}>{category}</Text>
+                    <Image source={require('../../images/category_marker_icon.png')} style={{ height: 13, width: 13 }} />
+                    <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 14, marginLeft: 5, color: 'white' , textTransform: 'capitalize' }]}>{category}</Text>
                     </View>
                 </View>
                     <FlatList
@@ -64,11 +65,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         alignSelf: 'baseline',
         justifyContent: 'flex-start',
-        padding: 5,
-        paddingLeft: 10,
-        paddingRight: 10,
+        padding: 3,
+        paddingLeft: 8,
+        paddingRight: 8,
         borderRadius: 15,
-        backgroundColor: '#4A357A',
+        backgroundColor: '#6454F0',
     },
 
     container: {

@@ -40,8 +40,23 @@ const AppStyle = StyleSheet.create({
         padding: 10,
         textTransform: "uppercase",
         marginTop: 20,
-        fontFamily: 'Roboto-Regular'//'Roboto-Light',
+        fontFamily: 'Roboto-Regular',//'Roboto-Light',
+        overflow: "hidden"
     },
+
+    // appButtonIOS: {
+    //     width: 150,
+    //     height: 40,
+    //     borderRadius: 20,
+    //     backgroundColor: '#6454F0',
+    //     color: 'white',
+    //     textAlign: "center",
+    //     padding: 10,
+    //     textTransform: "uppercase",
+    //     marginTop: 20,
+    //     fontFamily: 'Roboto-Regular',//'Roboto-Light',
+    //     overflow: "hidden"
+    // },
 
     appMarginTop: {
         marginTop: 20
@@ -65,7 +80,7 @@ const AppStyle = StyleSheet.create({
 
     toast_style: {
         backgroundColor: 'grey',
-        borderRadius: 20
+        borderRadius: 20,
     },
 
     light_TextColor: {

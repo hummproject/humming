@@ -16,11 +16,11 @@ const styles = StyleSheet.create({
         alignItems: 'center', 
         alignSelf:'baseline',
         justifyContent: 'flex-start', 
-        padding:5,
-        paddingLeft: 10, 
-        paddingRight:10, 
+        padding:3,
+        paddingLeft: 8, 
+        paddingRight:8, 
         borderRadius:15,
-        backgroundColor:'#4A357A'
+        backgroundColor:'#6454F0'
     },
 
     TopContainer: {

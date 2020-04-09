@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, SafeAreaView, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
+import { Text, View, SafeAreaView, StyleSheet, FlatList, TouchableOpacity, Image, BackHandler } from 'react-native';
 import BanterPagePosts from '../BanterPagePosts';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style'
@@ -14,7 +14,6 @@ export default class Banter extends Component {
             postsData: [],
             isUserSelected: false,
             userSelectedPost: {},
-            isuserSelectionChanged: false,
         };
     }
 
@@ -23,7 +22,7 @@ export default class Banter extends Component {
             const postsData = JSON.parse(value);
             this.setState({
                 postsData: postsData,
-                isUserSelected : false,
+                isUserSelected: false,
             });
         });
         console.debug('Banter Posts List', this.state.postsData)
@@ -50,19 +49,28 @@ export default class Banter extends Component {
         this.setState({
             userListArray: uniquePostsArray
         })
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        this.props.navigation.goBack();
+        return true;
+    };
 
     showPostBasedonUserSelection = (item) => {
         console.debug("user selected", item);
         this.setState({
             isUserSelected: true,
             userSelectedPost: item,
-            isuserSelectionChanged:!this.state.isuserSelectionChanged
         })
     };
 
     render() {
-        const { userListArray, userSelectedPost, isUserSelected,isuserSelectionChanged } = this.state;
+        const { userListArray, userSelectedPost, isUserSelected } = this.state;
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={styles.headerstyle}>
@@ -77,9 +85,11 @@ export default class Banter extends Component {
                                 return (
                                     <TouchableOpacity style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 15, backgroundColor: '#FFFFFF' }} onPress={() => this.showPostBasedonUserSelection(item)}>
                                         <Image source={item.userdp == null ? require('../../images/logo.png') : { uri: item.userdp }} style={{ height: 80, width: 80, borderRadius: 40, marginBottom: 10 }} resizeMode={item.userdp == null ? 'contain' : 'cover'} />
-                                        <View style={styles.categoryContainer}>
-                                            <Image source={require('../../images/category_marker_icon.png')} style={{ height: 15, width: 15 }} />
-                                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 5, color: 'white' }]}>{item.category}</Text>
+                                        <View>
+                                            <View style={styles.categoryContainer}>
+                                                <Image source={require('../../images/category_marker_icon.png')} style={{ height: 13, width: 13 }} />
+                                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white' }]}>{item.category}</Text>
+                                            </View>
                                         </View>
                                     </TouchableOpacity>
                                 )
@@ -89,11 +99,11 @@ export default class Banter extends Component {
                     />
                 </View>
                 {
-                    (isUserSelected && isuserSelectionChanged) ?
+                    isUserSelected ?
                         <FlatList
                             data={[userSelectedPost]}
                             renderItem={
-                                ({ item }) => <BanterPagePosts postsData={item} />
+                                ({ item }) => <BanterPagePosts key={item.marker_id} postsData={item} navigation={this.props.navigation} />
                             }
                             keyExtractor={(item, index) => index + ""}
                         />
@@ -121,10 +131,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         alignSelf: 'baseline',
         justifyContent: 'flex-start',
-        padding: 5,
-        paddingLeft: 10,
-        paddingRight: 10,
+        padding: 3,
+        paddingLeft: 8,
+        paddingRight: 8,
         borderRadius: 15,
-        backgroundColor: '#4A357A'
+        backgroundColor: '#6454F0'
     },
 });

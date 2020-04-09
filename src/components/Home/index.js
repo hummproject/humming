@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text } from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, BackHandler, Alert } from 'react-native';
 import HomePagePost from '../HomePagePost';
 import { AppStyle } from '../../App.style'
 import AppConfig from '../../config/constants';
@@ -33,7 +33,25 @@ export default class Home extends Component {
         //     this._componentFocused
         // );
         this.makeRequesttoFetchPosts();
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        Alert.alert(
+            '',
+            'Are you sure you want to exit the app?',
+            [
+                { text: 'CANCEL', onPress: () => { }, style: 'cancel' },
+                { text: 'YES', onPress: () => { BackHandler.exitApp() } },
+            ],
+            { cancelable: false }
+        )
+        return true;
+    };
 
     // componentWillUnmount() {
     //     this._sub.remove();
@@ -90,8 +108,8 @@ export default class Home extends Component {
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     <View style={styles.headerstyle}>
-                        <Image source={require('../../images/logo.png')} style={{ width: 30, height: 40, marginLeft: 15 }} />
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>HUMMING</Text>
+                        <Image source={require('../../images/home_header_logo.png')} style={{ width: 110, height: 50, marginLeft: 15 }} resizeMode={'center'} />
+                        {/* <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>HUMMING</Text> */}
                     </View>
                     <FlatList
                         contentInset={{ top: 0, bottom: -20, left: 0, right: 0 }}

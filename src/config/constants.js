@@ -14,6 +14,9 @@ const AppConfig = {
     GET_POST_USER_PROFILE :"/api/v1/getprofile",
     FOLLOW_USER :"/api/v1/follow",
     UN_FOLLOW_USER :"/api/v1/unfollow",
+    FORGOT_PASSWORD_GET_OTP: "/forgotpassword",
+    FORGOT_PASSWORD_VERIFY_OTP : "/verify",
+    FORGOT_PASSWORD_UPDATE_PASSWORD : "/updatepassword",
     HEADERS: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

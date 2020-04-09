@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
 const ProfileStyles = StyleSheet.create({
     followContent: {
@@ -39,13 +39,37 @@ const ProfileStyles = StyleSheet.create({
         borderTopWidth: 0,
     },
 
+    MenuOptionStyleIOS: {
+        zIndex: 1,
+        position: 'absolute',
+        top: 90,
+        right: 0,
+        flexDirection: 'column',
+        flexWrap: 'wrap',
+        backgroundColor: '#FFFFFF',
+        alignSelf: 'flex-end',
+        padding: 10,
+        borderBottomLeftRadius: 5,
+        elevation: 2,
+        borderColor: '#ececec',
+        borderWidth: 0.5,
+        borderTopWidth: 0,
+    },
+
     modalView: {
         backgroundColor: "white",
         borderRadius: 20,
         padding: 15,
-        width : '75%',
+        width: '75%',
         alignItems: 'center',
-        elevation: 2
+        elevation: 2,
+        shadowColor: '#F5F5F5',
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowRadius: 2,
+        shadowOpacity: 0.8
     },
 });
 

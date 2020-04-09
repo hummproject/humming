@@ -4,6 +4,7 @@ import { styles } from './HomePagePost.style';
 import { AppStyle } from '../../App.style';
 import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
+import ProgressiveImage from '../../ProgressiveImage'
 
 export default class HomePagePost extends Component {
     constructor(props) {
@@ -141,8 +142,8 @@ export default class HomePagePost extends Component {
                             @{tagName}
                         </Text>
                         <View style={styles.categoryContainer}>
-                            <Image source={require('../../images/category_marker_icon.png')} style={{ height: 15, width: 15 }} />
-                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 5, color: 'white' }]}>{category}</Text>
+                            <Image source={require('../../images/category_marker_icon.png')} style={{ height: 13, width: 13 }} />
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white' }]}>{category}</Text>
                         </View>
                     </View>
                 </View>
@@ -157,7 +158,7 @@ export default class HomePagePost extends Component {
                             console.debug(imageUri);
                             if (imageUri != '') {
                                 return (
-                                    < Image source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width, height: 200 }} />
+                                    < ProgressiveImage source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width, height: 200 }} />
                                 )
                             } else {
                                 return (

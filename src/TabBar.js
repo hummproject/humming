@@ -2,7 +2,9 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
-    Image
+    Image,
+    BackHandler, 
+    Alert
 } from 'react-native';
 
 import Home from './components/Home'
@@ -22,6 +24,7 @@ export default class TabBar extends React.Component {
         // const { navigation, route } = this.props;
         return (
             <Tab.Navigator
+                initialRouteName = 'Home'
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ focused, tintColor }) => {
                         let iconName;
@@ -60,7 +63,6 @@ export default class TabBar extends React.Component {
                 //     activeTintColor: '#8B0000',
                 //     inactiveTintColor: '#D3D3D3',
                 // }}
-                // initialPage={3}
                 tabBarOptions={{
                     showLabel: false
                 }}

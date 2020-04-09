@@ -26,6 +26,21 @@ export default class Register extends Component {
     dismissKeyboard() {
         Keyboard.dismiss();
     }
+
+    validateEmail = (text) => {
+        console.log(text);
+        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (reg.test(text) === false) {
+            console.log("Email is not correct");
+            return false;
+        }
+        else {
+            console.log("Email is correct");
+            return true;
+        }
+    }
+
+
     registerStepOne() {
         this.dismissKeyboard();
 
@@ -43,6 +58,10 @@ export default class Register extends Component {
         }
         if (email === '') {
             this.refs.toast.show("Email is required");
+            return;
+        }
+        if (this.validateEmail(email) === false) {
+            this.refs.toast.show("Email is not valid");
             return;
         }
 
@@ -125,6 +144,7 @@ export default class Register extends Component {
             }, 1000);
         });
     }
+    
     render() {
         return (
             <SafeAreaView style={AppStyle.appContainer}>

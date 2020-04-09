@@ -16,6 +16,7 @@ export default class PostsComments extends Component {
             error: null,
             userCommentedText: '',
             clearInput: false,
+            showtoast: false,
             userData: {},
             postDetails: this.props.route.params.postDetails
         };
@@ -32,7 +33,6 @@ export default class PostsComments extends Component {
     }
 
     PostComment = () => {
-        // console.debug('Post comment', this.state.userCommentedText);
         this.PostCommentOfUser();
     };
 
@@ -48,55 +48,65 @@ export default class PostsComments extends Component {
     PostCommentOfUser = () => {
         this.dismissKeyboard();
         // console.debug('post Details : Fetch', this.state.postDetails);
-        const { userData } = this.state;
-        const token = userData.token;
-        const url = AppConfig.DOMAIN + AppConfig.ADD_COMMENTS_TO_MARKER;
-        console.debug(url);
-        this.setState({ loading: true });
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'token': token,
-            },
-            body: JSON.stringify({
-                markerid: this.state.postDetails.marker_id,
-                content: this.state.userCommentedText,
-            }),
+        const { userData, userCommentedText, postDetails, commentsListArray } = this.state;
+        this.setState({
+            showtoast : true
         })
-            .then(response => response.json())
-            .then(responseData => {
-                // console.debug('comments Page comment response:', responseData)
-                this.setState({
-                    loading: false,
-                })
-                if (responseData.status === 200) {
-                    var data = responseData.data
-                    data["firstname"] = userData.firstname;
-                    data["lastname"] = userData.lastname;
-                    data["userdp"] = userData.userdp;
-                    let commentListAry = this.state.commentsListArray;
-                    commentListAry.unshift(data);
-                    this.setState({
-                        commentsListArray: commentListAry,
-                        error: responseData.error || null,
-                        clearInput: true
-                    });
-                } else {
-                    this.refs.toast.show(responseData.message);
-                }
+        if (userCommentedText !== "") {
+            const token = userData.token;
+            const url = AppConfig.DOMAIN + AppConfig.ADD_COMMENTS_TO_MARKER;
+            console.debug(url);
+            this.setState({ loading: true });
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'token': token,
+                },
+                body: JSON.stringify({
+                    markerid: postDetails.marker_id,
+                    content: userCommentedText,
+                }),
             })
-            .catch(error => {
-                console.debug('comments Page response ERROR:', error);
-                this.setState({ error, loading: false });
-                this.refs.toast.show("Something went wrong. Please try again later");
-            });
+                .then(response => response.json())
+                .then(responseData => {
+                    // console.debug('comments Page comment response:', responseData)
+                    this.setState({
+                        loading: false,
+                    })
+                    if (responseData.status === 200) {
+                        var data = responseData.data
+                        data["firstname"] = userData.firstname;
+                        data["lastname"] = userData.lastname;
+                        data["userdp"] = userData.userdp;
+                        var commentListAry = commentsListArray;
+                        commentListAry.unshift(data);
+                        console.debug("",commentListAry);
+                        this.setState({
+                            commentsListArray: commentListAry,
+                            error: responseData.error || null,
+                            clearInput: true,
+                            userCommentedText: '',
+                        });
+                    } else {
+                        this.refs.toast.show(responseData.message);
+                    }
+                })
+                .catch(error => {
+                    console.debug('comments Page response ERROR:', error);
+                    this.setState({ error, loading: false });
+                    this.refs.toast.show("Something went wrong. Please try again later");
+                });
+        }else{
+            this.refs.toast.show("Please write someting to post"); 
+        }
     };
 
     fetchCommentsforPosts = () => {
         // console.debug('post Details : Fetch', this.state.postDetails);
-        const token = this.state.userData.token;
+        const { userData, postDetails } = this.state;
+        const token = userData.token;
         const url = AppConfig.DOMAIN + AppConfig.GET_MARKER_COMMENTS;
         console.debug(url);
         this.setState({ loading: true });
@@ -108,24 +118,25 @@ export default class PostsComments extends Component {
                 'token': token,
             },
             body: JSON.stringify({
-                markerid: this.state.postDetails.marker_id,
+                markerid: postDetails.marker_id,
             }),
         })
             .then(response => response.json())
             .then(responseData => {
                 // console.debug('comments Page response:', responseData)
+                this.setState({
+                    loading: false,
+                })
                 if (responseData.status === 200) {
                     if (Array.isArray(responseData.data)) {
                         this.setState({
                             commentsListArray: responseData.data,
                             error: responseData.error || null,
-                            loading: false
                         });
                     } else {
                         this.setState({
                             commentsListArray: [],
                             error: responseData.error || null,
-                            loading: false
                         });
                     }
                 } else {
@@ -190,16 +201,16 @@ export default class PostsComments extends Component {
                     <FlatList
                         data={commentsListArray}
                         renderItem={
-                            ({ item }) => <PostsCommentsListComponent commentData={item} />
+                            ({ item }) => <PostsCommentsListComponent key={item.commentid} commentData={item} />
                         }
-                        keyExtractor={(item, index) => index + ""}
+                        keyExtractor={(item, index) => item + index}
                     />
                     <View style={styles.footerstyle}>
                         <Image source={userdp == null ? require('../../images/logo.png') : { uri: userdp }} resizeMode={'contain'} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
                         <TextInput
                             style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 40, flex: 2, marginLeft: 15 }]}
                             placeholder="Post a Comment"
-                            value={!this.state.clearInput ? this.state.userCommentedText : null}
+                            value={!this.state.clearInput ? userCommentedText : null}
                             onChangeText={(text) => this.setState({
                                 userCommentedText: text,
                             })}
