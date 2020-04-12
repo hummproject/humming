@@ -33,10 +33,17 @@ export default class Login extends Component {
                     userpassword: userPwd,
                 }).then((res) => {
                     this.setState({ loading: false })
+                    console.debug("User Data from Login", res && res.data)
                     if (res.status === 200) {
                         const userData = res && res.data;
-                        AsyncStorage.setItem("userData", JSON.stringify(userData));
-                        this.props.navigation.navigate('TabBar', { isfromLogin: true });
+                        console.debug("User Data from Login", userData)
+                        console.debug("isActive: ",userData.isactive);
+                        if (userData.isactive == true) {
+                            AsyncStorage.setItem("userData", JSON.stringify(userData));
+                            this.props.navigation.navigate('TabBar', { isfromLogin: true });
+                        } else {
+                            this.refs.toast.show("This account is currently deactive");
+                        }
                     } else {
                         this.refs.toast.show("username or password are incorrect");
                     }

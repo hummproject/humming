@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { RegisterUser } from './Register.service';
@@ -40,6 +40,39 @@ export default class Register extends Component {
         }
     }
 
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        const { showStepOne, showStepTwo, showStepThree } = this.state
+        if (showStepOne === false && showStepTwo === true) {
+            this.setState({
+                showStepOne: true,
+                showStepTwo: false,
+                showStepThree: false,
+                password: '',
+                confirmpassword: '',
+            });
+            console.debug('IF');
+        } else if (showStepOne === false && showStepTwo === false && showStepThree === true) {
+            this.setState({
+                showStepOne: false,
+                showStepTwo: true,
+                showStepThree: false,
+                username :''
+            });
+            console.debug('ELSE IF');
+        } else {
+            console.debug('ELSE');
+            this.props.navigation.goBack();
+        }
+        return true;
+    };
 
     registerStepOne() {
         this.dismissKeyboard();
@@ -89,7 +122,7 @@ export default class Register extends Component {
         this.setState({ showStepOne: false, showStepTwo: false, showStepThree: true });
     }
     registerStepThree() {
-        this.setState({ showLoader: true });
+       
         this.dismissKeyboard();
         var username = this.state.username;
 
@@ -97,7 +130,7 @@ export default class Register extends Component {
             this.refs.toast.show("Username is required");
             return;
         }
-
+        this.setState({ showLoader: true });
         Geolocation.getCurrentPosition((position) => {
             this.callRegisterApi(position);
         }, (error) => {
@@ -105,6 +138,7 @@ export default class Register extends Component {
             this.callRegisterApi();
         }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
     }
+
     callRegisterApi(position) {
         var locationData = position;
         var registrationData = {
@@ -126,11 +160,10 @@ export default class Register extends Component {
         RegisterUser(registrationData).then((res) => {
             if (res.status === 200) {
                 const userData = res && res.data;
-
                 AsyncStorage.setItem("userData", JSON.stringify(userData));
                 this.props.navigation.navigate('TabBar', { userData: res.data });
             } if (res.message === "User already existed, please login.") {
-                this.refs.toast.show("Username already existed. Please choose another.");
+                this.refs.toast.show("Username already exists. Please try another");
             } else {
                 this.refs.toast.show("Something went wrong. Please try again later");
             }
@@ -144,7 +177,7 @@ export default class Register extends Component {
             }, 1000);
         });
     }
-    
+
     render() {
         return (
             <SafeAreaView style={AppStyle.appContainer}>
@@ -152,11 +185,11 @@ export default class Register extends Component {
                 {
                     this.state.showStepOne ?
                         <View style={{ alignItems: 'center' }}>
-                            <TextInput style={AppStyle.appInput} placeholder="Firstname"
+                            <TextInput style={AppStyle.appInput} placeholder="Firstname" value={this.state.firstname}
                                 onChangeText={(firstname) => this.setState({ firstname })}></TextInput>
-                            <TextInput style={AppStyle.appInput} placeholder="Lastname"
+                            <TextInput style={AppStyle.appInput} placeholder="Lastname" value={this.state.lastname}
                                 onChangeText={(lastname) => this.setState({ lastname })}></TextInput>
-                            <TextInput style={AppStyle.appInput} placeholder="Email"
+                            <TextInput style={AppStyle.appInput} placeholder="Email" value={this.state.email}
                                 onChangeText={(email) => this.setState({ email })}></TextInput>
                             <TouchableOpacity onPress={() => this.registerStepOne()}>
                                 <Text style={AppStyle.appButton}>Next</Text>
@@ -175,9 +208,9 @@ export default class Register extends Component {
                 {
                     this.state.showStepTwo ?
                         <View style={{ alignItems: 'center' }}>
-                            <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
+                            <TextInput style={AppStyle.appInput} placeholder="Password" value={this.state.password} secureTextEntry={true}
                                 onChangeText={(password) => this.setState({ password })}></TextInput>
-                            <TextInput style={AppStyle.appInput} placeholder="Confirm password" secureTextEntry={true}
+                            <TextInput style={AppStyle.appInput} placeholder="Confirm password" value={this.state.confirmpassword} secureTextEntry={true}
                                 onChangeText={(confirmpassword) => this.setState({ confirmpassword })}></TextInput>
                             <TouchableOpacity onPress={() => this.registerStepTwo()}>
                                 <Text style={AppStyle.appButton}>Next</Text>

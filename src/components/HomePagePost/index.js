@@ -23,11 +23,10 @@ export default class HomePagePost extends Component {
     GotoPostCommentsPage = () => {
         const { navigation } = this.props
         navigation.navigate('postscomments', { postDetails: this.state.postDetails });
-    };
+    }
 
     GotoPostUserProfile = () => {
         const { navigation } = this.props
-        console.debug('go to post user profile');
         navigation.navigate('postuserprofile', { postDetails: this.state.postDetails });
     }
 
@@ -49,9 +48,8 @@ export default class HomePagePost extends Component {
     }
 
     LikeOrUnlikePost = () => {
-        // this.makeRequesttoLikeorUnlikethePost();
+        this.makeRequesttoLikeorUnlikethePost();
     };
-
 
     makeRequesttoLikeorUnlikethePost = () => {
         const { postDetails, userData, likeorUnlikeImgUri, postLikesCount, isMarkerAlreadyLiked } = this.state
@@ -66,7 +64,7 @@ export default class HomePagePost extends Component {
         console.debug("is Already liked", isMarkerAlreadyLiked);
         console.debug("Request for like", {
             markerid: postDetails.marker_id,
-            isLiked: !isMarkerAlreadyLiked
+            isLiked: isMarkerAlreadyLiked
         });
         this.setState({ loading: true });
         fetch(url, {
@@ -78,12 +76,13 @@ export default class HomePagePost extends Component {
             },
             body: JSON.stringify({
                 markerid: postDetails.marker_id,
-                isLiked: !isMarkerAlreadyLiked
+                isLiked: isMarkerAlreadyLiked
             })
         })
             .then(response => response.json())
             .then(responseData => {
                 console.debug('Home Posts lIKE Response:', responseData)
+                this.setState({ loading: false });
                 if (responseData.status === 200) {
                     // if (!isAlreadyLiked) {
                     //     markerLikesCount = markerLikesCount + 1

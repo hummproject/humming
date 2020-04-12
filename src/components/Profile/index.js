@@ -365,7 +365,7 @@ export default class Profile extends React.Component {
                                 data.append('useraddress', this.state.addressInputText);
                                 data.append('userbio', this.state.bioInputText);
                                 Keyboard.dismiss();
-                                this.UpdateProfile(data, true);
+                                this.UpdateProfile(data, true, false);
                             }}><Text style={AppStyle.appButton}>Update</Text>
                             </TouchableOpacity>
                         </View>
@@ -410,21 +410,33 @@ export default class Profile extends React.Component {
         }
     }
 
-    DeactivateProfile = () => {
+    async DeactivateProfile() {
         this.setState({
             showMenuOptions: !this.state.showMenuOptions
         })
         // console.debug('DeactivateProfile');
+        try {
+            await AsyncStorage.removeItem("userData")
+        } catch (err) {
+            console.log(`signOutfromApp:The error is: ${err}`)
+        }
         Alert.alert(
             'Account Deactivation',
             'Do you want to deactivate your account? You can reactivate only after 14 days',
             [
                 { text: 'CANCEL', onPress: () => { console.log('Cancel Pressed') }, style: 'cancel' },
-                { text: 'DEACTIVATE', onPress: () => { console.log('OK Pressed') } },
+                {
+                    text: 'DEACTIVATE', onPress: () => {
+                        console.log('OK Pressed')
+                        const data = new FormData();
+                        data.append('isactive', false); // Deactivate 
+                        console.debug("Deactivate profile",data);
+                        this.UpdateProfile(data, false, true)
+                    }
+                },
             ],
             { cancelable: false }
         )
-        // this.props.navigation.navigate('login')
     }
 
     uploadImage = () => {
@@ -446,12 +458,12 @@ export default class Profile extends React.Component {
                     name: response.fileName
                 });
                 data.append('firstname', userData.firstname);
-                this.UpdateProfile(data, userData);
+                this.UpdateProfile(data, false, false);
             }
         });
     }
 
-    UpdateProfile = (data, isfromModal) => {
+    UpdateProfile = (data, isfromModal, isFromDeactivateProfile) => {
         const { userData } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.UPDATE_USER_PROFILE
         console.debug('URL:', url);
@@ -471,6 +483,11 @@ export default class Profile extends React.Component {
                     loading: false,
                 })
                 if (resJson.status === 200) {
+                    if (isFromDeactivateProfile) {
+                        this.refs.toast.show("Profile deactivated successfully");
+                        this.props.navigation.navigate('login')
+                        return;
+                    }
                     if (isfromModal) {
                         this.setState({
                             showUploadModal: !this.state.showUploadModal,

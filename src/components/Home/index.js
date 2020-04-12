@@ -27,11 +27,6 @@ export default class Home extends Component {
                 userData: userData
             });
         });
-        // this._componentFocused();
-        // this._sub = this.props.navigation.addListener(
-        //     'didFocus',
-        //     this._componentFocused
-        // );
         this.makeRequesttoFetchPosts();
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
@@ -52,14 +47,6 @@ export default class Home extends Component {
         )
         return true;
     };
-
-    // componentWillUnmount() {
-    //     this._sub.remove();
-    // }
-
-    // _componentFocused = () => {
-    //     console.debug('Screen focused')
-    // }
 
     makeRequesttoFetchPosts = () => {
         const { page, userData } = this.state;

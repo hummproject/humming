@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView, BackHandler } from 'react-native';
+import { Text, View, TextInput, Image, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import AppConfig from '../../config/constants';
-import Logo from '../Logo';
+// import Logo from '../Logo';
 import Toast from 'react-native-easy-toast';
 // import Geolocation from 'react-native-geolocation-service';
 
@@ -248,59 +248,76 @@ export default class ForgotPassword extends Component {
     render() {
         return (
             <SafeAreaView style={AppStyle.appContainer}>
-                <Logo></Logo>
-                <Text>Forgot Password</Text>
-                {
-                    this.state.showStepOne ?
-                        <View style={{ alignItems: 'center' }}>
-                            <TextInput style={AppStyle.appInput} placeholder="Email" value={this.state.email}
-                                onChangeText={(email) => this.setState({ email })}></TextInput>
-                            {
-                                this.state.showStepTwo ?
-                                    <TextInput style={AppStyle.appInput} placeholder="OTP" value={this.state.otp}
-                                        onChangeText={(otp) => this.setState({ otp })}></TextInput>
-                                    : null
-                            }
-                            <TouchableOpacity onPress={() => this.ForgotPasswordStepOne()}>
-                                <Text style={AppStyle.appButton}>SUBMIT</Text>
-                            </TouchableOpacity>
-                            {
-                                this.state.showLoader ?
-                                    <ActivityIndicator
-                                        animating={true}
-                                        style={AppStyle.activityIndicator}
-                                        size='large'
-                                    /> : null
-                            }
-                        </View>
-                        : null
-                }
-                {
-                    this.state.showStepThree ?
-                        <View style={{ flex: 1, alignItems: 'center' }}>
-                            <TextInput style={AppStyle.appInput} placeholder="New Password" value={this.state.newPassword}
-                                onChangeText={(newPassword) => this.setState({ newPassword })}></TextInput>
-                            <TextInput style={AppStyle.appInput} placeholder="Re-enter New Password" value={this.state.newConfirmPassword}
-                                onChangeText={(newConfirmPassword) => this.setState({ newConfirmPassword })}></TextInput>
-                            <TouchableOpacity onPress={() => this.ForgotPasswordStepThree()}>
-                                <Text style={AppStyle.appButton}>SUBMIT</Text>
-                            </TouchableOpacity>
-                            {
-                                this.state.showLoader ?
-                                    <ActivityIndicator
-                                        animating={true}
-                                        style={AppStyle.activityIndicator}
-                                        size='large'
-                                    /> : null
-                            }
-                        </View>
-                        : null
-                }
-                <View style={AppStyle.appFooter}>
-                    <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 15 }]}>Remember Password?</Text>
-                    <TouchableOpacity onPress={() => this.props.navigation.navigate('login')}>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15 }]}>&nbsp;&nbsp;Sign in</Text>
-                    </TouchableOpacity>
+                {/* <Logo></Logo> */}
+                <View style={{ flex: 1 }}>
+                    <Image style={{
+                        width: 80,
+                        height: 80,
+                        marginVertical: 40,
+                    }} source={require('../../images/logo.png')} resizeMode={'contain'} />
+                </View>
+                <View style={{ flex: 2.5, alignItems: 'center' }}>
+                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, paddingTop: 30, paddingBottom: 30 }]}>Forgot Password</Text>
+                    {
+                        this.state.showStepOne ?
+                            <View style={{ alignItems: 'center' }}>
+                                <TextInput style={AppStyle.appInput} placeholder="Email" value={this.state.email}
+                                    onChangeText={(email) => this.setState({ email })}></TextInput>
+                                {
+                                    this.state.showStepTwo ?
+                                        <TextInput style={AppStyle.appInput} placeholder="OTP" value={this.state.otp}
+                                            onChangeText={(otp) => this.setState({ otp })}></TextInput>
+                                        : null
+                                }
+                                <TouchableOpacity onPress={() => this.ForgotPasswordStepOne()}>
+                                    <Text style={AppStyle.appButton}>SUBMIT</Text>
+                                </TouchableOpacity>
+                                {
+                                    this.state.showLoader ?
+                                        <ActivityIndicator
+                                            animating={true}
+                                            style={AppStyle.activityIndicator}
+                                            size='large'
+                                        /> : null
+                                }
+                            </View>
+                            : null
+                    }
+                    {
+                        this.state.showStepThree ?
+                            <View style={{ flex: 1, alignItems: 'center' }}>
+                                <TextInput style={AppStyle.appInput} placeholder="New Password" value={this.state.newPassword}
+                                    onChangeText={(newPassword) => this.setState({ newPassword })}></TextInput>
+                                <TextInput style={AppStyle.appInput} placeholder="Re-enter New Password" value={this.state.newConfirmPassword}
+                                    onChangeText={(newConfirmPassword) => this.setState({ newConfirmPassword })}></TextInput>
+                                <TouchableOpacity onPress={() => this.ForgotPasswordStepThree()}>
+                                    <Text style={AppStyle.appButton}>SUBMIT</Text>
+                                </TouchableOpacity>
+                                {
+                                    this.state.showLoader ?
+                                        <ActivityIndicator
+                                            animating={true}
+                                            style={AppStyle.activityIndicator}
+                                            size='large'
+                                        /> : null
+                                }
+                            </View>
+                            : null
+                    }
+                    {/* <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', backgroundColor: 'blue' }}> */}
+                    <View style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        position: 'absolute',
+                        bottom: 80
+                    }}>
+                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 15 }]}>Remember Password?</Text>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('login')}>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15 }]}>&nbsp;&nbsp;Sign in</Text>
+                        </TouchableOpacity>
+                    </View>
+                    {/* </View> */}
                 </View>
                 <Toast ref="toast"
                     style={AppStyle.toast_style} />

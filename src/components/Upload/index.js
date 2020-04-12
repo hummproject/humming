@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Picker, SafeAreaView, FlatList, Dimensions, ActivityIndicator, BackHandler } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Picker, SafeAreaView, FlatList, Dimensions, ActivityIndicator, BackHandler, Platform } from 'react-native';
 import { AppStyle } from '../../App.style';
 import { styles } from './upload.styles';
 import Toast from 'react-native-easy-toast';
 import AsyncStorage from '@react-native-community/async-storage';
 import ImagePicker from 'react-native-image-picker';
 import AppConfig from '../../config/constants';
+import CustomiOSPicker from '../CustomiOSPicker'
 // import { cos } from 'react-native-reanimated';
 
 const options = {
@@ -29,6 +30,8 @@ export default class Upload extends Component {
             userData: {},
             loading: false,
             showtoast: false,
+            showiOSPicker: false,
+            pickerData: ["Choose category", "Movies", "Music", "Sports", "Travel", "Politics", "Art", "Entertainment", "Technology", "Fashion", "Food"],
         };
     }
 
@@ -50,6 +53,13 @@ export default class Upload extends Component {
         this.props.navigation.goBack();
         return true;
     };
+
+    showiOSPicker = () => {
+        console.debug("In show iosPicker function")
+        this.setState({
+            showiOSPicker: true
+        })
+    }
 
     uploadImage = () => {
         ImagePicker.showImagePicker(options, (response) => {
@@ -140,6 +150,23 @@ export default class Upload extends Component {
         });
     }
 
+    callbackfromPicker = (data, index) => {
+        console.debug("picker data", data);
+        if (data !== 'Choose category') {
+            this.setState({
+                category: data,
+                choosenIndex: index,
+                showiOSPicker: false
+            })
+        } else {
+            this.setState({
+                category: '',
+                choosenIndex: 0,
+                showiOSPicker: false
+            })
+        }
+    }
+
     render() {
         const { isImageUploaded, uploadImageArray, loading, hummDescription } = this.state;
         return (
@@ -179,37 +206,43 @@ export default class Upload extends Component {
                         <View style={{ paddingTop: 20 }}>
                             <TextInput multiline={true} style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, minHeight: 50, overflow: 'hidden', marginLeft: 15, marginRight: 15 }]} placeholder="Write Something"
                                 onChangeText={hummDescription => this.setState({ hummDescription })} value={hummDescription}></TextInput>
-                            <View style={{ paddingTop: 30 }}>
-                                <View style={{ width: '90%', alignSelf: 'center', borderRadius: 25, backgroundColor: '#ECECEC' }} >
-                                    <Picker style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, width: '100%', height: 50, }]} itemStyle={{ alignItems: 'center', textAlign: 'center', color: '#9B9B9B' }}
-                                        selectedValue={this.state.category}
-                                        onValueChange={(itemValue, itemPosition) => {
-                                            console.debug('itemValue:', itemValue)
-                                            if (itemValue !== 'Choose category') {
-                                                this.setState({ category: itemValue, choosenIndex: itemPosition })
-                                            } else {
-                                                this.setState({ category: '', choosenIndex: 0 })
-                                            }
-                                        }
-                                        }
-                                    >
-                                        <Picker.Item label="Choose category" value="Choose category" disabled={true} />
-                                        <Picker.Item label="Movies" value="Movies" />
-                                        <Picker.Item label="Music" value="Music" />
-                                        <Picker.Item label="Sports" value="Sports" />
-                                        <Picker.Item label="Travel" value="Travel" />
-                                        <Picker.Item label="Politics" value="Politics" />
-                                        <Picker.Item label="Art" value="Art" />
-                                        <Picker.Item label="Entertainment" value="Entertainment" />
-                                        <Picker.Item label="Technology" value="Technology" />
-                                        <Picker.Item label="Fashion" value="Fashion" />
-                                        <Picker.Item label="Food" value="Food" />
-                                    </Picker>
+                            <TouchableOpacity onPress={() => {
+                                if (Platform.OS === 'ios') {
+                                    this.showiOSPicker();
+                                }
+                            }} style={{ paddingTop: 30 }}>
+                                <View style={{ width: '90%', alignSelf: 'center', borderRadius: 25, backgroundColor: '#ECECEC', height: 50 }} >
+                                    {
+                                        Platform.OS === 'android' ?
+                                            <Picker style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, width: '100%', height: 50, }]} itemStyle={{ alignItems: 'center', textAlign: 'center', color: '#9B9B9B' }}
+                                                selectedValue={this.state.category}
+                                                onValueChange={(itemValue, itemPosition) => {
+                                                    console.debug('itemValue:', itemValue)
+                                                    if (itemValue !== 'Choose category') {
+                                                        this.setState({ category: itemValue, choosenIndex: itemPosition })
+                                                    } else {
+                                                        this.setState({ category: '', choosenIndex: 0 })
+                                                    }
+                                                }
+                                                }
+                                            >
+                                                {this.state.pickerData.map((item, index) => (
+                                                    <Picker.Item label={item} value={item} key={index} />)
+                                                )}
+                                            </Picker>
+                                            :
+                                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}> {this.state.category === '' ? "Choose Category" : this.state.category}</Text>
+                                            </View>
+                                    }
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                             <TouchableOpacity style={{ alignSelf: 'center', marginBottom: 30, paddingTop: 30 }} onPress={this.upload}><Text style={AppStyle.appButton}>HUMM IT </Text></TouchableOpacity>
                         </View>
                     </ScrollView>
+                    {
+                        this.state.showiOSPicker ? <CustomiOSPicker pickerData={this.state.pickerData} callbackFromiOSPickerData={this.callbackfromPicker} /> : null
+                    }
                     {
                         loading ? <ActivityIndicator
                             animating={true}
