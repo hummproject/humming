@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView, BackHandler } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView, BackHandler, PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { RegisterUser } from './Register.service';
 import Logo from '../Logo';
 import Toast from 'react-native-easy-toast';
-import Geolocation from 'react-native-geolocation-service';
+import Geolocation from '@react-native-community/geolocation';
 
 export default class Register extends Component {
     constructor(props) {
@@ -23,21 +23,9 @@ export default class Register extends Component {
             showStepThree: false
         }
     }
+
     dismissKeyboard() {
         Keyboard.dismiss();
-    }
-
-    validateEmail = (text) => {
-        console.log(text);
-        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        if (reg.test(text) === false) {
-            console.log("Email is not correct");
-            return false;
-        }
-        else {
-            console.log("Email is correct");
-            return true;
-        }
     }
 
     componentDidMount() {
@@ -46,6 +34,17 @@ export default class Register extends Component {
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    validateEmail = (text) => {
+        console.log(text);
+        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (reg.test(text) === false) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     handleBackButton = () => {
@@ -64,7 +63,7 @@ export default class Register extends Component {
                 showStepOne: false,
                 showStepTwo: true,
                 showStepThree: false,
-                username :''
+                username: ''
             });
             console.debug('ELSE IF');
         } else {
@@ -97,9 +96,9 @@ export default class Register extends Component {
             this.refs.toast.show("Email is not valid");
             return;
         }
-
         this.setState({ showStepOne: false, showStepTwo: true });
     }
+
     registerStepTwo() {
         this.dismissKeyboard();
 
@@ -118,11 +117,11 @@ export default class Register extends Component {
             this.refs.toast.show("Password and confirm-password should be same");
             return;
         }
-
         this.setState({ showStepOne: false, showStepTwo: false, showStepThree: true });
     }
+
     registerStepThree() {
-       
+
         this.dismissKeyboard();
         var username = this.state.username;
 
@@ -131,12 +130,44 @@ export default class Register extends Component {
             return;
         }
         this.setState({ showLoader: true });
-        Geolocation.getCurrentPosition((position) => {
-            this.callRegisterApi(position);
-        }, (error) => {
-            console.log(error.code, error.message);
-            this.callRegisterApi();
-        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 });
+        if (Platform.OS === 'ios') {
+            this.fetchLocation();
+        } else {
+            this.requestLocationPermission();
+        }
+    }
+
+    async requestLocationPermission() {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
+                'title': 'Location Access Required',
+                'message': "This app requires access to your location to show you relevant posts based on location.",
+                buttonPositive: "OK"
+            }
+            )
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                //To Check, If Permission is granted
+                this.fetchLocation();
+            } else {
+                console.log("Location Permission Denied");
+                this.callRegisterApi();
+            }
+        } catch (err) {
+            console.warn(err)
+        }
+    }
+
+    fetchLocation() {
+        Geolocation.getCurrentPosition(
+            //Will give you the current location
+            (position) => {
+                console.log("GeoLocation Position:", position);
+                this.callRegisterApi(position)
+            },
+            (error) => alert(error.message),
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        );
     }
 
     callRegisterApi(position) {
@@ -158,6 +189,7 @@ export default class Register extends Component {
         registrationData.latlang = latlang;
 
         RegisterUser(registrationData).then((res) => {
+            console.log(res);
             if (res.status === 200) {
                 const userData = res && res.data;
                 AsyncStorage.setItem("userData", JSON.stringify(userData));

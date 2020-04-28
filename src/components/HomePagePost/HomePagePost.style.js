@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
 
     TopContainer: {
         flex: 1,
-        flexDirection: 'row-reverse',
+        flexDirection: 'row',
         paddingTop: 15,
         paddingBottom: 15,
         alignItems:'center'
@@ -43,14 +43,15 @@ const styles = StyleSheet.create({
     container_text: {
         flex: 1,
         flexDirection: 'column',
-        marginLeft: 15,
+        marginLeft: 25,
         justifyContent: 'flex-start',
     },
+    
     profile_photo: {
         height: 60,
         width: 60,
         borderRadius: 30,
-        marginRight: 15,
+        marginLeft: 10,
         backgroundColor:'#FEFEFE'
     },
 });

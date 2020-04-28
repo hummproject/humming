@@ -26,9 +26,7 @@ const styles = StyleSheet.create({
 
 export default class CustomiOSPicker extends React.Component {
     constructor(props) {
-        // super(props);
-        // console.debug("Picker Data props", this.props.pickerData)
-        // console.debug("Picker Data props", this.props.pickerData[0])
+        super(props);
         this.state = {
             pickerData: this.props.pickerData,
             pickerValue: this.props.pickerData[0],
@@ -63,7 +61,7 @@ export default class CustomiOSPicker extends React.Component {
                         selectedValue={this.state.pickerValue}
                         onValueChange={(itemValue, itemIndex) => this.setState({ pickerValue: itemValue, pickerindex: itemIndex })} >
                         {this.state.pickerData.map((item) => (
-                            <Picker.Item label={item} value={item} keyExtractor={(item, index) => index + ""} />)
+                            <Picker.Item label={item} value={item} keyExtractor={(item, index) => index + item} />)
                         )}
                     </Picker>
                     {/* </View> */}

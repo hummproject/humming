@@ -17,6 +17,7 @@ const AppConfig = {
     FORGOT_PASSWORD_GET_OTP: "/forgotpassword",
     FORGOT_PASSWORD_VERIFY_OTP : "/verify",
     FORGOT_PASSWORD_UPDATE_PASSWORD : "/updatepassword",
+    UPDATE_USER_ACCOUNT_STATUS : "/api/v1/updateaccountstatus",
     HEADERS: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

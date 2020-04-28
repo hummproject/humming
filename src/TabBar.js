@@ -18,6 +18,7 @@ const Tab = createBottomTabNavigator();
 export default class TabBar extends React.Component {
     constructor(props) {
         super(props);
+        console.debug("Tabbar Props",this.props)
     }
 
     render() {

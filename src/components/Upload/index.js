@@ -140,7 +140,7 @@ export default class Upload extends Component {
                     category: '',
                 })
                 this.refs.toast.show("Marker uploaded successfully");
-                this.props.navigation.navigate('TabBar');
+                // this.props.navigation.navigate('TabBar');
             } else {
                 this.refs.toast.show(res.message);
             }
@@ -172,7 +172,7 @@ export default class Upload extends Component {
         return (
             <KeyboardAvoidingView
                 behavior="position">
-                <SafeAreaView>
+                <SafeAreaView style={{ backgroundColor: 'white' }}>
                     <View style={styles.headerstyle}>
                         <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 15 }]}>Say Something</Text>
                     </View>

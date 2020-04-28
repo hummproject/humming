@@ -5,6 +5,7 @@ import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
 import Toast from 'react-native-easy-toast';
+import AppConfig from '../../config/constants';
 
 export default class Login extends Component {
     constructor(props) {
@@ -12,7 +13,6 @@ export default class Login extends Component {
         this.state = {
             userName: "",
             userPwd: "",
-            isLoggedIn: "",
             loading: false,
         };
     }
@@ -37,12 +37,12 @@ export default class Login extends Component {
                     if (res.status === 200) {
                         const userData = res && res.data;
                         console.debug("User Data from Login", userData)
-                        console.debug("isActive: ",userData.isactive);
-                        if (userData.isactive == true) {
+                        console.debug("isActive: ", userData.isactive);
+                        if (userData.isactive == '0') { // if isactive is '0' then Active User else call service to activate user
                             AsyncStorage.setItem("userData", JSON.stringify(userData));
-                            this.props.navigation.navigate('TabBar', { isfromLogin: true });
+                            this.props.navigation.navigate('TabBar', { routeName: 'Home' });
                         } else {
-                            this.refs.toast.show("This account is currently deactive");
+                            this.UpdateAccountStatus(userData);
                         }
                     } else {
                         this.refs.toast.show("username or password are incorrect");
@@ -62,6 +62,40 @@ export default class Login extends Component {
         }
     }
 
+    UpdateAccountStatus = (userData) => {
+        const url = AppConfig.DOMAIN + AppConfig.UPDATE_USER_ACCOUNT_STATUS
+        console.debug('URL:', url);
+        this.setState({ loading: true });
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'token': userData.token,
+            },
+            body: JSON.stringify({
+                statusType: 'activate',
+            })
+        }).then((res) => res.json())
+            .then(resJson => {
+                console.debug('Activate profile response', resJson);
+                this.setState({
+                    loading: false,
+                })
+                console.debug("Activate profile:", resJson.data)
+                if (resJson.status === 200 && resJson.message.toLowerCase() === 'account status updated successfully.') {
+                    AsyncStorage.setItem("userData", JSON.stringify(userData));
+                    this.props.navigation.navigate('TabBar', { routeName: 'Home' });
+                } else {
+                    this.refs.toast.show(resJson.message);
+                }
+            }).catch((err) => {
+                console.debug('Activate Profile response ERROR:', err);
+                this.setState({ error: err, loading: false });
+                this.refs.toast.show("Something went wrong. Please try again later");
+            });
+    };
+
     goToRegister = () => {
         this.props.navigation.navigate('register');
     }
@@ -71,10 +105,22 @@ export default class Login extends Component {
     }
 
     componentDidMount() {
+        this.setState({
+            userName: "",
+            userPwd: "",
+        })
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            // do something
+            this.setState({
+                userName: "",
+                userPwd: "",
+            })
+        });
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
 
     componentWillUnmount() {
+        this._unsubscribe();
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
     }
 
@@ -97,9 +143,9 @@ export default class Login extends Component {
             <SafeAreaView style={AppStyle.appContainer}>
                 <Logo></Logo>
                 {/* <Home/> */}
-                <TextInput style={AppStyle.appInput} placeholder="Username"
+                <TextInput style={AppStyle.appInput} placeholder="Username" value={this.state.userName}
                     onChangeText={userName => this.setState({ userName })}></TextInput>
-                <TextInput style={AppStyle.appInput} placeholder="Password" secureTextEntry={true}
+                <TextInput style={AppStyle.appInput} placeholder="Password" value={this.state.userPwd} secureTextEntry={true}
                     onChangeText={userPwd => this.setState({ userPwd })}></TextInput>
                 <TouchableOpacity onPress={this.login}>
                     <Text style={AppStyle.appButton}>Sign in</Text>

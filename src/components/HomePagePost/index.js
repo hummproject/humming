@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Text, View, Image, TouchableOpacity, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { styles } from './HomePagePost.style';
 import { AppStyle } from '../../App.style';
@@ -6,7 +6,7 @@ import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
 import ProgressiveImage from '../../ProgressiveImage'
 
-export default class HomePagePost extends Component {
+export default class HomePagePost extends PureComponent {
     constructor(props) {
         super(props)
         this.state = {
@@ -33,7 +33,7 @@ export default class HomePagePost extends Component {
     componentDidMount() {
         var isAlreadyLiked = false;
         const { postDetails, userData } = this.state;
-        // console.debug("constructor markerlike array OBJ", postDetails.markerlike)
+        // console.debug("HomePOSTS: DID MOUNT", postDetails.markerlike)
         if (postDetails.markerlike !== null) {
             for (let markerlikeObj of postDetails.markerlike) {
                 if (markerlikeObj.userid === userData.userid) {
@@ -53,19 +53,19 @@ export default class HomePagePost extends Component {
 
     makeRequesttoLikeorUnlikethePost = () => {
         const { postDetails, userData, likeorUnlikeImgUri, postLikesCount, isMarkerAlreadyLiked } = this.state
-        console.debug('Like OR Unlike function:Marker Details', postDetails);
-        console.debug('Like OR Unlike function:User Deatils', userData);
-        // var likeorunlikeImgUri = likeorUnlikeImgUri;
+        // console.debug('Like OR Unlike function:Marker Details', postDetails);
+        // console.debug('Like OR Unlike function:User Deatils', userData);
+        var likeorunlikeImgUri = likeorUnlikeImgUri;
         // var markerlikeArray = postDetails.markerlike !== null ? postDetails.markerlike : []
-        // var markerLikesCount = postLikesCount;
-
+        var markerLikesCount = postLikesCount;
+        var isLiked = "false"
+        if (!isMarkerAlreadyLiked) {
+            isLiked = "true"
+        } else {
+            isLiked = "false"
+        }
         const url = AppConfig.DOMAIN + AppConfig.LIKE_OR_UNLIKE_MARKER
         console.debug(url);
-        console.debug("is Already liked", isMarkerAlreadyLiked);
-        console.debug("Request for like", {
-            markerid: postDetails.marker_id,
-            isLiked: isMarkerAlreadyLiked
-        });
         this.setState({ loading: true });
         fetch(url, {
             method: 'POST',
@@ -76,7 +76,7 @@ export default class HomePagePost extends Component {
             },
             body: JSON.stringify({
                 markerid: postDetails.marker_id,
-                isLiked: isMarkerAlreadyLiked
+                isLiked: isLiked
             })
         })
             .then(response => response.json())
@@ -84,23 +84,24 @@ export default class HomePagePost extends Component {
                 console.debug('Home Posts lIKE Response:', responseData)
                 this.setState({ loading: false });
                 if (responseData.status === 200) {
-                    // if (!isAlreadyLiked) {
-                    //     markerLikesCount = markerLikesCount + 1
-                    //     likeorunlikeImgUri = require('../../images/like-icon.png');
-                    // } else {
-                    //     markerLikesCount = markerLikesCount - 1
-                    //     likeorunlikeImgUri = require('../../images/unlike-icon.png');
-                    // }
-                    // this.setState({
-                    //     likeorUnlikeImgUri: likeorunlikeImgUri,
-                    //     postLikesCount: markerLikesCount
-                    // })
-                    // this.setState({
-                    //     postsListArray: responseData.data,
-                    //     error: responseData.error || null,
-                    //     loading: false,
-                    //     refreshing: false
-                    // });
+                    if (!("message" in responseData.data)) {
+                        if (!isMarkerAlreadyLiked) {
+                            markerLikesCount = markerLikesCount + 1
+                            likeorunlikeImgUri = require('../../images/like-icon.png');
+                        } else {
+                            markerLikesCount = markerLikesCount - 1
+                            likeorunlikeImgUri = require('../../images/unlike-icon.png');
+                        }
+                        console.debug("Total Likes Count", markerLikesCount)
+                        console.debug("Image URI ", likeorunlikeImgUri)
+                        this.setState({
+                            isMarkerAlreadyLiked: !isMarkerAlreadyLiked,
+                            likeorUnlikeImgUri: likeorunlikeImgUri,
+                            postLikesCount: markerLikesCount
+                        })
+                    } else {
+                        // console.debug("LIKE RESPONSE: ELSE", responseData.data.message)
+                    }
                 } else {
                     this.refs.toast.show(responseData.message);
                 }
@@ -115,7 +116,7 @@ export default class HomePagePost extends Component {
     render() {
         const postDetails = this.state.postDetails;
         const likeorUnlikeImgUri = this.state.likeorUnlikeImgUri;
-        console.debug(postDetails);
+        // console.debug(postDetails);
         var tagName = postDetails.username;
         var firstName = postDetails['firstname'];
         var lastName = postDetails['lastname'];
@@ -142,7 +143,7 @@ export default class HomePagePost extends Component {
                         </Text>
                         <View style={styles.categoryContainer}>
                             <Image source={require('../../images/category_marker_icon.png')} style={{ height: 13, width: 13 }} />
-                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white' }]}>{category}</Text>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white', textTransform: 'capitalize'  }]}>{category}</Text>
                         </View>
                     </View>
                 </View>
@@ -152,9 +153,9 @@ export default class HomePagePost extends Component {
                         pagingEnabled={true}
                         data={postimageUri}
                         renderItem={({ item }) => {
-                            console.debug(item);
+                            // console.debug(item);
                             let imageUri = item != null ? item : ''
-                            console.debug(imageUri);
+                            // console.debug(imageUri);
                             if (imageUri != '') {
                                 return (
                                     < ProgressiveImage source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width, height: 200 }} />
@@ -202,7 +203,7 @@ export default class HomePagePost extends Component {
                         size='large'
                     /> : null
                 }
-                <Toast ref="toast" style={AppStyle.toast_style} />
+                {/* <Toast ref="toast" style={AppStyle.toast_style} /> */}
             </View>
         )
     };

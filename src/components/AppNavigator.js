@@ -11,7 +11,7 @@ import ForgotPassword from './ForgotPassword'
 const Stack = createStackNavigator()
 
 function AppNavigator(props) {
-    console.debug("Props im Navigator",props.initalScreen)
+    // console.debug("Props im Navigator",props.initalScreen)
     return (
         <NavigationContainer>
             <Stack.Navigator

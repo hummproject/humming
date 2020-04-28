@@ -3,6 +3,8 @@ import { Text, View, SafeAreaView, StyleSheet, FlatList, TouchableOpacity, Image
 import BanterPagePosts from '../BanterPagePosts';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style'
+import AppConfig from '../../config/constants';
+import Toast from 'react-native-easy-toast'
 
 export default class Banter extends Component {
     constructor(props) {
@@ -49,6 +51,10 @@ export default class Banter extends Component {
         this.setState({
             userListArray: uniquePostsArray
         })
+        // this._unsubscribe = this.props.navigation.addListener('focus', () => {
+        //     // do something
+        //     // this.makeRequesttoFetchPosts();
+        // });
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
 
@@ -69,8 +75,44 @@ export default class Banter extends Component {
         })
     };
 
+    makeRequesttoFetchPosts = () => {
+        const { userData } = this.state;
+        const url = AppConfig.DOMAIN + AppConfig.GET_MARKERS
+        console.debug(url);
+        this.setState({ loading: true });
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'token': userData.token
+            },
+            body: JSON.stringify({
+                location: '78.4373585,17.4337072',
+                pageno: '0'
+            })
+        })
+            .then(response => response.json())
+            .then(responseData => {
+                console.debug('Banter Posts response:', responseData)
+                this.setState({
+                    loading: false,
+                })
+                if (responseData.status === 200) {
+                    AsyncStorage.setItem("PostsData", JSON.stringify(responseData.data));
+                } else {
+                    this.refs.toast.show(responseData.message);
+                }
+            })
+            .catch(error => {
+                console.debug('Home Posts response ERROR:', error);
+                this.setState({ error, loading: false });
+                this.refs.toast.show("Something went wrong. Please try again later");
+            });
+    };
+
     render() {
-        const { userListArray, userSelectedPost, isUserSelected } = this.state;
+        const { userListArray, userSelectedPost, isUserSelected, loading } = this.state;
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={styles.headerstyle}>
@@ -88,7 +130,7 @@ export default class Banter extends Component {
                                         <View>
                                             <View style={styles.categoryContainer}>
                                                 <Image source={require('../../images/category_marker_icon.png')} style={{ height: 13, width: 13 }} />
-                                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white' }]}>{item.category}</Text>
+                                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white', textTransform: 'capitalize' }]}>{item.category}</Text>
                                             </View>
                                         </View>
                                     </TouchableOpacity>
@@ -112,6 +154,14 @@ export default class Banter extends Component {
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Click on any profile to view their post disscussions</Text>
                         </View>
                 }
+                {
+                    loading ? <ActivityIndicator
+                        animating={true}
+                        style={AppStyle.activityIndicator}
+                        size='large'
+                    /> : null
+                }
+                <Toast ref="toast" style={AppStyle.toast_style} />
             </SafeAreaView >
         )
     };

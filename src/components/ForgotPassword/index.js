@@ -178,14 +178,17 @@ export default class ForgotPassword extends Component {
                     showLoader: false,
                 })
                 if (responseData.status === 200) {
-                    this.setState({
-                        showStepOne: false,
-                        showStepTwo: false,
-                        showStepThree: true,
-                        newPassword: '',
-                        newConfirmPassword: '',
-                        error: responseData.error || null
-                    });
+                    const data = responseData.data
+                    if (data.validuser === true) {
+                        this.setState({
+                            showStepOne: false,
+                            showStepTwo: false,
+                            showStepThree: true,
+                            newPassword: '',
+                            newConfirmPassword: '',
+                            error: responseData.error || null
+                        });
+                    }
                 } else {
                     const error = responseData.error
                     if (error.validuser === false) {
@@ -226,12 +229,6 @@ export default class ForgotPassword extends Component {
                     showLoader: false,
                 })
                 if (responseData.status === 200) {
-                    // this.setState({
-                    //     showStepOne: true,
-                    //     showStepTwo: true,
-                    //     otp: '',
-                    //     error: responseData.error || null
-                    // });
                     this.refs.toast.show("Password updated successfully, login to continue");
                     this.props.navigation.goBack();
                 } else {

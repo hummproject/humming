@@ -8,6 +8,7 @@ import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
 import { TextInput } from 'react-native-paper';
 import ProgressiveImage from '../../ProgressiveImage'
+import { NavigationActions } from '@react-navigation/native';
 
 const options = {
     title: 'Select Option',
@@ -212,7 +213,8 @@ export default class Profile extends React.Component {
                                 <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, paddingLeft: 15, paddingBottom: 10 }]}>Previous Posts</Text>
                                 <FlatList
                                     horizontal
-                                    pagingEnabled={true}
+                                    contentContainerStyle={{ paddingEnd: 15 }}
+                                    showsHorizontalScrollIndicator={false}
                                     data={userPostsAry}
                                     renderItem={({ item }) => {
                                         // console.debug(item.media);
@@ -221,7 +223,7 @@ export default class Profile extends React.Component {
                                         if (imageUri != '') {
                                             return (
                                                 <TouchableOpacity onPress={this.OpenPost}>
-                                                    <View style={{ flex: 1, borderColor: '#F5F5F5', borderWidth: 0.5, borderRadius: 8, marginLeft: 15, width: 130, height: 130, marginRight: 15 }}>
+                                                    <View style={{ flex: 1, borderColor: '#F5F5F5', borderWidth: 0.5, borderRadius: 8, marginLeft: 15, width: 130, height: 130 }}>
                                                         < Image source={imageUri == null ? require('../../images/logo.png') : { uri: imageUri }} resizeMode={imageUri == null ? 'contain' : 'cover'} style={{ width: 130, height: 130, borderRadius: 8 }} />
                                                     </View>
                                                 </TouchableOpacity>
@@ -365,7 +367,7 @@ export default class Profile extends React.Component {
                                 data.append('useraddress', this.state.addressInputText);
                                 data.append('userbio', this.state.bioInputText);
                                 Keyboard.dismiss();
-                                this.UpdateProfile(data, true, false);
+                                this.UpdateProfile(data, true);
                             }}><Text style={AppStyle.appButton}>Update</Text>
                             </TouchableOpacity>
                         </View>
@@ -414,24 +416,14 @@ export default class Profile extends React.Component {
         this.setState({
             showMenuOptions: !this.state.showMenuOptions
         })
-        // console.debug('DeactivateProfile');
-        try {
-            await AsyncStorage.removeItem("userData")
-        } catch (err) {
-            console.log(`signOutfromApp:The error is: ${err}`)
-        }
         Alert.alert(
             'Account Deactivation',
-            'Do you want to deactivate your account? You can reactivate only after 14 days',
+            'Do you want to deactivate your account? You can always re-activate your account by logging into app within 2 weeks, after that account is deleted permanently.',
             [
-                { text: 'CANCEL', onPress: () => { console.log('Cancel Pressed') }, style: 'cancel' },
+                { text: 'CANCEL', onPress: () => { }, style: 'cancel' },
                 {
                     text: 'DEACTIVATE', onPress: () => {
-                        console.log('OK Pressed')
-                        const data = new FormData();
-                        data.append('isactive', false); // Deactivate 
-                        console.debug("Deactivate profile",data);
-                        this.UpdateProfile(data, false, true)
+                        this.UpdateAccountStatus();
                     }
                 },
             ],
@@ -458,12 +450,53 @@ export default class Profile extends React.Component {
                     name: response.fileName
                 });
                 data.append('firstname', userData.firstname);
-                this.UpdateProfile(data, false, false);
+                this.UpdateProfile(data, false);
             }
         });
     }
 
-    UpdateProfile = (data, isfromModal, isFromDeactivateProfile) => {
+    UpdateAccountStatus() {
+        const { userData } = this.state;
+        const url = AppConfig.DOMAIN + AppConfig.UPDATE_USER_ACCOUNT_STATUS
+        console.debug('URL:', url);
+        this.setState({ loading: true });
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'token': userData.token,
+            },
+            body: JSON.stringify({
+                statusType: 'deactivate',
+            })
+        }).then((res) => res.json())
+            .then(resJson => {
+                console.debug('Deactivate profile response', resJson);
+                this.setState({
+                    loading: false,
+                })
+                if (resJson.status === 200 && resJson.message.toLowerCase() === 'account status updated successfully.') {
+                    (async () => {
+                        try {
+                            await AsyncStorage.removeItem("userData")
+                        } catch (err) {
+                            console.log(`RemoveUserDatafromApp:The error is: ${err}`)
+                        }
+                    })();
+                    this.refs.toast.show("Profile deactivated successfully");
+                    this.props.navigation.navigate('login')
+                } else {
+                    this.refs.toast.show(resJson.message);
+                }
+            }).catch((err) => {
+                console.debug('Deactivate Profile response ERROR:', err);
+                this.setState({ error: err, loading: false });
+                this.refs.toast.show("Something went wrong. Please try again later");
+            });
+    };
+
+    UpdateProfile = (data, isfromModal) => {
         const { userData } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.UPDATE_USER_PROFILE
         console.debug('URL:', url);
@@ -483,11 +516,6 @@ export default class Profile extends React.Component {
                     loading: false,
                 })
                 if (resJson.status === 200) {
-                    if (isFromDeactivateProfile) {
-                        this.refs.toast.show("Profile deactivated successfully");
-                        this.props.navigation.navigate('login')
-                        return;
-                    }
                     if (isfromModal) {
                         this.setState({
                             showUploadModal: !this.state.showUploadModal,
