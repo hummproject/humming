@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity, FlatList, ActivityIndicator, Alert, Modal, TouchableHighlight, Keyboard, Platform, BackHandler } from 'react-native';
+import { Text, View, SafeAreaView, ScrollView, Image, TouchableOpacity, TouchableWithoutFeedback, FlatList, ActivityIndicator, Alert, Modal, TouchableHighlight, Keyboard, BackHandler } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { ProfileStyles } from './Profile.style';
@@ -8,7 +8,7 @@ import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
 import { TextInput } from 'react-native-paper';
 import ProgressiveImage from '../../ProgressiveImage'
-import { NavigationActions } from '@react-navigation/native';
+import NetInfo from "@react-native-community/netinfo";
 
 const options = {
     title: 'Select Option',
@@ -45,6 +45,9 @@ export default class Profile extends React.Component {
             phoneInputText: '',
             addressInputText: '',
             bioInputText: '',
+            showModalLoader: false,
+            is_connected: false,
+            menuTop: 60,
         };
     }
 
@@ -70,12 +73,20 @@ export default class Profile extends React.Component {
                 bioInputText: userData.userbio === null ? '' : userData.userbio
             });
         });
-        this.makeRequesttoFetchUserMarkers();
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe = NetInfo.addEventListener(state => {
+            if (state.isInternetReachable) {
+                this.setState({ is_connected: true });
+            } else {
+                this.setState({ is_connected: false });
+            }
+        });
+        this.makeRequesttoFetchUserMarkers();
     }
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe();
     }
 
     handleBackButton = () => {
@@ -84,10 +95,15 @@ export default class Profile extends React.Component {
     };
 
     makeRequesttoFetchUserMarkers = () => {
-        const { userData } = this.state;
+        const { userData, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.GET_MARKERS_BY_USER
         console.debug(url);
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({ loading: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -126,7 +142,6 @@ export default class Profile extends React.Component {
             });
     };
 
-
     render() {
         const { userPostsAry,
             loading,
@@ -140,11 +155,17 @@ export default class Profile extends React.Component {
             userbio,
             usermobile,
             useremail,
-            useraddress
+            useraddress,
+            menuTop
         } = this.state;
         return (
-            <SafeAreaView style={{ flex: 1 }}>
-                <View style={ProfileStyles.headerstyle}>
+            < SafeAreaView style={{ flex: 1 }}>
+                <View style={ProfileStyles.headerstyle} ref="Header" onLayout={({ nativeEvent }) => {
+                    this.refs.Header.measure((x, y, width, height, pageX, pageY) => {
+                        // console.log(x, y, width, height, pageX, pageY);
+                        this.setState({ menuTop: y + height });
+                    })
+                }}>
                     <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 15 }]}>@{username}</Text>
                     <View style={{
                         flex: 1,
@@ -154,13 +175,13 @@ export default class Profile extends React.Component {
                         marginRight: 15,
                     }}>
                         <TouchableOpacity onPress={() => this.showMenu()}>
-                            <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 35, marginLeft: 25 }} resizeMode={'center'} />
+                            <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 25, marginLeft: 25 }} resizeMode={'contain'} />
                         </TouchableOpacity>
                     </View>
                 </View>
                 {
                     this.state.showMenuOptions ?
-                        <View style={Platform.OS === 'ios' ? ProfileStyles.MenuOptionStyleIOS : ProfileStyles.MenuOptionStyle}>
+                        <View style={[ProfileStyles.MenuOptionStyle, { top: menuTop }]}>
                             <TouchableOpacity onPress={() => this.showUpdateProfile()}>
                                 <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Update Profile</Text>
                             </TouchableOpacity>
@@ -175,9 +196,10 @@ export default class Profile extends React.Component {
                 }
                 <ScrollView style={{ backgroundColor: 'white' }}>
                     <View style={[ProfileStyles.userDp, { alignSelf: 'center', borderColor: '#F5F5F5', borderWidth: 0.5, marginTop: 10 }]}>
-                        <ProgressiveImage style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={userdp == null ? 'contain' : 'cover'} />
-                        <TouchableOpacity onPress={() => this.uploadImage()} style={{ position: "absolute", bottom: 0, right: 0, margin: 10 }}>
-                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>EDIT</Text>
+                        <ProgressiveImage style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={(userdp == null) || (userdp == '') ? 'contain' : 'cover'} />
+                        <TouchableOpacity onPress={() => this.uploadImage()} style={{ position: "absolute", bottom: 0, right: 0 }}>
+                            {/* <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>EDIT</Text> */}
+                            <Image style={{ height: 20, width: 20, margin: 10 }} source={require('../../images/edit-icon.png')} resizeMode={'contain'} />
                         </TouchableOpacity>
                     </View>
                     <View style={{ flex: 1, alignItems: "center", marginTop: 20, }}>
@@ -241,7 +263,7 @@ export default class Profile extends React.Component {
                     <View style={[AppStyle.appAlignItemsCenter, { marginTop: 20 }]}>
                         <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>PHONE NUMBER</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../images/phone_filled.png')} resizeMode={'center'} />
+                            <Image style={{ width: 18, height: 15, marginRight: 5 }} source={require('../../images/phone_filled.png')} resizeMode={'contain'} />
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                                 {(usermobile == null) || (usermobile == '') ? <Text>Not Available</Text> : <Text>+91 {usermobile}</Text>}
                             </Text>
@@ -250,7 +272,7 @@ export default class Profile extends React.Component {
                     <View style={[AppStyle.appAlignItemsCenter, { paddingTop: 20, paddingBottom: 20 }]}>
                         <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>EMAIL</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../images/email_filled.png')} resizeMode={'center'} />
+                            <Image style={{ width: 18, height: 18, marginRight: 4 }} source={require('../../images/email_filled.png')} resizeMode={'contain'} />
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                                 {(useremail == null) || (useremail == '') ? <Text>Not Available</Text> : <Text>{useremail}</Text>}
                             </Text>
@@ -259,7 +281,7 @@ export default class Profile extends React.Component {
                     <View style={[AppStyle.appAlignItemsCenter, { paddingBottom: 20 }]}>
                         <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>ADDRESS</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../images/location.png')} resizeMode={'center'} />
+                            <Image style={{ width: 18, height: 18 }} source={require('../../images/location.png')} resizeMode={'contain'} />
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                                 {(useraddress == null) || (useraddress == '') ? <Text>Not Available</Text> : <Text>{useraddress}</Text>}
                             </Text>
@@ -281,97 +303,108 @@ export default class Profile extends React.Component {
                         this.setState({
                             showUploadModal: !this.state.showUploadModal,
                         })
-                        console.debug("pressed on TouchableFeedback")
                     }} >
-                        <View />
-                    </TouchableHighlight>
-                    <View style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                    }}>
-                        <View style={ProfileStyles.modalView}>
-                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 18 }]}>Update Profile</Text>
-                            <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
-                                <TextInput
-                                    style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
-                                    placeholder="Profession"
-                                    underlineColor='transparent'
-                                    theme={{ colors: { primary: 'transparent' } }}
-                                    value={this.state.professionInputText}
-                                    onChangeText={(text) => this.setState({
-                                        professionInputText: text
-                                    })} />
-                            </View>
-                            <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
-                                <TextInput
-                                    style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
-                                    placeholder="Phone"
-                                    underlineColor='transparent'
-                                    theme={{ colors: { primary: 'transparent' } }}
-                                    value={this.state.phoneInputText}
-                                    onChangeText={(text) => this.setState({
-                                        phoneInputText: text
-                                    })} />
-                            </View>
-                            <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
-                                <TextInput
-                                    style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
-                                    placeholder="Address"
-                                    underlineColor='transparent'
-                                    theme={{ colors: { primary: 'transparent' } }}
-                                    value={this.state.addressInputText}
-                                    onChangeText={(text) => this.setState({
-                                        addressInputText: text
-                                    })} />
-                            </View>
-                            <View style={{ borderRadius: 10, width: '100%', height: 60, marginTop: 15, backgroundColor: '#F5F5F5', }}>
-                                <TextInput
-                                    style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 60, backgroundColor: 'transparent' }]}
-                                    placeholder="Bio"
-                                    underlineColor='transparent'
-                                    theme={{ colors: { primary: 'transparent' } }}
-                                    value={this.state.bioInputText}
-                                    onChangeText={(text) => this.setState({
-                                        bioInputText: text
-                                    })} />
-                            </View>
-                            <TouchableOpacity style={{ alignSelf: 'center', paddingTop: 10, paddingBottom: 10 }} onPress={() => {
-                                const data = new FormData();
-                                this.setState({
-                                    showToast: true,
-                                })
-                                if (this.state.professionInputText === '') {
-                                    this.refs.toast.show("Profession cannot be empty");
-                                    return;
-                                }
-                                if (this.state.phoneInputText === '') {
-                                    this.refs.toast.show("Mobile number cannot be empty");
-                                    return;
-                                }
-                                if (this.state.addressInputText === '') {
-                                    this.refs.toast.show("Address cannot be empty");
-                                    return;
-                                }
-                                if (this.state.bioInputText === '') {
-                                    this.refs.toast.show("Bio cannot be empty");
-                                    return;
-                                }
-                                data.append('userprofession', this.state.professionInputText);
-                                data.append('usermobile', this.state.phoneInputText);
-                                data.append('useraddress', this.state.addressInputText);
-                                data.append('userbio', this.state.bioInputText);
-                                Keyboard.dismiss();
-                                this.UpdateProfile(data, true);
-                            }}><Text style={AppStyle.appButton}>Update</Text>
-                            </TouchableOpacity>
+                        <View style={{
+                            flex: 1,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                        }}>
+                            <TouchableWithoutFeedback>
+                                <View style={ProfileStyles.modalView}>
+                                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 18 }]}>Update Profile</Text>
+                                    <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
+                                        <TextInput
+                                            style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
+                                            placeholder="Profession"
+                                            underlineColor='transparent'
+                                            theme={{ colors: { primary: 'transparent' } }}
+                                            value={this.state.professionInputText}
+                                            onChangeText={(text) => this.setState({
+                                                professionInputText: text
+                                            })} />
+                                    </View>
+                                    <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
+                                        <TextInput
+                                            style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
+                                            placeholder="Phone"
+                                            underlineColor='transparent'
+                                            theme={{ colors: { primary: 'transparent' } }}
+                                            value={this.state.phoneInputText}
+                                            onChangeText={(text) => this.setState({
+                                                phoneInputText: text
+                                            })} />
+                                    </View>
+                                    <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
+                                        <TextInput
+                                            style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
+                                            placeholder="Address"
+                                            underlineColor='transparent'
+                                            theme={{ colors: { primary: 'transparent' } }}
+                                            value={this.state.addressInputText}
+                                            onChangeText={(text) => this.setState({
+                                                addressInputText: text
+                                            })} />
+                                    </View>
+                                    <View style={{ borderRadius: 10, width: '100%', height: 60, marginTop: 15, backgroundColor: '#F5F5F5', }}>
+                                        <TextInput
+                                            style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 60, backgroundColor: 'transparent' }]}
+                                            placeholder="Bio"
+                                            underlineColor='transparent'
+                                            theme={{ colors: { primary: 'transparent' } }}
+                                            value={this.state.bioInputText}
+                                            onChangeText={(text) => this.setState({
+                                                bioInputText: text
+                                            })} />
+                                    </View>
+                                    <TouchableOpacity style={{ alignSelf: 'center', paddingTop: 10, paddingBottom: 10 }} onPress={() => {
+                                        const data = new FormData();
+                                        this.setState({
+                                            showToast: true,
+                                        })
+                                        if (this.state.professionInputText === '') {
+                                            this.refs.toast.show("Profession cannot be empty");
+                                            return;
+                                        }
+                                        if (this.state.phoneInputText === '') {
+                                            this.refs.toast.show("Mobile number cannot be empty");
+                                            return;
+                                        }
+                                        if (this.state.addressInputText === '') {
+                                            this.refs.toast.show("Address cannot be empty");
+                                            return;
+                                        }
+                                        if (this.state.bioInputText === '') {
+                                            this.refs.toast.show("Bio cannot be empty");
+                                            return;
+                                        }
+                                        data.append('userprofession', this.state.professionInputText);
+                                        data.append('usermobile', this.state.phoneInputText);
+                                        data.append('useraddress', this.state.addressInputText);
+                                        data.append('userbio', this.state.bioInputText);
+                                        Keyboard.dismiss();
+                                        this.UpdateProfile(data, true);
+                                    }}><Text style={AppStyle.appButton}>Update</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </TouchableWithoutFeedback>
                         </View>
-                    </View>
+                    </TouchableHighlight>
+                    {
+                        this.state.showModalLoader ? <ActivityIndicator style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            position: 'absolute',
+                            top: 0, left: 0,
+                            right: 0, bottom: 0,
+                            backgroundColor: '#F5FCFF88',
+                            borderRadius: 20
+                        }} animating={true} size='large'></ActivityIndicator> : null
+                    }
                 </Modal>
                 {
                     loading ?
@@ -456,10 +489,15 @@ export default class Profile extends React.Component {
     }
 
     UpdateAccountStatus() {
-        const { userData } = this.state;
+        const { userData, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.UPDATE_USER_ACCOUNT_STATUS
         console.debug('URL:', url);
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({ loading: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'PUT',
             headers: {
@@ -497,10 +535,23 @@ export default class Profile extends React.Component {
     };
 
     UpdateProfile = (data, isfromModal) => {
-        const { userData } = this.state;
+        const { userData, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.UPDATE_USER_PROFILE
         console.debug('URL:', url);
-        this.setState({ loading: true });
+        if (!isfromModal) {
+            this.setState({ loading: true });
+        } else {
+            this.setState({ showModalLoader: true })
+        }
+        if (!is_connected) {
+            if (!isfromModal) {
+                this.setState({ loading: false });
+            } else {
+                this.setState({ showModalLoader: false })
+            }
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -512,9 +563,13 @@ export default class Profile extends React.Component {
         }).then((res) => res.json())
             .then(resJson => {
                 console.debug('Update profile response', resJson);
-                this.setState({
-                    loading: false,
-                })
+                if (!isfromModal) {
+                    this.setState({
+                        loading: false,
+                    })
+                } else {
+                    this.setState({ showModalLoader: false })
+                }
                 if (resJson.status === 200) {
                     if (isfromModal) {
                         this.setState({
@@ -545,7 +600,7 @@ export default class Profile extends React.Component {
                 }
             }).catch((err) => {
                 console.debug('Update Profile response ERROR:', err);
-                this.setState({ error: err, loading: false });
+                this.setState({ error: err, loading: false, showModalLoader: false });
                 this.refs.toast.show("Something went wrong. Please try again later");
             });
     };

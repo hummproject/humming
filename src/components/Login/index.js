@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView, Keyboard, BackHandler, Alert } from 'react-native';
+import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView, Keyboard, BackHandler, Alert, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
 import Logo from '../Logo';
 import Toast from 'react-native-easy-toast';
 import AppConfig from '../../config/constants';
+import NetInfo from "@react-native-community/netinfo";
 
 export default class Login extends Component {
     constructor(props) {
@@ -14,6 +15,7 @@ export default class Login extends Component {
             userName: "",
             userPwd: "",
             loading: false,
+            is_connected: false,
         };
     }
 
@@ -23,11 +25,18 @@ export default class Login extends Component {
 
     login = () => {
         this.dismissKeyboard();
-        const userName = this.state.userName;
-        const userPwd = this.state.userPwd;
+        const { userPwd, userName, is_connected } = this.state;
         if (userName != "") {
             if (userPwd != "") {
                 this.setState({ loading: true })
+                if (!is_connected) {
+                    this.setState({
+                        loading: false,
+                        refreshing: false,
+                    });
+                    this.refs.toast.show("Internet is not connected, Please try again!");
+                    return;
+                }
                 LoginUser({
                     userName: userName,
                     userpassword: userPwd,
@@ -117,11 +126,19 @@ export default class Login extends Component {
             })
         });
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe = NetInfo.addEventListener(state => {
+            if (state.isInternetReachable) {
+                this.setState({ is_connected: true });
+            } else {
+                this.setState({ is_connected: false });
+            }
+        });
     }
 
     componentWillUnmount() {
         this._unsubscribe();
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe();
     }
 
     handleBackButton = () => {
@@ -138,9 +155,9 @@ export default class Login extends Component {
     };
 
     render() {
-        const loading = this.state.loading;
         return (
             <SafeAreaView style={AppStyle.appContainer}>
+                <StatusBar barStyle={'dark-content'} />
                 <Logo></Logo>
                 {/* <Home/> */}
                 <TextInput style={AppStyle.appInput} placeholder="Username" value={this.state.userName}

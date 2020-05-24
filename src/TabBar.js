@@ -3,7 +3,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
     Image,
-    BackHandler, 
+    BackHandler,
     Alert
 } from 'react-native';
 
@@ -18,14 +18,46 @@ const Tab = createBottomTabNavigator();
 export default class TabBar extends React.Component {
     constructor(props) {
         super(props);
-        console.debug("Tabbar Props",this.props)
+        this.state = {
+            routeName: null
+        }
+        console.debug("Tabbar Props", this.props)
+        console.debug("Tabbar Props: Route", this.props.route.params)
+    }
+
+    componentDidMount() {
+        console.debug("TabBar Props: route: Did Mount", this.props.route.params);
+        var route = 'Home'
+        if (this.props.route.params) {
+            route = this.props.route.params.routeName
+        }
+        this.setState({
+            routeName: route
+        })
+        this._unsubscribe = this.props.navigation.addListener('focus', () => {
+            // do something
+            console.debug("TabBar Props: route: Did Mount: didfocus", this.props.route.params);
+            console.debug("TabBar Props: route: Did Mount: didfocus: state", this.state.routeName);
+            var route = 'Home'
+            if (this.props.route.params) {
+                route = this.props.route.params.routeName
+            }
+            this.setState({
+                routeName: route
+            })
+        });
+    }
+
+    componentWillUnmount() {
+        this._unsubscribe();
     }
 
     render() {
-        // const { navigation, route } = this.props;
+        const { routeName } = this.state;
+        console.debug("Inital Route name in render: Tabbar:", routeName)
         return (
             <Tab.Navigator
-                initialRouteName = 'Home'
+                initialRouteName={routeName}
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ focused, tintColor }) => {
                         let iconName;
@@ -56,7 +88,7 @@ export default class TabBar extends React.Component {
                                 style={{
                                     width: 25, height: 25
                                 }}
-                                source={iconName} resizeMode = {'contain'}/>
+                                source={iconName} resizeMode={'contain'} />
                         );
                     },
                 })}
@@ -68,7 +100,7 @@ export default class TabBar extends React.Component {
                     showLabel: false
                 }}
             >
-                <Tab.Screen name="Home"  component={Home} />
+                <Tab.Screen name="Home" component={Home} />
                 <Tab.Screen name="search" component={Search} />
                 <Tab.Screen name="Upload" component={Upload} />
                 <Tab.Screen name="Banter" component={Banter} />

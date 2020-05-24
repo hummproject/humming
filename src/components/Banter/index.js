@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style'
 import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
+import NetInfo from "@react-native-community/netinfo";
 
 export default class Banter extends Component {
     constructor(props) {
@@ -16,6 +17,7 @@ export default class Banter extends Component {
             postsData: [],
             isUserSelected: false,
             userSelectedPost: {},
+            is_connected: false,
         };
     }
 
@@ -27,7 +29,6 @@ export default class Banter extends Component {
                 isUserSelected: false,
             });
         });
-        console.debug('Banter Posts List', this.state.postsData)
         var postsArray = this.state.postsData
         postsArray.sort(function (a, b) {
             const objA = a.markercomments === null ? 0 : a.markercomments.length
@@ -51,15 +52,26 @@ export default class Banter extends Component {
         this.setState({
             userListArray: uniquePostsArray
         })
+        if (this.state.userListArray === 0) {
+            this.makeRequesttoFetchPosts();
+        }
         // this._unsubscribe = this.props.navigation.addListener('focus', () => {
         //     // do something
         //     // this.makeRequesttoFetchPosts();
         // });
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe = NetInfo.addEventListener(state => {
+            if (state.isInternetReachable) {
+                this.setState({ is_connected: true });
+            } else {
+                this.setState({ is_connected: false });
+            }
+        });
     }
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe();
     }
 
     handleBackButton = () => {
@@ -76,10 +88,15 @@ export default class Banter extends Component {
     };
 
     makeRequesttoFetchPosts = () => {
-        const { userData } = this.state;
+        const { userData, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.GET_MARKERS
         console.debug(url);
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({ loading: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -100,12 +117,35 @@ export default class Banter extends Component {
                 })
                 if (responseData.status === 200) {
                     AsyncStorage.setItem("PostsData", JSON.stringify(responseData.data));
+                    var postsArray = responseData.data
+                    postsArray.sort(function (a, b) {
+                        const objA = a.markercomments === null ? 0 : a.markercomments.length
+                        const objB = b.markercomments === null ? 0 : b.markercomments.length
+                        let comparison = 0;
+                        if (objA > objB) {
+                            comparison = -1;
+                        } else if (objA < objB) {
+                            comparison = 1;
+                        }
+                        return comparison;
+                    });
+                    // console.debug('sorted Array:', postsArray);
+                    var uniquePostsArray = postsArray.reduce((unique, o) => {
+                        if (!unique.some(obj => obj.userid === o.userid)) {
+                            unique.push(o);
+                        }
+                        return unique;
+                    }, []);
+                    // console.debug('sorted Array: Unique', uniquePostsArray);
+                    this.setState({
+                        userListArray: uniquePostsArray
+                    })
                 } else {
                     this.refs.toast.show(responseData.message);
                 }
             })
             .catch(error => {
-                console.debug('Home Posts response ERROR:', error);
+                console.debug('Banter Posts response ERROR:', error);
                 this.setState({ error, loading: false });
                 this.refs.toast.show("Something went wrong. Please try again later");
             });

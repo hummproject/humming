@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Dimensions, Platform } from 'react-native';
 
+
 const ProfileStyles = StyleSheet.create({
     followContent: {
         flexDirection: "row",
@@ -25,24 +26,6 @@ const ProfileStyles = StyleSheet.create({
     MenuOptionStyle: {
         zIndex: 1,
         position: 'absolute',
-        top: 55,
-        right: 0,
-        flexDirection: 'column',
-        flexWrap: 'wrap',
-        backgroundColor: '#FFFFFF',
-        alignSelf: 'flex-end',
-        padding: 10,
-        borderBottomLeftRadius: 5,
-        elevation: 2,
-        borderColor: '#ececec',
-        borderWidth: 0.5,
-        borderTopWidth: 0,
-    },
-
-    MenuOptionStyleIOS: {
-        zIndex: 1,
-        position: 'absolute',
-        top: 90,
         right: 0,
         flexDirection: 'column',
         flexWrap: 'wrap',
@@ -63,6 +46,8 @@ const ProfileStyles = StyleSheet.create({
         width: '75%',
         alignItems: 'center',
         elevation: 2,
+        borderColor: '#F5F5F5',
+        borderWidth: 1,
         shadowColor: '#F5F5F5',
         shadowOffset: {
             width: 0,

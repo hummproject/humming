@@ -6,6 +6,7 @@ import { RegisterUser } from './Register.service';
 import Logo from '../Logo';
 import Toast from 'react-native-easy-toast';
 import Geolocation from '@react-native-community/geolocation';
+import NetInfo from "@react-native-community/netinfo";
 
 export default class Register extends Component {
     constructor(props) {
@@ -20,7 +21,8 @@ export default class Register extends Component {
             showLoader: false,
             showStepOne: true,
             showStepTwo: false,
-            showStepThree: false
+            showStepThree: false,
+            is_connected: false,
         }
     }
 
@@ -30,10 +32,18 @@ export default class Register extends Component {
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe = NetInfo.addEventListener(state => {
+            if (state.isInternetReachable) {
+                this.setState({ is_connected: true });
+            } else {
+                this.setState({ is_connected: false });
+            }
+        });
     }
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe();
     }
 
     validateEmail = (text) => {
@@ -187,7 +197,11 @@ export default class Register extends Component {
         }
 
         registrationData.latlang = latlang;
-
+        if (!this.state.is_connected) {
+            this.setState({ showLoader: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         RegisterUser(registrationData).then((res) => {
             console.log(res);
             if (res.status === 200) {

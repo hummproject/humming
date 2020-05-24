@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-// import SplashScreen from 'react-native-splash-screen'
+import SplashScreen from 'react-native-splash-screen'
 import AppNavigator from './src/components/AppNavigator'
 import AsyncStorage from '@react-native-community/async-storage';
 // import { cos } from 'react-native-reanimated';
+import {Platform} from 'react-native'
 
 
 export default class App extends Component {
@@ -15,6 +16,7 @@ export default class App extends Component {
   }
 
   async componentDidMount() {
+    SplashScreen.hide();
     await AsyncStorage.getItem("userData").then(value => {
       const userData = JSON.parse(value);
       this.setState({

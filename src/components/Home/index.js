@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, BackHandler, Alert, PermissionsAndroid } from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, BackHandler, Alert, PermissionsAndroid, StatusBar } from 'react-native';
 import HomePagePost from '../HomePagePost';
 import { AppStyle } from '../../App.style'
 import AppConfig from '../../config/constants';
@@ -7,6 +7,7 @@ import Toast from 'react-native-easy-toast'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from '@react-native-community/geolocation';
+import NetInfo from "@react-native-community/netinfo";
 
 export default class Home extends Component {
     constructor(props) {
@@ -19,7 +20,8 @@ export default class Home extends Component {
             error: null,
             userData: {},
             isListEnded: false,
-            refreshing: false
+            refreshing: false,
+            is_connected: false,
         };
     }
 
@@ -32,6 +34,7 @@ export default class Home extends Component {
             });
         });
         if (Platform.OS === 'ios') {
+            Geolocation.requestAuthorization()
             this.fetchLocation();
         } else {
             this.requestLocationPermission();
@@ -49,6 +52,13 @@ export default class Home extends Component {
             )
         });
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe = NetInfo.addEventListener(state => {
+            if (state.isInternetReachable) {
+                this.setState({ is_connected: true });
+            } else {
+                this.setState({ is_connected: false });
+            }
+        });
     }
 
     async requestLocationPermission() {
@@ -104,6 +114,7 @@ export default class Home extends Component {
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
         this._unsubscribe();
+        this.netinfoSubscribe();
     }
 
     handleBackButton = () => {
@@ -120,14 +131,18 @@ export default class Home extends Component {
     };
 
     makeRequesttoFetchPosts = () => {
-        const { page, userData, latlang, postsListArray } = this.state;
+        const { page, userData, latlang, postsListArray, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.GET_MARKERS
-        console.debug(url);
-        console.debug("REQUEST ", JSON.stringify({
-            location: latlang,
-            pageno: page
-        }))
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({
+                loading: false,
+                refreshing: false,
+            });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
+        console.debug(url);
         fetch(url, {
             method: 'POST',
             headers: {
@@ -143,7 +158,6 @@ export default class Home extends Component {
             .then(response => response.json())
             .then(responseData => {
                 console.debug('Home Posts response:', responseData)
-                AsyncStorage.setItem("PostsData", JSON.stringify(responseData.data));
                 this.setState({
                     loading: false,
                     refreshing: false,
@@ -164,6 +178,7 @@ export default class Home extends Component {
                             error: responseData.error || null,
                         });
                     }
+                    AsyncStorage.setItem("PostsData", JSON.stringify(this.state.postsListArray));
                 } else {
                     this.refs.toast.show(responseData.message);
                 }
@@ -179,11 +194,13 @@ export default class Home extends Component {
         const { postsListArray, loading, userData } = this.state;
         return (
             <SafeAreaView style={{ flex: 1 }}>
+                <StatusBar barStyle={'dark-content'} />
+                {/* <View style={{ flex: 1 }}> */}
+                <View style={styles.headerstyle}>
+                    <Image source={require('../../images/home_header_logo.png')} style={{ width: 110, height: 50, marginLeft: 15 }} resizeMode={'contain'} />
+                    {/* <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>HUMMING</Text> */}
+                </View>
                 <View style={{ flex: 1 }}>
-                    <View style={styles.headerstyle}>
-                        <Image source={require('../../images/home_header_logo.png')} style={{ width: 110, height: 50, marginLeft: 15 }} resizeMode={'contain'} />
-                        {/* <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>HUMMING</Text> */}
-                    </View>
                     <FlatList
                         ref={(ref) => { this.flatListRef = ref; }}
                         data={postsListArray}
@@ -208,15 +225,16 @@ export default class Home extends Component {
                             }
                         }}
                     />
-                    {
-                        loading ? <ActivityIndicator
-                            animating={true}
-                            style={AppStyle.activityIndicator}
-                            size='large'
-                        /> : null
-                    }
-                    <Toast ref="toast" style={AppStyle.toast_style} />
                 </View>
+                {
+                    loading ? <ActivityIndicator
+                        animating={true}
+                        style={AppStyle.activityIndicator}
+                        size='large'
+                    /> : null
+                }
+                <Toast ref="toast" style={AppStyle.toast_style} />
+                {/* </View> */}
             </SafeAreaView>
         )
     };

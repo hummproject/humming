@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { Text, View, TextInput, Image, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView, BackHandler } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import AppConfig from '../../config/constants';
 // import Logo from '../Logo';
 import Toast from 'react-native-easy-toast';
-// import Geolocation from 'react-native-geolocation-service';
+import NetInfo from "@react-native-community/netinfo";
 
 export default class ForgotPassword extends Component {
     constructor(props) {
@@ -19,7 +18,8 @@ export default class ForgotPassword extends Component {
             showLoader: false,
             showStepOne: true,
             showStepTwo: false,
-            showStepThree: false
+            showStepThree: false,
+            is_connected: false,
         }
     }
     dismissKeyboard() {
@@ -28,10 +28,18 @@ export default class ForgotPassword extends Component {
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe = NetInfo.addEventListener(state => {
+            if (state.isInternetReachable) {
+                this.setState({ is_connected: true });
+            } else {
+                this.setState({ is_connected: false });
+            }
+        });
     }
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe();
     }
 
     handleBackButton = () => {
@@ -107,10 +115,17 @@ export default class ForgotPassword extends Component {
     }
 
     makeRequesttoGetOTP = () => {
-        const { email } = this.state;
+        const { email, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.FORGOT_PASSWORD_GET_OTP
         console.debug(url);
         this.setState({ showLoader: true });
+        if (!is_connected) {
+            this.setState({
+                showLoader: false,
+            });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -156,10 +171,17 @@ export default class ForgotPassword extends Component {
     };
 
     makeRequesttoVerifyOTP = () => {
-        const { email, otp } = this.state;
+        const { email, otp, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.FORGOT_PASSWORD_VERIFY_OTP
         console.debug(url);
         this.setState({ showLoader: true });
+        if (!is_connected) {
+            this.setState({
+                showLoader: false,
+            });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -206,10 +228,17 @@ export default class ForgotPassword extends Component {
     };
 
     makeRequesttoUpdatePassword = () => {
-        const { email, newPassword } = this.state;
+        const { email, newPassword, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.FORGOT_PASSWORD_UPDATE_PASSWORD
         console.debug(url);
         this.setState({ showLoader: true });
+        if (!is_connected) {
+            this.setState({
+                showLoader: false,
+            });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {

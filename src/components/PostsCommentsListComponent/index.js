@@ -43,7 +43,7 @@ export default class PostsCommentsListComponent extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.TopContainer}>
-                    <Image source={commntedUserdp == null ? require('../../images/logo.png') : { uri: commntedUserdp }} resizeMode={'contain'} style={styles.profile_photo} />
+                    <Image source={commntedUserdp == null ? require('../../images/logo.png') : { uri: commntedUserdp }}  resizeMode={commntedUserdp == null ? 'contain' : 'cover'} style={styles.profile_photo} />
                     <View style={styles.container_text}>
                         <View style={{
                             flexDirection: 'row',

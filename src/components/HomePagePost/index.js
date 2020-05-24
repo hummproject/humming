@@ -143,7 +143,7 @@ export default class HomePagePost extends PureComponent {
                         </Text>
                         <View style={styles.categoryContainer}>
                             <Image source={require('../../images/category_marker_icon.png')} style={{ height: 13, width: 13 }} />
-                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white', textTransform: 'capitalize'  }]}>{category}</Text>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white', textTransform: 'capitalize' }]}>{category}</Text>
                         </View>
                     </View>
                 </View>

@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import PostsCommentsListComponent from '../PostsCommentsListComponent';
 import Toast from 'react-native-easy-toast'
 import { SafeAreaView } from 'react-native-safe-area-context';
+import NetInfo from "@react-native-community/netinfo";
 
 export default class PostsComments extends Component {
     constructor(props) {
@@ -18,6 +19,7 @@ export default class PostsComments extends Component {
             clearInput: false,
             showtoast: false,
             userData: {},
+            is_connected: false,
             postDetails: this.props.route.params.postDetails
         };
     }
@@ -29,7 +31,18 @@ export default class PostsComments extends Component {
                 userData: userData,
             });
         });
+        this.netinfoSubscribe = NetInfo.addEventListener(state => {
+            if (state.isInternetReachable) {
+                this.setState({ is_connected: true });
+            } else {
+                this.setState({ is_connected: false });
+            }
+        });
         this.fetchCommentsforPosts();
+    }
+
+    componentWillUnmount() {
+        this.netinfoSubscribe();
     }
 
     PostComment = () => {
@@ -48,15 +61,20 @@ export default class PostsComments extends Component {
     PostCommentOfUser = () => {
         this.dismissKeyboard();
         // console.debug('post Details : Fetch', this.state.postDetails);
-        const { userData, userCommentedText, postDetails, commentsListArray } = this.state;
+        const { userData, userCommentedText, postDetails, commentsListArray, is_connected } = this.state;
         this.setState({
-            showtoast : true
+            showtoast: true
         })
         if (userCommentedText !== "") {
             const token = userData.token;
             const url = AppConfig.DOMAIN + AppConfig.ADD_COMMENTS_TO_MARKER;
             console.debug(url);
             this.setState({ loading: true });
+            if (!is_connected) {
+                this.setState({ loading: false });
+                this.refs.toast.show("Internet is not connected, Please try again!");
+                return;
+            }
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -82,7 +100,7 @@ export default class PostsComments extends Component {
                         data["userdp"] = userData.userdp;
                         var commentListAry = commentsListArray;
                         commentListAry.unshift(data);
-                        console.debug("",commentListAry);
+                        console.debug("", commentListAry);
                         this.setState({
                             commentsListArray: commentListAry,
                             error: responseData.error || null,
@@ -98,18 +116,23 @@ export default class PostsComments extends Component {
                     this.setState({ error, loading: false });
                     this.refs.toast.show("Something went wrong. Please try again later");
                 });
-        }else{
-            this.refs.toast.show("Please write someting to post"); 
+        } else {
+            this.refs.toast.show("Please write someting to post");
         }
     };
 
     fetchCommentsforPosts = () => {
         // console.debug('post Details : Fetch', this.state.postDetails);
-        const { userData, postDetails } = this.state;
+        const { userData, postDetails, is_connected } = this.state;
         const token = userData.token;
         const url = AppConfig.DOMAIN + AppConfig.GET_MARKER_COMMENTS;
         console.debug(url);
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({ loading: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -206,7 +229,7 @@ export default class PostsComments extends Component {
                         keyExtractor={(item, index) => item + index}
                     />
                     <View style={styles.footerstyle}>
-                        <Image source={userdp == null ? require('../../images/logo.png') : { uri: userdp }} resizeMode={'contain'} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
+                        <Image source={userdp == null ? require('../../images/logo.png') : { uri: userdp }} resizeMode={userdp == null ? 'contain' : 'cover'} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
                         <TextInput
                             style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 40, flex: 2, marginLeft: 15 }]}
                             placeholder="Post a Comment"

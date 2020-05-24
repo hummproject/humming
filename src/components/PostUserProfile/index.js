@@ -5,6 +5,7 @@ import { AppStyle } from '../../App.style';
 import { ProfileStyles } from '../Profile/Profile.style';
 import AppConfig from '../../config/constants';
 import Toast from 'react-native-easy-toast'
+import NetInfo from "@react-native-community/netinfo";
 
 export default class PostUserProfile extends React.Component {
     constructor(props) {
@@ -31,6 +32,8 @@ export default class PostUserProfile extends React.Component {
             usermobile: '',
             useremail: '',
             useraddress: '',
+            is_connected: false,
+            menuTop: 60
         };
     }
 
@@ -51,12 +54,20 @@ export default class PostUserProfile extends React.Component {
                 })
             }
         });
-        this.makeRequesttoFetchPostUserDetails();
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe = NetInfo.addEventListener(state => {
+            if (state.isInternetReachable) {
+                this.setState({ is_connected: true });
+            } else {
+                this.setState({ is_connected: false });
+            }
+        });
+        this.makeRequesttoFetchPostUserDetails()
     }
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe();
     }
 
     handleBackButton = () => {
@@ -65,10 +76,15 @@ export default class PostUserProfile extends React.Component {
     };
 
     makeRequesttoFetchUserMarkers = () => {
-        const { userData, postDetails } = this.state;
+        const { userData, postDetails, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.GET_MARKERS_BY_USER
         console.debug(url);
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({ loading: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -82,7 +98,7 @@ export default class PostUserProfile extends React.Component {
         })
             .then(response => response.json())
             .then(responseData => {
-                console.debug('PostUser ProfilePage response:', responseData)
+                console.debug('PostUser ProfilePage Markers response:', responseData)
                 this.setState({ loading: false });
                 if (responseData.status === 200) {
                     if (Array.isArray(responseData.data)) {
@@ -101,17 +117,22 @@ export default class PostUserProfile extends React.Component {
                 }
             })
             .catch(error => {
-                console.debug('PostUser ProfilePage response ERROR:', error);
+                console.debug('PostUser ProfilePage Markers response ERROR:', error);
                 this.setState({ error: error, loading: false });
                 this.refs.toast.show("Something went wrong. Please try again later");
             });
     };
 
     makeRequesttoFetchPostUserDetails = () => {
-        const { userData, postDetails } = this.state;
+        const { userData, postDetails, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.GET_POST_USER_PROFILE
         console.debug(url);
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({ loading: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -135,8 +156,6 @@ export default class PostUserProfile extends React.Component {
                             break;
                         }
                     }
-                    // console.debug("UserData: ",userData)
-                    // console.debug("Is UserAlready Following",isAlreadyFollowing);
                     this.setState({
                         error: responseData.error || null,
                         username: responseData.data.username,
@@ -165,23 +184,28 @@ export default class PostUserProfile extends React.Component {
     };
 
     makeRequesttoFollowOrUnFollowPostUser = () => {
-        const { userData, isUserAlreadyFollowing } = this.state;
+        const { userData, isUserAlreadyFollowing, postDetails, is_connected } = this.state;
         var data;
         var url;
         if (isUserAlreadyFollowing) { // Unfollow
             url = AppConfig.DOMAIN + AppConfig.UN_FOLLOW_USER
             data = {
-                unFollowerId: userData.userid,
+                unFollowerId: postDetails.userid,
             }
         } else { // follow
             url = AppConfig.DOMAIN + AppConfig.FOLLOW_USER
             data = {
-                followerId: userData.userid,
+                followerId: postDetails.userid,
             }
         }
         console.debug("URL:", url);
         console.debug("Request:", data);
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({ loading: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -196,8 +220,6 @@ export default class PostUserProfile extends React.Component {
                 console.debug('Post USER Profile Page follow or unfollow response:', responseData)
                 this.setState({ loading: false });
                 if (responseData.status === 200) {
-                    // console.debug("UserData: ",userData)
-                    // console.debug("Is UserAlready Following",isAlreadyFollowing);
                     this.setState({
                         isUserAlreadyFollowing: !this.state.isUserAlreadyFollowing
                     });
@@ -228,12 +250,17 @@ export default class PostUserProfile extends React.Component {
             useremail,
             useraddress,
             isUserAlreadyFollowing,
-            showFolloworUnfollowButton
+            showFolloworUnfollowButton,
+            menuTop
         } = this.state;
-        console.debug("user followers,", followers);
         return (
             <SafeAreaView style={{ flex: 1 }}>
-                <View style={ProfileStyles.headerstyle}>
+                <View style={ProfileStyles.headerstyle} ref="Header" onLayout={({ nativeEvent }) => {
+                    this.refs.Header.measure((x, y, width, height, pageX, pageY) => {
+                        // console.log(x, y, width, height, pageX, pageY);
+                        this.setState({ menuTop: y + height });
+                    })
+                }}>
                     <TouchableOpacity onPress={this.returnBack} >
                         <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
                     </TouchableOpacity>
@@ -252,7 +279,7 @@ export default class PostUserProfile extends React.Component {
                 </View>
                 {
                     this.state.showMenuOptions ?
-                        <View style={ProfileStyles.MenuOptionStyle}>
+                        <View style={[ProfileStyles.MenuOptionStyle, { top: menuTop }]}>
                             <TouchableOpacity onPress={() => this.BlockUserProfile()}>
                                 <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Block</Text>
                             </TouchableOpacity>
@@ -261,7 +288,7 @@ export default class PostUserProfile extends React.Component {
                 }
                 <ScrollView style={{ backgroundColor: 'white' }}>
                     <View style={[ProfileStyles.userDp, { alignSelf: 'center', borderColor: '#F5F5F5', borderWidth: 0.5, marginTop: 10 }]}>
-                        <Image style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={userdp == null ? 'contain' : 'cover'} />
+                        <Image style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={(userdp == null) || (userdp == '') ? 'contain' : 'cover'} />
                     </View>
                     <View style={{ flex: 1, alignItems: "center", marginTop: 20, }}>
                         <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 18, textTransform: 'capitalize' }]}>{firstname + ' ' + lastname}</Text>
@@ -303,7 +330,8 @@ export default class PostUserProfile extends React.Component {
                                 <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, paddingLeft: 15, paddingBottom: 10 }]}>Previous Posts</Text>
                                 <FlatList
                                     horizontal
-                                    pagingEnabled={true}
+                                    contentContainerStyle={{ paddingEnd: 15 }}
+                                    showsHorizontalScrollIndicator={false}
                                     data={userPostsAry}
                                     renderItem={({ item }) => {
                                         // console.debug(item.media);
@@ -312,7 +340,7 @@ export default class PostUserProfile extends React.Component {
                                         if (imageUri != '') {
                                             return (
                                                 <TouchableOpacity onPress={this.OpenPost}>
-                                                    <View style={{ flex: 1, borderColor: '#F5F5F5', borderWidth: 0.5, borderRadius: 8, marginLeft: 15, width: 130, height: 130, marginRight: 15 }}>
+                                                    <View style={{ flex: 1, borderColor: '#F5F5F5', borderWidth: 0.5, borderRadius: 8, marginLeft: 15, width: 130, height: 130 }}>
                                                         < Image source={imageUri == null ? require('../../images/logo.png') : { uri: imageUri }} resizeMode={imageUri == null ? 'contain' : 'cover'} style={{ width: 130, height: 130, borderRadius: 8 }} />
                                                     </View>
                                                 </TouchableOpacity>

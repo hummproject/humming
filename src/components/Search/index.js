@@ -6,6 +6,7 @@ import SearchPosts from '../SearchPosts';
 import Toast from 'react-native-easy-toast'
 import AppConfig from '../../config/constants'
 import { AppStyle } from '../../App.style'
+import NetInfo from "@react-native-community/netinfo";
 
 export default class Search extends Component {
     constructor(props) {
@@ -16,6 +17,7 @@ export default class Search extends Component {
             dataArray: [], //this is the array
             error: null,
             searchedText: '',
+            is_connected: false,
         };
     }
 
@@ -26,12 +28,20 @@ export default class Search extends Component {
                 userData: userData
             });
         });
-        this.makeRequesttoFetchTopMarkers();
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe = NetInfo.addEventListener(state => {
+            if (state.isInternetReachable) {
+                this.setState({ is_connected: true });
+            } else {
+                this.setState({ is_connected: false });
+            }
+        });
+        this.makeRequesttoFetchTopMarkers();
     }
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        this.netinfoSubscribe();
     }
 
     handleBackButton = () => {
@@ -48,10 +58,15 @@ export default class Search extends Component {
     };
 
     makeRequesttoFetchSearchedMarkers = () => {
-        const { userData } = this.state;
+        const { userData, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.SEARCH_ALL_MARKERS
         console.debug(url);
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({ loading: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
@@ -121,10 +136,15 @@ export default class Search extends Component {
     };
 
     makeRequesttoFetchTopMarkers = () => {
-        const { userData } = this.state;
+        const { userData, is_connected } = this.state;
         const url = AppConfig.DOMAIN + AppConfig.SEARCH_TOP_MARKERS
         console.debug(url);
         this.setState({ loading: true });
+        if (!is_connected) {
+            this.setState({ loading: false });
+            this.refs.toast.show("Internet is not connected, Please try again!");
+            return;
+        }
         fetch(url, {
             method: 'POST',
             headers: {
