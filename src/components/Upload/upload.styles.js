@@ -6,12 +6,30 @@ const styles = StyleSheet.create({
   headerstyle: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    height: 60,
+    height: 70,
     elevation: 2,
     borderBottomColor: '#ECECEC',
     borderBottomWidth: 1,
     alignItems: 'center',
+    justifyContent: 'space-between'
   },
+
+  upload_container: {
+    margin: 10, 
+    alignItems: 'center',
+    borderRadius: 5,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#ECECEC',
+    shadowOffset: {
+        width: 0,
+        height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 1,
+    elevation: 2,
+    borderColor: '#ECECEC',
+    borderWidth: (Platform.OS === 'ios') ? 0.5 : 0,
+},
 
   up2: {
     height: 40,
@@ -30,7 +48,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ECECEC',
     borderBottomWidth: 1,
   },
-  
+
   up7: {
     marginVertical: 20,
     borderRadius: 20,

@@ -6,8 +6,8 @@ import Register from './Register';
 import TabBar from '../TabBar';
 import PostsComments from './PostsComments'
 import PostUserProfile from './PostUserProfile'
+import UserProfile from './Profile'
 import ForgotPassword from './ForgotPassword'
-import PostDetails from './PostDetails'
 
 const Stack = createStackNavigator()
 
@@ -26,7 +26,7 @@ function AppNavigator(props) {
                 <Stack.Screen name='TabBar' component={TabBar} />
                 <Stack.Screen name='postscomments' component={PostsComments} />
                 <Stack.Screen name='postuserprofile' component={PostUserProfile} />
-                <Stack.Screen name='postdetails' component={PostDetails} />
+                <Stack.Screen name='userprofile' component={UserProfile} />
             </Stack.Navigator>
         </NavigationContainer>
     )

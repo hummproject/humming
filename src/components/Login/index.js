@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView, Keyboard, BackHandler, Alert, StatusBar } from 'react-native';
+import { Text, View, Image, TextInput, TouchableOpacity, ActivityIndicator, SafeAreaView, Keyboard, BackHandler, Alert, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { LoginUser } from './Login.service';
 import { AppStyle } from '../../App.style';
-import Logo from '../Logo';
+import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-easy-toast';
 import AppConfig from '../../config/constants';
+import { ButtonGradientColor1, ButtonGradientColor2 } from '../../config/constants';
 import NetInfo from "@react-native-community/netinfo";
 
 export default class Login extends Component {
@@ -156,24 +157,38 @@ export default class Login extends Component {
 
     render() {
         return (
-            <SafeAreaView style={AppStyle.appContainer}>
+            <SafeAreaView style={AppStyle.login_appContainer}>
                 <StatusBar barStyle={'dark-content'} />
-                <Logo></Logo>
-                {/* <Home/> */}
-                <TextInput style={AppStyle.appInput} placeholder="Username" value={this.state.userName}
-                    onChangeText={userName => this.setState({ userName })}></TextInput>
-                <TextInput style={AppStyle.appInput} placeholder="Password" value={this.state.userPwd} secureTextEntry={true}
-                    onChangeText={userPwd => this.setState({ userPwd })}></TextInput>
-                <TouchableOpacity onPress={this.login}>
-                    <Text style={AppStyle.appButton}>Sign in</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={this.goToForgotPassword}>
-                    <Text style={[AppStyle.app_font, { marginTop: 25, fontSize: 15 }, AppStyle.light_TextColor]}>Forgot your password?</Text>
-                </TouchableOpacity>
-                <View style={AppStyle.appFooter}>
-                    <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 15 }]}>Don't have an account?</Text>
+                <Image style={AppStyle.Loginlogo} source={require('../../images/logo.png')} />
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
+                    <Text style={[AppStyle.app_font_heading, AppStyle.dark_TextColor, { fontSize: 23, marginBottom: 5 }]}>Welcome to Humming</Text>
+                    <Text style={[AppStyle.app_font_heading, AppStyle.light_blue_TextColor, { fontSize: 15, marginBottom: 30 }]}>Login to your account</Text>
+                    <TextInput style={AppStyle.appInput} placeholder="User name" value={this.state.userName}
+                        onChangeText={userName => this.setState({ userName })}></TextInput>
+                    <TextInput style={AppStyle.appInput} placeholder="Password" value={this.state.userPwd} secureTextEntry={true}
+                        onChangeText={userPwd => this.setState({ userPwd })}></TextInput>
+                    <TouchableOpacity onPress={this.login}>
+                        <LinearGradient
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                            style={AppStyle.appButton_background}>
+                            <Text style={AppStyle.appButton_Text}>Sign in</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.goToForgotPassword}>
+                        <Text style={[AppStyle.app_font, { marginTop: 30, fontSize: 14 }, AppStyle.light_gray_TextColor]}>Forgot your password?</Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    marginBottom: 50,
+                }}>
+                    <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Don't have an account?</Text>
                     <TouchableOpacity onPress={this.goToRegister}>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15 }]}>&nbsp;&nbsp;Sign up</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>&nbsp;Sign up</Text>
                     </TouchableOpacity>
                 </View>
                 {

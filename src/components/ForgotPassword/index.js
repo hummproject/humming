@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Text, View, TextInput, Image, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView, BackHandler } from 'react-native';
 import { AppStyle } from '../../App.style';
-import AppConfig from '../../config/constants';
-// import Logo from '../Logo';
+import AppConfig from '../../config/constants'
+import { ButtonGradientColor1, ButtonGradientColor2 } from '../../config/constants';
+import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-easy-toast';
 import NetInfo from "@react-native-community/netinfo";
 
@@ -20,6 +21,8 @@ export default class ForgotPassword extends Component {
             showStepTwo: false,
             showStepThree: false,
             is_connected: false,
+            isEmailInputEnabled: true,
+            forgotPasswordText: 'Enter your email to confirm'
         }
     }
     dismissKeyboard() {
@@ -27,6 +30,7 @@ export default class ForgotPassword extends Component {
     }
 
     componentDidMount() {
+        // this.setState({isEmailInputEnabled: true})
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
         this.netinfoSubscribe = NetInfo.addEventListener(state => {
             if (state.isInternetReachable) {
@@ -45,10 +49,10 @@ export default class ForgotPassword extends Component {
     handleBackButton = () => {
         const { showStepOne, showStepTwo, showStepThree } = this.state
         if (showStepOne === true && showStepTwo === true) {
-            this.setState({ showStepOne: true, showStepTwo: false, showStepThree: false });
+            this.setState({ showStepOne: true, isEmailInputEnabled: true, forgotPasswordText: 'Enter your email to confirm', showStepTwo: false, showStepThree: false });
             console.debug('IF');
         } else if (showStepOne === false && showStepTwo === false && showStepThree === true) {
-            this.setState({ showStepOne: true, showStepTwo: true, showStepThree: false });
+            this.setState({ showStepOne: true, isEmailInputEnabled: false, forgotPasswordText: 'Enter OTP to confirm your identity', showStepTwo: true, showStepThree: false });
             console.debug('ELSE IF');
         } else {
             console.debug('ELSE');
@@ -148,6 +152,8 @@ export default class ForgotPassword extends Component {
                         this.setState({
                             showStepOne: true,
                             showStepTwo: true,
+                            isEmailInputEnabled: false,
+                            forgotPasswordText: 'Enter OTP to confirm your identity',
                             otp: '',
                             error: responseData.error || null
                         });
@@ -273,81 +279,77 @@ export default class ForgotPassword extends Component {
 
     render() {
         return (
-            <SafeAreaView style={AppStyle.appContainer}>
-                {/* <Logo></Logo> */}
-                <View style={{ flex: 1 }}>
-                    <Image style={{
-                        width: 80,
-                        height: 80,
-                        marginVertical: 40,
-                    }} source={require('../../images/logo.png')} resizeMode={'contain'} />
+            <SafeAreaView style={AppStyle.login_appContainer}>
+                <Image style={AppStyle.Loginlogo} source={require('../../images/logo.png')} />
+                {
+                    this.state.showStepOne ?
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 100 }}>
+                            <Text style={[AppStyle.app_font_heading, AppStyle.dark_TextColor, { fontSize: 23, marginBottom: 5 }]}>Forgot password</Text>
+                            <Text style={[AppStyle.app_font_heading, AppStyle.light_blue_TextColor, { fontSize: 15, marginBottom: 30 }]}>{this.state.forgotPasswordText}</Text>
+                            <TextInput style={AppStyle.appInput} placeholder="Email" value={this.state.email}
+                                onChangeText={(email) => this.setState({ email })} editable={this.state.isEmailInputEnabled} ></TextInput>
+                            {
+                                this.state.showStepTwo ?
+                                    <TextInput style={AppStyle.appInput} placeholder="Enter OTP" value={this.state.otp} maxLength={4}
+                                        keyboardType={'numeric'}
+                                        onChangeText={(otp) => this.setState({ otp })}></TextInput>
+                                    : null
+                            }
+                            <TouchableOpacity onPress={() => this.ForgotPasswordStepOne()}>
+                                <LinearGradient
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                    style={AppStyle.appButton_background}>
+                                    <Text style={AppStyle.appButton_Text}>SUBMIT</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
+                        : null
+                }
+                {
+                    this.state.showStepThree ?
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 100 }} >
+                            <Text style={[AppStyle.app_font_heading, AppStyle.dark_TextColor, { fontSize: 23, marginBottom: 5 }]}>Reset password</Text>
+                            <Text style={[AppStyle.app_font_heading, AppStyle.light_blue_TextColor, { fontSize: 15, marginBottom: 30 }]}>Create your new password</Text>
+                            <TextInput style={AppStyle.appInput} placeholder="New Password" value={this.state.newPassword} secureTextEntry={true}
+                                onChangeText={(newPassword) => this.setState({ newPassword })}></TextInput>
+                            <TextInput style={AppStyle.appInput} placeholder="Re-enter New Password" value={this.state.newConfirmPassword} secureTextEntry={true}
+                                onChangeText={(newConfirmPassword) => this.setState({ newConfirmPassword })}></TextInput>
+                            <TouchableOpacity onPress={() => this.ForgotPasswordStepThree()}>
+                                <LinearGradient
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                    style={AppStyle.appButton_background}>
+                                    <Text style={AppStyle.appButton_Text}>SUBMIT</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
+                        : null
+                }
+                <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    marginBottom: 50,
+                }}>
+                    <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Remember Password?</Text>
+                    <TouchableOpacity onPress={() => this.props.navigation.navigate('login')}>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>&nbsp;Sign in</Text>
+                    </TouchableOpacity>
                 </View>
-                <View style={{ flex: 2.5, alignItems: 'center' }}>
-                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, paddingTop: 30, paddingBottom: 30 }]}>Forgot Password</Text>
-                    {
-                        this.state.showStepOne ?
-                            <View style={{ alignItems: 'center' }}>
-                                <TextInput style={AppStyle.appInput} placeholder="Email" value={this.state.email}
-                                    onChangeText={(email) => this.setState({ email })}></TextInput>
-                                {
-                                    this.state.showStepTwo ?
-                                        <TextInput style={AppStyle.appInput} placeholder="OTP" value={this.state.otp}
-                                            onChangeText={(otp) => this.setState({ otp })}></TextInput>
-                                        : null
-                                }
-                                <TouchableOpacity onPress={() => this.ForgotPasswordStepOne()}>
-                                    <Text style={AppStyle.appButton}>SUBMIT</Text>
-                                </TouchableOpacity>
-                                {
-                                    this.state.showLoader ?
-                                        <ActivityIndicator
-                                            animating={true}
-                                            style={AppStyle.activityIndicator}
-                                            size='large'
-                                        /> : null
-                                }
-                            </View>
-                            : null
-                    }
-                    {
-                        this.state.showStepThree ?
-                            <View style={{ flex: 1, alignItems: 'center' }}>
-                                <TextInput style={AppStyle.appInput} placeholder="New Password" value={this.state.newPassword}
-                                    onChangeText={(newPassword) => this.setState({ newPassword })}></TextInput>
-                                <TextInput style={AppStyle.appInput} placeholder="Re-enter New Password" value={this.state.newConfirmPassword}
-                                    onChangeText={(newConfirmPassword) => this.setState({ newConfirmPassword })}></TextInput>
-                                <TouchableOpacity onPress={() => this.ForgotPasswordStepThree()}>
-                                    <Text style={AppStyle.appButton}>SUBMIT</Text>
-                                </TouchableOpacity>
-                                {
-                                    this.state.showLoader ?
-                                        <ActivityIndicator
-                                            animating={true}
-                                            style={AppStyle.activityIndicator}
-                                            size='large'
-                                        /> : null
-                                }
-                            </View>
-                            : null
-                    }
-                    {/* <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'space-around', backgroundColor: 'blue' }}> */}
-                    <View style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        flexDirection: 'row',
-                        position: 'absolute',
-                        bottom: 80
-                    }}>
-                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 15 }]}>Remember Password?</Text>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate('login')}>
-                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15 }]}>&nbsp;&nbsp;Sign in</Text>
-                        </TouchableOpacity>
-                    </View>
-                    {/* </View> */}
-                </View>
+                {
+                    this.state.showLoader ?
+                        <ActivityIndicator
+                            animating={true}
+                            style={AppStyle.activityIndicator}
+                            size='large'
+                        /> : null
+                }
                 <Toast ref="toast"
                     style={AppStyle.toast_style} />
-            </SafeAreaView>
+            </SafeAreaView >
         )
     }
 }

@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { ProfileStyles } from '../Profile/Profile.style';
 import AppConfig from '../../config/constants';
+import { ButtonGradientColor1, ButtonGradientColor2 } from '../../config/constants';
+import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-easy-toast'
 import NetInfo from "@react-native-community/netinfo";
 
@@ -261,34 +263,33 @@ export default class PostUserProfile extends React.Component {
                         this.setState({ menuTop: y + height });
                     })
                 }}>
-                    <TouchableOpacity onPress={this.returnBack} >
-                        <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
+                    <TouchableOpacity onPress={this.returnBack} style={{ padding: 8, marginLeft: 10 }}>
+                        <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 13, height: 20, marginLeft: 10 }} />
                     </TouchableOpacity>
-                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 18, marginLeft: 15 }]}>@{username}</Text>
-                    <View style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
-                        marginRight: 15,
-                    }}>
-                        <TouchableOpacity onPress={() => this.showMenu()}>
-                            <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 35, marginLeft: 25 }} resizeMode={'center'} />
-                        </TouchableOpacity>
-                    </View>
+                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 18 }]}>@{username}</Text>
+                    <TouchableOpacity onPress={() => this.showMenu()} style={{ padding: 8, marginRight: 10 }}>
+                        <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 20, marginLeft: 10 }} resizeMode={'contain'} />
+                    </TouchableOpacity>
                 </View>
                 {
                     this.state.showMenuOptions ?
-                        <View style={[ProfileStyles.MenuOptionStyle, { top: menuTop }]}>
+                        <View style={[ProfileStyles.MenuOptionStyle, { top: menuTop - 10 }]}>
                             <TouchableOpacity onPress={() => this.BlockUserProfile()}>
-                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Block</Text>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 14, padding: 8 }]}>Block</Text>
                             </TouchableOpacity>
                         </View>
                         : null
                 }
                 <ScrollView style={{ backgroundColor: 'white' }}>
-                    <View style={[ProfileStyles.userDp, { alignSelf: 'center', borderColor: '#F5F5F5', borderWidth: 0.5, marginTop: 10 }]}>
-                        <Image style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={(userdp == null) || (userdp == '') ? 'contain' : 'cover'} />
+                    <View style={[ProfileStyles.userDp, { alignSelf: 'center', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F5', marginTop: 10 }]}>
+                        {
+                            (userdp == null) || (userdp == '') ?
+                                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                    <Image source={require('../../images/no_profile.png')} resizeMode='contain' style={{ width: 75, height: 75, marginBottom: 10 }} />
+                                </View>
+                                :
+                                <Image style={ProfileStyles.userDp} source={{ uri: userdp }} resizeMode={(userdp == null) || (userdp == '') ? 'contain' : 'cover'} />
+                        }
                     </View>
                     <View style={{ flex: 1, alignItems: "center", marginTop: 20, }}>
                         <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 18, textTransform: 'capitalize' }]}>{firstname + ' ' + lastname}</Text>
@@ -316,7 +317,13 @@ export default class PostUserProfile extends React.Component {
                     {
                         showFolloworUnfollowButton ?
                             <TouchableOpacity style={{ alignSelf: 'center', paddingTop: 10, paddingBottom: 10 }} onPress={() => { this.makeRequesttoFollowOrUnFollowPostUser() }}>
-                                <Text style={AppStyle.appButton}>{isUserAlreadyFollowing ? "UN FOLLOW" : "FOLLOW"}</Text>
+                                <LinearGradient
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                    style={AppStyle.appButton_background}>
+                                    <Text style={AppStyle.appButton_Text}>{isUserAlreadyFollowing ? "UN FOLLOW" : "FOLLOW"}</Text>
+                                </LinearGradient>
                             </TouchableOpacity>
                             : null
                     }
@@ -339,10 +346,8 @@ export default class PostUserProfile extends React.Component {
                                         // console.debug('iMAGE uRL', imageUri);
                                         if (imageUri != '') {
                                             return (
-                                                <TouchableOpacity onPress={this.OpenPost}>
-                                                    <View style={{ flex: 1, borderColor: '#F5F5F5', borderWidth: 0.5, borderRadius: 8, marginLeft: 15, width: 130, height: 130 }}>
-                                                        < Image source={imageUri == null ? require('../../images/logo.png') : { uri: imageUri }} resizeMode={imageUri == null ? 'contain' : 'cover'} style={{ width: 130, height: 130, borderRadius: 8 }} />
-                                                    </View>
+                                                <TouchableOpacity onPress={this.OpenPost} style={{ flex: 1, borderColor: '#F5F5F5', borderWidth: 0.5, borderRadius: 8, marginLeft: 15, width: 130, height: 130, backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center' }}>
+                                                    < Image source={imageUri == null ? require('../../images/no_image_logo.png') : { uri: imageUri }} resizeMode={imageUri == null ? 'contain' : 'cover'} style={{ width: (imageUri == null ? 40 : 130), height: (imageUri == null ? 40 : 130), borderRadius: 8 }} />
                                                 </TouchableOpacity>
                                             )
                                         } else {
@@ -358,7 +363,7 @@ export default class PostUserProfile extends React.Component {
                     <View style={[AppStyle.appAlignItemsCenter, { marginTop: 20 }]}>
                         <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>PHONE NUMBER</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../images/phone_filled.png')} resizeMode={'center'} />
+                            <Image style={{ width: 18, height: 15, marginRight: 5 }} source={require('../../images/phone_filled.png')} resizeMode={'contain'} />
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                                 {(usermobile == null) || (usermobile == '') ? <Text>Not Available</Text> : <Text>{usermobile}</Text>}
                             </Text>
@@ -367,7 +372,7 @@ export default class PostUserProfile extends React.Component {
                     <View style={[AppStyle.appAlignItemsCenter, { paddingTop: 20, paddingBottom: 20 }]}>
                         <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>EMAIL</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../images/email_filled.png')} resizeMode={'center'} />
+                            <Image style={{ width: 18, height: 18, marginRight: 4 }} source={require('../../images/email_filled.png')} resizeMode={'contain'} />
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                                 {(useremail == null) || (useremail == '') ? <Text>Not Available</Text> : <Text>{useremail}</Text>}
                             </Text>
@@ -376,7 +381,7 @@ export default class PostUserProfile extends React.Component {
                     <View style={[AppStyle.appAlignItemsCenter, { paddingBottom: 20 }]}>
                         <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>ADDRESS</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Image source={require('../../images/location.png')} resizeMode={'center'} />
+                            <Image style={{ width: 18, height: 18 }} source={require('../../images/location.png')} resizeMode={'contain'} />
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>
                                 {(useraddress == null) || (useraddress == '') ? <Text>Not Available</Text> : <Text>{useraddress}</Text>}
                             </Text>

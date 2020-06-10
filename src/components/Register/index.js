@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView, BackHandler, PermissionsAndroid } from 'react-native';
+import { Text, View, Image, TextInput, TouchableOpacity, ActivityIndicator, Keyboard, SafeAreaView, BackHandler, PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { RegisterUser } from './Register.service';
-import Logo from '../Logo';
+import { ButtonGradientColor1, ButtonGradientColor2 } from '../../config/constants';
+import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-easy-toast';
 import Geolocation from '@react-native-community/geolocation';
 import NetInfo from "@react-native-community/netinfo";
@@ -226,73 +227,93 @@ export default class Register extends Component {
 
     render() {
         return (
-            <SafeAreaView style={AppStyle.appContainer}>
-                <Logo></Logo>
+            <SafeAreaView style={AppStyle.login_appContainer}>
+                <Image style={AppStyle.Loginlogo} source={require('../../images/logo.png')} />
                 {
                     this.state.showStepOne ?
-                        <View style={{ alignItems: 'center' }}>
-                            <TextInput style={AppStyle.appInput} placeholder="Firstname" value={this.state.firstname}
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
+                            <Text style={[AppStyle.app_font_heading, AppStyle.dark_TextColor, { fontSize: 23, marginBottom: 5 }]}>Create an account</Text>
+                            <Text style={[AppStyle.app_font_heading, AppStyle.light_blue_TextColor, { fontSize: 15, marginBottom: 30 }]}>Its simple and easy</Text>
+                            <TextInput style={AppStyle.appInput} placeholder="First name" value={this.state.firstname}
                                 onChangeText={(firstname) => this.setState({ firstname })}></TextInput>
-                            <TextInput style={AppStyle.appInput} placeholder="Lastname" value={this.state.lastname}
+                            <TextInput style={AppStyle.appInput} placeholder="Last name" value={this.state.lastname}
                                 onChangeText={(lastname) => this.setState({ lastname })}></TextInput>
                             <TextInput style={AppStyle.appInput} placeholder="Email" value={this.state.email}
                                 onChangeText={(email) => this.setState({ email })}></TextInput>
                             <TouchableOpacity onPress={() => this.registerStepOne()}>
-                                <Text style={AppStyle.appButton}>Next</Text>
+                                <LinearGradient
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                    style={AppStyle.appButton_background}>
+                                    <Text style={AppStyle.appButton_Text}>Next</Text>
+                                </LinearGradient>
                             </TouchableOpacity>
-                            {
-                                this.state.showLoader ?
-                                    <ActivityIndicator
-                                        animating={true}
-                                        style={AppStyle.activityIndicator}
-                                        size='large'
-                                    /> : null
-                            }
                         </View>
                         : null
                 }
                 {
                     this.state.showStepTwo ?
-                        <View style={{ alignItems: 'center' }}>
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 100 }}>
+                            <Text style={[AppStyle.app_font_heading, AppStyle.dark_TextColor, { fontSize: 23, marginBottom: 5 }]}>Create an account</Text>
+                            <Text style={[AppStyle.app_font_heading, AppStyle.light_blue_TextColor, { fontSize: 15, marginBottom: 30 }]}>Its simple and easy</Text>
                             <TextInput style={AppStyle.appInput} placeholder="Password" value={this.state.password} secureTextEntry={true}
                                 onChangeText={(password) => this.setState({ password })}></TextInput>
-                            <TextInput style={AppStyle.appInput} placeholder="Confirm password" value={this.state.confirmpassword} secureTextEntry={true}
+                            <TextInput style={AppStyle.appInput} placeholder="Re-enter password" value={this.state.confirmpassword} secureTextEntry={true}
                                 onChangeText={(confirmpassword) => this.setState({ confirmpassword })}></TextInput>
                             <TouchableOpacity onPress={() => this.registerStepTwo()}>
-                                <Text style={AppStyle.appButton}>Next</Text>
+                                <LinearGradient
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                    style={AppStyle.appButton_background}>
+                                    <Text style={AppStyle.appButton_Text}>Next</Text>
+                                </LinearGradient>
                             </TouchableOpacity>
                         </View>
                         : null
                 }
                 {
                     this.state.showStepThree ?
-                        <View style={{ flex: 1, alignItems: 'center' }}>
-                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15 }]}>Create Username</Text>
-                            <TextInput style={AppStyle.appInput} placeholder="Username"
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 170 }}>
+                            <Text style={[AppStyle.app_font_heading, AppStyle.dark_TextColor, { fontSize: 23, marginBottom: 5 }]}>You're done</Text>
+                            <Text style={[AppStyle.app_font_heading, AppStyle.light_blue_TextColor, { fontSize: 15, marginBottom: 30 }]}>Give a username to your profile</Text>
+                            <TextInput style={AppStyle.appInput} placeholder="Give Username"
                                 onChangeText={(username) => this.setState({ username })}></TextInput>
                             <TouchableOpacity onPress={() => this.registerStepThree()}>
-                                <Text style={AppStyle.appButton}>Enter Humming</Text>
+                                <LinearGradient
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                    style={AppStyle.appButton_background}>
+                                    <Text style={AppStyle.appButton_Text}>Enter Humming</Text>
+                                </LinearGradient>
                             </TouchableOpacity>
-                            {
-                                this.state.showLoader ?
-                                    <ActivityIndicator
-                                        animating={true}
-                                        style={AppStyle.activityIndicator}
-                                        size='large'
-                                    /> : null
-                            }
                         </View>
                         : null
                 }
-                <View style={AppStyle.appFooter}>
-                    <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 15 }]}>Existing User?</Text>
+                <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    marginBottom: 50,
+                }}>
+                    <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Existing User?</Text>
                     <TouchableOpacity onPress={() => this.props.navigation.navigate('login')}>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15 }]}>&nbsp;&nbsp;Sign in</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>&nbsp;Sign in</Text>
                     </TouchableOpacity>
                 </View>
+                {
+                    this.state.showLoader ?
+                        <ActivityIndicator
+                            animating={true}
+                            style={AppStyle.activityIndicator}
+                            size='large'
+                        /> : null
+                }
                 <Toast ref="toast"
                     style={AppStyle.toast_style} />
-            </SafeAreaView>
+            </SafeAreaView >
         )
     }
 }

@@ -54,9 +54,8 @@ export default class CustomiOSPicker extends React.Component {
                             <Text style={[AppStyle.app_font, { color: '#007AFF', fontSize: 16, marginRight: 15 }]}>Done</Text>
                         </TouchableOpacity>
                     </View>
-                    {/* <View style={{ width: '100%', height: 165, marginBottom: 100, }}> */}
                     <Picker
-                        style={{ width: '100%', height: 165, marginBottom: 100 }}
+                        style={{ width: '100%', height: 165, marginBottom: 100, backgroundColor: '#ffffff' }}
                         itemStyle={[AppStyle.app_font, { fontSize: 15, alignItems: 'center', textAlign: 'center', color: '#9B9B9B' }]}
                         selectedValue={this.state.pickerValue}
                         onValueChange={(itemValue, itemIndex) => this.setState({ pickerValue: itemValue, pickerindex: itemIndex })} >
@@ -64,7 +63,6 @@ export default class CustomiOSPicker extends React.Component {
                             <Picker.Item label={item} value={item} keyExtractor={(item, index) => index + item} />)
                         )}
                     </Picker>
-                    {/* </View> */}
                 </View>
             </View>
         );

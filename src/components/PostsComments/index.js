@@ -188,13 +188,13 @@ export default class PostsComments extends Component {
             loading ?
                 <SafeAreaView style={{ flex: 1 }}>
                     <View style={styles.headerstyle}>
-                        <TouchableOpacity onPress={this.returnBack} >
-                            <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
+                        <TouchableOpacity onPress={this.returnBack} style={{ padding: 8, marginLeft: 10 }}>
+                            <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 13, height: 20, marginLeft: 10 }} />
                         </TouchableOpacity>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>Comments</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 20 }]}>Comments</Text>
                         <View style={styles.commentsCountcontainer}>
-                            <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
-                                style={{ width: 27, height: 27 }} />
+                            <Image source={require('../../images/comment-icon.png')} resizeMode={'contain'}
+                                style={{ width: 25, height: 25 }} />
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10 }]}>
                                 {markercommentArray.length}
                             </Text>
@@ -209,13 +209,13 @@ export default class PostsComments extends Component {
                 :
                 <SafeAreaView style={{ flex: 1 }}>
                     <View style={styles.headerstyle}>
-                        <TouchableOpacity onPress={this.returnBack} >
-                            <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 25, height: 35, marginLeft: 15 }} />
+                        <TouchableOpacity onPress={this.returnBack} style={{ padding: 8, marginLeft: 10 }}>
+                            <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 13, height: 20, marginLeft: 10 }} />
                         </TouchableOpacity>
-                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>Comments</Text>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 20 }]}>Comments</Text>
                         <View style={styles.commentsCountcontainer}>
-                            <Image source={require('../../images/comment-icon.png')} resizeMode={'cover'}
-                                style={{ width: 27, height: 27 }} />
+                            <Image source={require('../../images/comment-icon.png')} resizeMode={'contain'}
+                                style={{ width: 25, height: 25 }} />
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10 }]}>
                                 {markercommentArray.length}
                             </Text>
@@ -229,7 +229,9 @@ export default class PostsComments extends Component {
                         keyExtractor={(item, index) => item + index}
                     />
                     <View style={styles.footerstyle}>
-                        <Image source={userdp == null ? require('../../images/logo.png') : { uri: userdp }} resizeMode={userdp == null ? 'contain' : 'cover'} style={{ width: 35, height: 35, marginLeft: 22, borderRadius: 17.5, }} />
+                        <View style={[{ width: 35, height: 35, marginLeft: 20, borderRadius: 17.5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F5F5' }]}>
+                            <Image source={(userdp == null || userdp == '') ? require('../../images/profile_icon.png') : { uri: userdp }} style={(userdp == null || userdp == '') ? { height: 15, width: 15 } : { width: 35, height: 35, borderRadius: 17.5 }} resizeMode={(userdp == null || userdp == '') ? 'contain' : 'cover'} />
+                        </View>
                         <TextInput
                             style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 40, flex: 2, marginLeft: 15 }]}
                             placeholder="Post a Comment"
@@ -259,12 +261,14 @@ const styles = StyleSheet.create({
     headerstyle: {
         flexDirection: 'row',
         backgroundColor: 'white',
-        height: 60,
+        height: 70,
         elevation: 2,
         borderBottomColor: '#ECECEC',
         borderBottomWidth: 1,
         alignItems: 'center',
+        justifyContent: 'space-between'
     },
+
     footerstyle: {
         flexDirection: 'row',
         backgroundColor: 'white',
@@ -274,11 +278,11 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         alignItems: 'center',
     },
+
     commentsCountcontainer: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        marginRight: 15,
+        marginRight: 20,
     },
 });

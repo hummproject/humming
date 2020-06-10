@@ -4,11 +4,14 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style';
 import { ProfileStyles } from './Profile.style';
 import ImagePicker from 'react-native-image-picker';
+import LinearGradient from 'react-native-linear-gradient';
 import AppConfig from '../../config/constants';
+import { ButtonGradientColor1, ButtonGradientColor2 } from '../../config/constants';
 import Toast from 'react-native-easy-toast'
 import { TextInput } from 'react-native-paper';
 import ProgressiveImage from '../../ProgressiveImage'
 import NetInfo from "@react-native-community/netinfo";
+import { StackActions, NavigationActions } from 'react-navigation'
 
 const options = {
     title: 'Select Option',
@@ -142,6 +145,10 @@ export default class Profile extends React.Component {
             });
     };
 
+    returnBack = () => {
+        this.props.navigation.goBack();
+    };
+
     render() {
         const { userPostsAry,
             loading,
@@ -166,41 +173,57 @@ export default class Profile extends React.Component {
                         this.setState({ menuTop: y + height });
                     })
                 }}>
-                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 15 }]}>@{username}</Text>
-                    <View style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
-                        marginRight: 15,
-                    }}>
-                        <TouchableOpacity onPress={() => this.showMenu()}>
-                            <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 25, marginLeft: 25 }} resizeMode={'contain'} />
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={this.returnBack} style={{ padding: 8, marginLeft: 10 }}>
+                        <Image source={require('../../images/back.png')} resizeMode={'contain'} style={{ width: 13, height: 20, marginLeft: 10 }} />
+                    </TouchableOpacity>
+                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 18 }]}>@{username}</Text>
+                    <TouchableOpacity onPress={() => this.showMenu()} style={{ padding: 8, marginRight: 10 }}>
+                        <Image source={require('../../images/profile_menu.png')} style={{ width: 8, height: 20, marginLeft: 10 }} resizeMode={'contain'} />
+                    </TouchableOpacity>
                 </View>
                 {
                     this.state.showMenuOptions ?
-                        <View style={[ProfileStyles.MenuOptionStyle, { top: menuTop }]}>
+                        <View style={[ProfileStyles.MenuOptionStyle, { top: menuTop - 10 }]}>
                             <TouchableOpacity onPress={() => this.showUpdateProfile()}>
-                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Update Profile</Text>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 14, padding: 8 }]}>Update Profile</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => this.signOutfromApp()}>
-                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Sign out</Text>
-                            </TouchableOpacity>
+                            <View style={{ borderBottomColor: '#707070', borderBottomWidth: 0.5 }}></View>
                             <TouchableOpacity onPress={() => this.DeactivateProfile()}>
-                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, padding: 8 }]}>Deactivate Account</Text>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 14, padding: 8 }]}>Deactivate Account</Text>
+                            </TouchableOpacity>
+                            <View style={{ borderBottomColor: '#707070', borderBottomWidth: 0.5 }}></View>
+                            <TouchableOpacity onPress={() => this.showPrivacyPolicy()}>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 14, padding: 8 }]}>Terms & Conditions</Text>
+                            </TouchableOpacity>
+                            <View style={{ borderBottomColor: '#707070', borderBottomWidth: 0.5 }}></View>
+                            <TouchableOpacity onPress={() => this.signOutfromApp()}>
+                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 14, padding: 8 }]}>Sign out</Text>
                             </TouchableOpacity>
                         </View>
                         : null
                 }
                 <ScrollView style={{ backgroundColor: 'white' }}>
-                    <View style={[ProfileStyles.userDp, { alignSelf: 'center', borderColor: '#F5F5F5', borderWidth: 0.5, marginTop: 10 }]}>
-                        <ProgressiveImage style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={(userdp == null) || (userdp == '') ? 'contain' : 'cover'} />
-                        <TouchableOpacity onPress={() => this.uploadImage()} style={{ position: "absolute", bottom: 0, right: 0 }}>
-                            {/* <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>EDIT</Text> */}
-                            <Image style={{ height: 20, width: 20, margin: 10 }} source={require('../../images/edit-icon.png')} resizeMode={'contain'} />
-                        </TouchableOpacity>
+                    <View style={[ProfileStyles.userDp, { alignSelf: 'center', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F5', marginTop: 10 }]}>
+                        {
+                            (userdp == null) || (userdp == '') ?
+                                <TouchableOpacity onPress={() => this.uploadImage()} style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                    <Image source={require('../../images/take_photo.png')} resizeMode='contain' style={{ width: 75, height: 40, marginBottom: 10 }} />
+                                    <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Upload profile photo</Text>
+                                </TouchableOpacity>
+                                :
+                                <View>
+                                    <ProgressiveImage style={ProfileStyles.userDp} source={(userdp == null) || (userdp == '') ? require('../../images/logo.png') : { uri: userdp }} resizeMode={(userdp == null) || (userdp == '') ? 'contain' : 'cover'} />
+                                    <TouchableOpacity onPress={() => this.uploadImage()} style={{ position: "absolute", bottom: 10, right: 10 }}>
+                                        <LinearGradient
+                                            start={{ x: 0, y: 0 }}
+                                            end={{ x: 1, y: 0 }}
+                                            colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                            style={{ height: 30, width: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' }}>
+                                            <Image style={{ height: 12, width: 12 }} source={require('../../images/edit-icon.png')} resizeMode={'contain'} />
+                                        </LinearGradient>
+                                    </TouchableOpacity>
+                                </View>
+                        }
                     </View>
                     <View style={{ flex: 1, alignItems: "center", marginTop: 20, }}>
                         <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 18, textTransform: 'capitalize' }]}>{firstname + ' ' + lastname}</Text>
@@ -244,10 +267,8 @@ export default class Profile extends React.Component {
                                         // console.debug('iMAGE uRL', imageUri);
                                         if (imageUri != '') {
                                             return (
-                                                <TouchableOpacity onPress={this.OpenPost}>
-                                                    <View style={{ flex: 1, borderColor: '#F5F5F5', borderWidth: 0.5, borderRadius: 8, marginLeft: 15, width: 130, height: 130 }}>
-                                                        < Image source={imageUri == null ? require('../../images/logo.png') : { uri: imageUri }} resizeMode={imageUri == null ? 'contain' : 'cover'} style={{ width: 130, height: 130, borderRadius: 8 }} />
-                                                    </View>
+                                                <TouchableOpacity onPress={this.OpenPost} style={{ flex: 1, borderColor: '#F5F5F5', borderWidth: 0.5, borderRadius: 8, marginLeft: 15, width: 130, height: 130, backgroundColor: '#ffffff', alignItems: 'center', justifyContent: 'center' }}>
+                                                    < Image source={imageUri == null ? require('../../images/no_image_logo.png') : { uri: imageUri }} resizeMode={imageUri == null ? 'contain' : 'cover'} style={{ width: (imageUri == null ? 40 : 130), height: (imageUri == null ? 40 : 130), borderRadius: 8 }} />
                                                 </TouchableOpacity>
                                             )
                                         } else {
@@ -313,10 +334,11 @@ export default class Profile extends React.Component {
                             left: 0,
                             right: 0,
                             bottom: 0,
+                            backgroundColor: 'rgba(52, 52, 52, 0.5)',
                         }}>
                             <TouchableWithoutFeedback>
                                 <View style={ProfileStyles.modalView}>
-                                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 18 }]}>Update Profile</Text>
+                                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 20 }]}>Update Profile</Text>
                                     <View style={{ borderRadius: 10, width: '100%', height: 45, marginTop: 15, backgroundColor: '#F5F5F5', }}>
                                         <TextInput
                                             style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, height: 45, backgroundColor: 'transparent' }]}
@@ -388,7 +410,14 @@ export default class Profile extends React.Component {
                                         data.append('userbio', this.state.bioInputText);
                                         Keyboard.dismiss();
                                         this.UpdateProfile(data, true);
-                                    }}><Text style={AppStyle.appButton}>Update</Text>
+                                    }}>
+                                        <LinearGradient
+                                            start={{ x: 0, y: 0 }}
+                                            end={{ x: 1, y: 0 }}
+                                            colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                            style={AppStyle.appButton_background}>
+                                            <Text style={AppStyle.appButton_Text}>Update</Text>
+                                        </LinearGradient>
                                     </TouchableOpacity>
                                 </View>
                             </TouchableWithoutFeedback>
@@ -432,6 +461,10 @@ export default class Profile extends React.Component {
         })
     }
 
+    showPrivacyPolicy = () => {
+
+    }
+
     async signOutfromApp() {
         this.setState({
             showMenuOptions: !this.state.showMenuOptions
@@ -439,7 +472,15 @@ export default class Profile extends React.Component {
         try {
             await AsyncStorage.removeItem("userData")
             // console.debug('signOutfromApp: data removed');
-            this.props.navigation.navigate('login')
+            // this.props.navigation.navigate('login')
+            let resetAction = StackActions.reset({
+                index: 0,
+                actions: [
+                    NavigationActions.navigate({ routeName: 'login' })
+                ],
+            });
+            this.props.navigation.dispatch(resetAction);
+            this.props.navigation.navigate('login');
         } catch (err) {
             console.log(`signOutfromApp:The error is: ${err}`)
         }
@@ -594,6 +635,13 @@ export default class Profile extends React.Component {
                         addressInputText: resJson.data.useraddress === null ? '' : resJson.data.useraddress,
                         bioInputText: resJson.data.userbio === null ? '' : resJson.data.userbio
                     });
+                    var userdata = this.state.userData;
+                    userdata["userdp"] = resJson.data.userdp;
+                    userdata["usermobile"] = resJson.data.usermobile;
+                    userdata["userprofession"] = resJson.data.userprofession;
+                    userdata["useraddress"] = resJson.data.useraddress;
+                    userdata["userbio"] = resJson.data.userbio;
+                    AsyncStorage.setItem("userData", JSON.stringify(userdata));
                     this.refs.toast.show("Profile updated successfully");
                 } else {
                     this.refs.toast.show(resJson.message);

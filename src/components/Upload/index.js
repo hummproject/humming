@@ -4,8 +4,10 @@ import { AppStyle } from '../../App.style';
 import { styles } from './upload.styles';
 import Toast from 'react-native-easy-toast';
 import AsyncStorage from '@react-native-community/async-storage';
-import ImagePicker from 'react-native-image-picker';
+import LinearGradient from 'react-native-linear-gradient';
 import AppConfig from '../../config/constants';
+import { ButtonGradientColor1, ButtonGradientColor2 } from '../../config/constants';
+import ImagePicker from 'react-native-image-picker';
 import CustomiOSPicker from '../CustomiOSPicker'
 import Geolocation from '@react-native-community/geolocation';
 import NetInfo from "@react-native-community/netinfo";
@@ -29,12 +31,13 @@ export default class Upload extends Component {
             isImageUploaded: false,
             uploadImageArray: [],
             userData: {},
+            userDp: null,
             loading: false,
             showtoast: false,
             showiOSPicker: false,
             latlang: "0.000,0.000",
             is_connected: false,
-            pickerData: ["Choose category", "Movies", "Music", "Sports", "Travel", "Politics", "Art", "Entertainment", "Technology", "Fashion", "Food"],
+            pickerData: ["Add marker", "Movies", "Music", "Sports", "Travel", "Politics", "Art", "Entertainment", "Technology", "Fashion", "Food"],
         };
     }
 
@@ -43,6 +46,7 @@ export default class Upload extends Component {
             const userData = JSON.parse(value);
             this.setState({
                 userData: userData,
+                userDp: userData.userdp
             });
         });
         this._unsubscribe = this.props.navigation.addListener('focus', () => {
@@ -178,7 +182,7 @@ export default class Upload extends Component {
             showtoast: true,
         })
         if (category === '') {
-            this.refs.toast.show("Category cannot be empty");
+            this.refs.toast.show("Please add marker");
             return;
         }
         if (hummDescription === '' && uploadImageArray.length <= 0) {
@@ -198,15 +202,14 @@ export default class Upload extends Component {
                 name: obj.fileName
             });
         }
-        console.log(data);
         data.append('description', hummDescription);
         data.append('category', category);
         data.append('latitude', '0');
         data.append('longitude', '0');
         data.append('location', '78.3915,17.4933'); // latlang
-        console.log(data);
         let url = AppConfig.DOMAIN + AppConfig.SAVE_MARKER
-        console.debug('URL: ', url)
+        console.debug('URL:', url)
+        console.debug("Upload Request", data);
         this.setState({
             loading: true,
         })
@@ -229,7 +232,7 @@ export default class Upload extends Component {
             this.setState({
                 loading: false,
             })
-            console.debug('Post marker response', res)
+            console.debug('Upload Post marker response', res)
             if (res.status === 200) {
                 this.setState({
                     isImageUploaded: false,
@@ -238,7 +241,7 @@ export default class Upload extends Component {
                     category: '',
                 })
                 this.refs.toast.show("Marker uploaded successfully");
-                // this.props.navigation.navigate('TabBar');
+                this.props.navigation.navigate('Home');
             } else {
                 this.refs.toast.show(res.message);
             }
@@ -253,7 +256,7 @@ export default class Upload extends Component {
 
     callbackfromPicker = (data, index) => {
         console.debug("picker data", data);
-        if (data !== 'Choose category') {
+        if (data !== 'Add marker') {
             this.setState({
                 category: data,
                 choosenIndex: index,
@@ -268,57 +271,73 @@ export default class Upload extends Component {
         }
     }
 
+    navigatetoUserProfile = () => {
+        this.props.navigation.navigate('userprofile');
+    }
+
     render() {
-        const { isImageUploaded, uploadImageArray, loading, hummDescription } = this.state;
+        const { isImageUploaded, uploadImageArray, loading, hummDescription, userDp } = this.state;
         return (
             // <KeyboardAvoidingView behavior="position">
-            <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: '#FBFBFB' }}>
                 <View style={styles.headerstyle}>
-                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 15 }]}>Say Something</Text>
+                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 20, marginLeft: 20 }]}>Hum here</Text>
+                    <TouchableOpacity onPress={this.navigatetoUserProfile} style={{ padding: 5, marginRight: 15 }}>
+                        <View style={[AppStyle.header_profile_photo, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F5F5' }]}>
+                            <Image source={(userDp == null || userDp == '') ? require('../../images/profile_icon.png') : { uri: userDp }} style={(userDp == null || userDp == '') ? { height: 15, width: 15 } : AppStyle.header_profile_photo} resizeMode={(userDp == null || userDp == '') ? 'contain' : 'cover'} />
+                        </View>
+                    </TouchableOpacity>
                 </View>
-                <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: 'white' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderBottomColor: '#f5f5f5', borderBottomWidth: 1, height: 250, width: Dimensions.get("window").width }}>
-                        {
-                            isImageUploaded ?
-                                <View>
-                                    <FlatList
-                                        horizontal
-                                        pagingEnabled={true}
-                                        data={uploadImageArray}
-                                        renderItem={({ item }) => {
-                                            return (
-                                                <Image source={{ uri: item.uri }} resizeMode='cover' style={{ width: Dimensions.get("window").width, height: 250 }} />
-                                            )
-                                        }}
-                                        keyExtractor={(item, index) => index + ""}
-                                    />
-                                    <TouchableOpacity onPress={() => this.uploadImage()} style={{ zIndex: 1, position: 'absolute', bottom: 8, right: 8, padding: 8, backgroundColor: 'white', borderRadius: 20 }} >
-                                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Upload More</Text>
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View style={styles.upload_container}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F5', height: 225, width: '92%', marginTop: 15, borderRadius: 5 }}>
+                            {
+                                isImageUploaded ?
+                                    <View style={{ height: 225, width: '100%' }}>
+                                        <FlatList
+                                            horizontal
+                                            pagingEnabled={true}
+                                            data={uploadImageArray}
+                                            renderItem={({ item }) => {
+                                                return (
+                                                    <Image source={{ uri: item.uri }} resizeMode='cover' style={{ width: (Dimensions.get('window').width) * .876, height: 225, borderRadius: 5 }} />
+                                                )
+                                            }}
+                                            keyExtractor={(item, index) => index + ""}
+                                        />
+                                        <TouchableOpacity onPress={() => this.uploadImage()} style={{ zIndex: 1, position: 'absolute', bottom: 0, right: 0, padding: 5 }} >
+                                            <LinearGradient
+                                                start={{ x: 0, y: 0 }}
+                                                end={{ x: 1, y: 0 }}
+                                                colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                                style={{ height: 30, width: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' }}>
+                                                <Image style={{ height: 13, width: 13 }} source={require('../../images/add.png')} resizeMode={'contain'} />
+                                            </LinearGradient>
+                                        </TouchableOpacity>
+                                    </View>
+                                    :
+                                    <TouchableOpacity onPress={() => this.uploadImage()} style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                        <Image source={require('../../images/take_photo.png')} resizeMode='contain' style={{ width: 75, height: 40, marginBottom: 10 }} />
+                                        <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Select photos or videos</Text>
                                     </TouchableOpacity>
-                                </View>
-                                :
-                                <TouchableOpacity onPress={() => this.uploadImage()} style={{ alignItems: 'center', justifyContent: 'center' }}>
-                                    <Image source={require('../../images/logo.png')} resizeMode='contain' style={{ width: 80, height: 80 }} />
-                                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Click here to Upload</Text>
-                                </TouchableOpacity>
-                        }
-                    </View>
-                    <View style={{ paddingTop: 20 }}>
-                        <TextInput multiline={true} style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, minHeight: 50, overflow: 'hidden', marginLeft: 15, marginRight: 15 }]} placeholder="Write Something"
+                            }
+                        </View>
+                        <TextInput multiline={true} style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, minHeight: 70, textAlign: 'center', overflow: 'hidden', width: '92%', marginBottom: 15, marginTop: 10 }]} placeholder="Write something here"
                             onChangeText={hummDescription => this.setState({ hummDescription })} value={hummDescription}></TextInput>
+                    </View>
+                    <View style={{ paddingTop: 15 }}>
                         <TouchableOpacity onPress={() => {
                             if (Platform.OS === 'ios') {
                                 this.showiOSPicker();
                             }
-                        }} style={{ paddingTop: 30 }}>
-                            <View style={{ width: '90%', alignSelf: 'center', borderRadius: 25, backgroundColor: '#ECECEC', height: 50 }} >
+                        }} style={{ paddingTop: 20 }}>
+                            <View style={{ width: '85%', alignSelf: 'center', borderRadius: 15, backgroundColor: '#F5F5F5', height: 50 }} >
                                 {
                                     Platform.OS === 'android' ?
-                                        <Picker style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, width: '100%', height: 50, }]} itemStyle={{ alignItems: 'center', textAlign: 'center', color: '#9B9B9B' }}
+                                        <Picker style={[AppStyle.dark_TextColor, AppStyle.app_font, { width: '100%', fontSize: 14, height: 50, backgroundColor: 'transparent' }]} mode={'dialog'} itemStyle={[AppStyle.app_font, { fontSize: 14, textAlign: 'center', color: '#9B9B9B' }]}
                                             selectedValue={this.state.category}
                                             onValueChange={(itemValue, itemPosition) => {
-                                                console.debug('itemValue:', itemValue)
-                                                if (itemValue !== 'Choose category') {
+                                                if (itemValue !== 'Add marker') {
                                                     this.setState({ category: itemValue, choosenIndex: itemPosition })
                                                 } else {
                                                     this.setState({ category: '', choosenIndex: 0 })
@@ -332,12 +351,20 @@ export default class Upload extends Component {
                                         </Picker>
                                         :
                                         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}> {this.state.category === '' ? "Choose Category" : this.state.category}</Text>
+                                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}> {this.state.category === '' ? "Add marker" : this.state.category}</Text>
                                         </View>
                                 }
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ alignSelf: 'center', marginBottom: 30, paddingTop: 30 }} onPress={this.UploadMarker}><Text style={AppStyle.appButton}>HUMM IT </Text></TouchableOpacity>
+                        <TouchableOpacity style={{ alignSelf: 'center', marginBottom: 30, paddingTop: 20 }} onPress={this.UploadMarker}>
+                            <LinearGradient
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                style={AppStyle.appButton_background}>
+                                <Text style={AppStyle.appButton_Text}>HUM IT</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
                 {

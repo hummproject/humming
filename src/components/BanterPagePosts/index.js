@@ -114,24 +114,30 @@ export default class BanterPagePosts extends Component {
 
     render() {
         const { postDetails, likeorUnlikeImgUri, postLikesCount, loading } = this.state
-        // console.debug(postDetails);
         var postDesc = postDetails.description;
-        var postimageUri = postDetails.media;
+        var postimagesAry = postDetails.media !== null ? postDetails.media : []
         var markercommentArray = postDetails.markercomments !== null ? postDetails.markercomments : []
         return (
-            <View style={styles.container}>
-                <View style={{ flexDirection: 'column' }}>
+            <View style={[styles.container, { marginBottom: 15, marginTop: 1 }]}>
+                <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
+                    {postDesc === '' ? null
+                        :
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 15, marginRight: 15, marginBottom: (postimagesAry.length === 0 || postimagesAry[0] === null ? 0 : 15), marginTop: 15 }]}>
+                            {postDesc}
+                        </Text>
+                    }
                     <FlatList
                         horizontal
-                        pagingEnabled={true}
-                        data={postimageUri}
+                        contentContainerStyle={{ paddingRight: 15 }}
+                        pagingEnabled={false}
+                        data={postimagesAry}
                         renderItem={({ item }) => {
-                            // console.debug(item);
                             let imageUri = item != null ? item : ''
-                            // console.debug(imageUri);
                             if (imageUri != '') {
                                 return (
-                                    < ProgressiveImage source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width, height: 250 }} />
+                                    <View style={{ marginLeft: 15 }}>
+                                        < ProgressiveImage source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width - 50, height: 200 }} />
+                                    </View>
                                 )
                             } else {
                                 return (
@@ -141,9 +147,6 @@ export default class BanterPagePosts extends Component {
                         }}
                         keyExtractor={(item, index) => index + ""}
                     />
-                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 15, marginRight: 15, marginTop: 15 }]}>
-                        {postDesc}
-                    </Text>
                 </View>
                 <View style={styles.BottomContainer}>
                     <TouchableOpacity onPress={this.LikeOrUnlikePost} style={{
@@ -152,7 +155,7 @@ export default class BanterPagePosts extends Component {
                         justifyContent: 'flex-start'
                     }}>
                         <Image source={likeorUnlikeImgUri}
-                            style={{ width: 32, height: 27, marginLeft: 15 }} resizeMode={'contain'} />
+                            style={{ width: 30, height: 25, marginLeft: 15 }} resizeMode={'contain'} />
                         <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10, marginRight: 25 }]}>
                             {postLikesCount}
                         </Text>
@@ -163,7 +166,7 @@ export default class BanterPagePosts extends Component {
                         justifyContent: 'flex-start'
                     }}>
                         <Image source={require('../../images/comment-icon.png')} resizeMode={'contain'}
-                            style={{ width: 27, height: 27 }} />
+                            style={{ width: 25, height: 25 }} />
                         <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10 }]}>
                             {markercommentArray.length}
                         </Text>

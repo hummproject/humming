@@ -3,7 +3,9 @@ import { Text, View, SafeAreaView, StyleSheet, FlatList, TouchableOpacity, Image
 import BanterPagePosts from '../BanterPagePosts';
 import AsyncStorage from '@react-native-community/async-storage';
 import { AppStyle } from '../../App.style'
+import LinearGradient from 'react-native-linear-gradient';
 import AppConfig from '../../config/constants';
+import { ButtonGradientColor1, ButtonGradientColor2 } from '../../config/constants';
 import Toast from 'react-native-easy-toast'
 import NetInfo from "@react-native-community/netinfo";
 
@@ -15,6 +17,8 @@ export default class Banter extends Component {
             userListArray: [], //this is the array
             error: null,
             postsData: [],
+            userData: {},
+            userDp: null,
             isUserSelected: false,
             userSelectedPost: {},
             is_connected: false,
@@ -27,6 +31,13 @@ export default class Banter extends Component {
             this.setState({
                 postsData: postsData,
                 isUserSelected: false,
+            });
+        });
+        await AsyncStorage.getItem("userData").then(value => {
+            const userData = JSON.parse(value);
+            this.setState({
+                userData: userData,
+                userDp: userData.userdp
             });
         });
         var postsArray = this.state.postsData
@@ -79,12 +90,19 @@ export default class Banter extends Component {
         return true;
     };
 
-    showPostBasedonUserSelection = (item) => {
+    showPostBasedonUserSelection = (item, index) => {
         console.debug("user selected", item);
+        console.debug("user selected index", index);
         this.setState({
             isUserSelected: true,
             userSelectedPost: item,
         })
+        // this.flatListRef.scrol
+        // scrollToItem({
+        //     animated:true, //can also be false
+        //     item:item, 
+        //     viewPosition:0 //this is the first position that is currently attached to the window
+        // })
     };
 
     makeRequesttoFetchPosts = () => {
@@ -151,28 +169,53 @@ export default class Banter extends Component {
             });
     };
 
+    navigatetoUserProfile = () => {
+        this.props.navigation.navigate('userprofile');
+    }
+
     render() {
-        const { userListArray, userSelectedPost, isUserSelected, loading } = this.state;
+        const { userListArray, userSelectedPost, isUserSelected, loading, userDp } = this.state;
         return (
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
                 <View style={styles.headerstyle}>
-                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 15 }]}>Banter</Text>
+                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 20, marginLeft: 20 }]}>Banter</Text>
+                    <TouchableOpacity onPress={this.navigatetoUserProfile} style={{ padding: 5, marginRight: 15 }}>
+                        <View style={[AppStyle.header_profile_photo, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F5F5' }]}>
+                            <Image source={(userDp == null || userDp == '') ? require('../../images/profile_icon.png') : { uri: userDp }} style={(userDp == null || userDp == '') ? { height: 15, width: 15 } : AppStyle.header_profile_photo} resizeMode={(userDp == null || userDp == '') ? 'contain' : 'cover'} />
+                        </View>
+                    </TouchableOpacity>
                 </View>
                 <View style={{ justifyContent: 'space-around' }}>
                     <FlatList
+                        ref={(ref) => { this.flatListRef = ref; }}
                         horizontal
+                        showsHorizontalScrollIndicator={false}
                         data={userListArray}
                         renderItem={
-                            ({ item }) => {
+                            ({ item, index }) => {
                                 return (
-                                    <TouchableOpacity style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 15, backgroundColor: '#FFFFFF' }} onPress={() => this.showPostBasedonUserSelection(item)}>
-                                        <Image source={item.userdp == null ? require('../../images/logo.png') : { uri: item.userdp }} style={{ height: 80, width: 80, borderRadius: 40, marginBottom: 10 }} resizeMode={item.userdp == null ? 'contain' : 'cover'} />
-                                        <View>
-                                            <View style={styles.categoryContainer}>
-                                                <Image source={require('../../images/category_marker_icon.png')} style={{ height: 13, width: 13 }} />
-                                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white', textTransform: 'capitalize' }]}>{item.category}</Text>
+                                    <TouchableOpacity style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingLeft: 15, paddingRight: 15, paddingTop: 15, backgroundColor: '#ffffff' }} onPress={() => this.showPostBasedonUserSelection(item, index)}>
+                                        <View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 10, height: 90, width: 90, borderRadius: 45, borderWidth: 2, borderColor: '#E62469', overflow: 'hidden' }}>
+                                            <View style={{ alignItems: 'center', justifyContent: 'center', overflow: 'hidden', height: 80, width: 80, borderRadius: 40, borderWidth: 1, borderColor: '#FC4735', backgroundColor: '#F5F5F5' }}>
+                                                <Image source={item.userdp == null ? require('../../images/profile_icon.png') : { uri: item.userdp }} style={{ height: (item.userdp == null ? 35 : 80), width: (item.userdp == null ? 35 : 80) }} resizeMode={item.userdp == null ? 'contain' : 'cover'} />
                                             </View>
                                         </View>
+                                        <View>
+                                            <LinearGradient
+                                                start={{ x: 0, y: 0 }}
+                                                end={{ x: 1, y: 0 }}
+                                                colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                                                style={styles.categoryContainer}>
+                                                <Image source={require('../../images/category_marker_icon.png')} style={{ height: 13, width: 13 }} />
+                                                <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white', textTransform: 'capitalize' }]}>{item.category}</Text>
+                                            </LinearGradient>
+                                        </View>
+                                        {
+                                            userSelectedPost.marker_id === item.marker_id ?
+                                                <Image source={require('../../images/triangle.png')} style={{ height: 16, width: 16, marginTop: 10 }} />
+                                                :
+                                                <Image source={require('../../images/triangle.png')} style={{ height: 16, width: 16, marginTop: 10, tintColor: 'transparent' }} />
+                                        }
                                     </TouchableOpacity>
                                 )
                             }
@@ -182,13 +225,15 @@ export default class Banter extends Component {
                 </View>
                 {
                     isUserSelected ?
-                        <FlatList
-                            data={[userSelectedPost]}
-                            renderItem={
-                                ({ item }) => <BanterPagePosts key={item.marker_id} postsData={item} navigation={this.props.navigation} />
-                            }
-                            keyExtractor={(item, index) => index + ""}
-                        />
+                        <View style={{ marginBottom: 20 }}>
+                            <FlatList
+                                data={[userSelectedPost]}
+                                renderItem={
+                                    ({ item }) => <BanterPagePosts key={item.marker_id} postsData={item} navigation={this.props.navigation} />
+                                }
+                                keyExtractor={(item, index) => index + ""}
+                            />
+                        </View>
                         :
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', alignSelf: 'stretch' }}>
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14 }]}>Click on any profile to view their post disscussions</Text>
@@ -210,12 +255,14 @@ const styles = StyleSheet.create({
     headerstyle: {
         flexDirection: 'row',
         backgroundColor: 'white',
-        height: 60,
+        height: 70,
         elevation: 2,
         borderBottomColor: '#ECECEC',
         borderBottomWidth: 1,
         alignItems: 'center',
+        justifyContent: 'space-between'
     },
+
     categoryContainer: {
         flexDirection: "row",
         alignItems: 'center',
@@ -225,6 +272,5 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
         paddingRight: 8,
         borderRadius: 15,
-        backgroundColor: '#6454F0'
     },
 });

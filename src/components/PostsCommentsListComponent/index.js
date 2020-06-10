@@ -31,29 +31,31 @@ export default class PostsCommentsListComponent extends Component {
         // console.debug('time diff in seconds', timeDiffinSeconds);
         var commentedTime = '';
         if (timeDiffinSeconds < 60) {
-            commentedTime =  Math.trunc(timeDiffinSeconds) + ' seconds ago';
-        }else if(timeDiffinSeconds >= 60 && timeDiffinSeconds < 3600){
-            commentedTime =  Math.trunc((timeDiffinSeconds/60)) + ' minutes ago';
-        }else if(timeDiffinSeconds >= 3600 && timeDiffinSeconds < 86400) {
-            commentedTime =  Math.trunc((timeDiffinSeconds/(60*60))) + ' hours ago';
-        }else{
-            commentedTime =  Math.trunc((timeDiffinSeconds/(60*60*24))) + ' days ago';
+            commentedTime = Math.trunc(timeDiffinSeconds) + ' seconds ago';
+        } else if (timeDiffinSeconds >= 60 && timeDiffinSeconds < 3600) {
+            commentedTime = Math.trunc((timeDiffinSeconds / 60)) + ' minutes ago';
+        } else if (timeDiffinSeconds >= 3600 && timeDiffinSeconds < 86400) {
+            commentedTime = Math.trunc((timeDiffinSeconds / (60 * 60))) + ' hours ago';
+        } else {
+            commentedTime = Math.trunc((timeDiffinSeconds / (60 * 60 * 24))) + ' days ago';
         }
         // console.debug('Commented Date value:',commentedTime);
         return (
             <View style={styles.container}>
                 <View style={styles.TopContainer}>
-                    <Image source={commntedUserdp == null ? require('../../images/logo.png') : { uri: commntedUserdp }}  resizeMode={commntedUserdp == null ? 'contain' : 'cover'} style={styles.profile_photo} />
+                    <View style={[styles.profile_photo, { marginLeft: 15, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F5F5' }]}>
+                        <Image source={(commntedUserdp == null || commntedUserdp == '') ? require('../../images/profile_icon.png') : { uri: commntedUserdp }} style={(commntedUserdp == null || commntedUserdp == '') ? { height: 20, width: 20 } : styles.profile_photo} resizeMode={(commntedUserdp == null || commntedUserdp == '') ? 'contain' : 'cover'} />
+                    </View>
                     <View style={styles.container_text}>
                         <View style={{
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'space-between',
                         }}>
-                            <Text style={[AppStyle.dark_TextColor,AppStyle.app_font, {fontSize: 16, textTransform: 'capitalize' }]}>{userName}</Text>
-                            <Text style={[AppStyle.light_TextColor,AppStyle.app_font,{fontSize: 14, marginRight: 15 }]}>{commentedTime}</Text>
+                            <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 16, textTransform: 'capitalize' }]}>{userName}</Text>
+                            <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14, marginRight: 15 }]}>{commentedTime}</Text>
                         </View>
-                        <Text style={[AppStyle.dark_TextColor,AppStyle.app_font,{fontSize: 15, marginTop: 10, marginBottom: 10, marginRight: 15}]}>
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginTop: 10, marginBottom: 10, marginRight: 15 }]}>
                             {comment}
                         </Text>
                         {/* <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>

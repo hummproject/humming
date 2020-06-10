@@ -11,7 +11,7 @@ import Home from './components/Home'
 import Search from './components/Search'
 import Upload from './components/Upload'
 import Banter from './components/Banter'
-import Profile from './components/Profile'
+import Notifications from './components/Notifications'
 
 const Tab = createBottomTabNavigator();
 
@@ -57,7 +57,7 @@ export default class TabBar extends React.Component {
         console.debug("Inital Route name in render: Tabbar:", routeName)
         return (
             <Tab.Navigator
-                initialRouteName={routeName}
+                initialRouteName={'Home'}
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ focused, tintColor }) => {
                         let iconName;
@@ -77,10 +77,10 @@ export default class TabBar extends React.Component {
                             iconName = focused
                                 ? require('./images/TabBar/banter-icon-active.png')
                                 : require('./images/TabBar/banter-icon-inactive.png')
-                        } else if (route.name === 'Profile') {
+                        } else if (route.name === 'Notifications') {
                             iconName = focused
-                                ? require('./images/TabBar/profile-icon-active.png')
-                                : require('./images/TabBar/profile-icon-inactive.png')
+                                ? require('./images/TabBar/notification-icon-active.png')
+                                : require('./images/TabBar/notification-icon-inactive.png')
                         }
                         // You can return any component that you like here!
                         return (
@@ -104,7 +104,7 @@ export default class TabBar extends React.Component {
                 <Tab.Screen name="search" component={Search} />
                 <Tab.Screen name="Upload" component={Upload} />
                 <Tab.Screen name="Banter" component={Banter} />
-                <Tab.Screen name="Profile" component={Profile} />
+                <Tab.Screen name="Notifications" component={Notifications} />
             </Tab.Navigator>
         );
     };

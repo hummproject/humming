@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, BackHandler, Alert, PermissionsAndroid, StatusBar } from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet, Image, Text, TouchableOpacity, TouchableHighlight, BackHandler, Alert, PermissionsAndroid, StatusBar } from 'react-native';
 import HomePagePost from '../HomePagePost';
 import { AppStyle } from '../../App.style'
 import AppConfig from '../../config/constants';
@@ -19,6 +19,8 @@ export default class Home extends Component {
             latlang: "0.000,0.000",
             error: null,
             userData: {},
+            userDp: null,
+            showMenuOptions: false,
             isListEnded: false,
             refreshing: false,
             is_connected: false,
@@ -30,6 +32,7 @@ export default class Home extends Component {
             const userData = JSON.parse(value);
             this.setState({
                 userData: userData,
+                userDp: userData.userdp,
                 refresh: false
             });
         });
@@ -190,22 +193,35 @@ export default class Home extends Component {
             });
     };
 
+    navigatetoUserProfile = () => {
+        this.props.navigation.navigate('userprofile');
+    }
+
+    showMenuOptions = () => {
+        console.debug("Menu options");
+        this.setState({ showMenuOptions: !this.state.showMenuOptions });
+    }
+
     render() {
-        const { postsListArray, loading, userData } = this.state;
+        const { postsListArray, loading, userData, userDp } = this.state;
         return (
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: '#FBFBFB' }}>
                 <StatusBar barStyle={'dark-content'} />
-                {/* <View style={{ flex: 1 }}> */}
                 <View style={styles.headerstyle}>
-                    <Image source={require('../../images/home_header_logo.png')} style={{ width: 110, height: 50, marginLeft: 15 }} resizeMode={'contain'} />
-                    {/* <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 20, marginLeft: 20 }]}>HUMMING</Text> */}
+                    <Image source={require('../../images/home_header_logo.png')} style={{ marginLeft: 20, height: 45, width: 125 }} resizeMode={'contain'} />
+                    <TouchableOpacity onPress={this.navigatetoUserProfile} style={{ padding: 5, marginRight: 15 }}>
+                        <View style={[AppStyle.header_profile_photo, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F5F5' }]}>
+                            <Image source={(userDp == null || userDp == '') ? require('../../images/profile_icon.png') : { uri: userDp }} style={(userDp == null || userDp == '') ? { height: 15, width: 15 } : AppStyle.header_profile_photo} resizeMode={(userDp == null || userDp == '') ? 'contain' : 'cover'} />
+                        </View>
+                    </TouchableOpacity>
                 </View>
                 <View style={{ flex: 1 }}>
                     <FlatList
+                        contentContainerStyle={{ paddingBottom: 10 }}
                         ref={(ref) => { this.flatListRef = ref; }}
                         data={postsListArray}
                         renderItem={
-                            ({ item }) => <HomePagePost key={item.marker_id} markerData={item} userData={userData} navigation={this.props.navigation} />
+                            ({ item }) => <HomePagePost key={item.marker_id} markerData={item} userData={userData} navigation={this.props.navigation} showMenuOptions={this.showMenuOptions} />
                         }
                         keyExtractor={(item, index) => item + index}
                         onEndReachedThreshold={0.5}
@@ -227,6 +243,26 @@ export default class Home extends Component {
                     />
                 </View>
                 {
+                    this.state.showMenuOptions ?
+                        <TouchableHighlight style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(52, 52, 52, 0.5)', }}
+                            onPress={() => {
+                                this.setState({
+                                    showMenuOptions: !this.state.showMenuOptions
+                                })
+                            }} >
+                            <View style={[styles.MenuOptionStyle, { top: 100 }]}>
+                                <TouchableOpacity onPress={() => this.showUpdateProfile()}>
+                                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 14, paddingBottom: 8 }]}>Edit</Text>
+                                </TouchableOpacity>
+                                <View style={{ borderBottomColor: '#707070', borderBottomWidth: 0.5 }}></View>
+                                <TouchableOpacity onPress={() => this.DeactivateProfile()}>
+                                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font_heading, { fontSize: 14, paddingTop: 8 }]}>Delete</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </TouchableHighlight>
+                        : null
+                }
+                {
                     loading ? <ActivityIndicator
                         animating={true}
                         style={AppStyle.activityIndicator}
@@ -234,7 +270,6 @@ export default class Home extends Component {
                     /> : null
                 }
                 <Toast ref="toast" style={AppStyle.toast_style} />
-                {/* </View> */}
             </SafeAreaView>
         )
     };
@@ -244,10 +279,23 @@ const styles = StyleSheet.create({
     headerstyle: {
         flexDirection: 'row',
         backgroundColor: 'white',
-        height: 60,
+        height: 70,
         elevation: 2,
         borderBottomColor: '#ECECEC',
         borderBottomWidth: 1,
         alignItems: 'center',
-    }
+        justifyContent: 'space-between'
+    },
+
+    MenuOptionStyle: {
+        zIndex: 1,
+        position: 'absolute',
+        right: 20,
+        flexDirection: 'column',
+        flexWrap: 'wrap',
+        backgroundColor: '#FFFFFF',
+        alignSelf: 'flex-end',
+        padding: 10,
+        borderRadius: 5,
+    },
 });

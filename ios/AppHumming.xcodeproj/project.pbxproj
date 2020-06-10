@@ -22,6 +22,8 @@
 		A629964F2441CE12008799F0 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3F328729D87F453A8C8006F5 /* Roboto-Bold.ttf */; };
 		A62996502441CE12008799F0 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5919C10948124456B0320B06 /* Roboto-Light.ttf */; };
 		A62996512441CE12008799F0 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D53E4E9F32A24A2793AFBE57 /* Roboto-Medium.ttf */; };
+		A64925C7248CCBDF0075FC2A /* SFUIText-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A64925C5248CCBDF0075FC2A /* SFUIText-Bold.ttf */; };
+		A64925C8248CCBDF0075FC2A /* SFUIText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A64925C6248CCBDF0075FC2A /* SFUIText-Regular.ttf */; };
 		C52B831A6CAADE9F41DF83DF /* libPods-AppHumming.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC076B6D32591129A2BDAEC5 /* libPods-AppHumming.a */; };
 		E95C3D0024B7E4D9BC8516DB /* libPods-AppHumming-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB518C6550775C3F6127F9BB /* libPods-AppHumming-tvOS.a */; };
 /* End PBXBuildFile section */
@@ -76,6 +78,8 @@
 		75A6D23A1D6C49D0A4728BDA /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		92E1007586ED49DBA0340793 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		9DC623075C2240B8824AE805 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		A64925C5248CCBDF0075FC2A /* SFUIText-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFUIText-Bold.ttf"; sourceTree = "<group>"; };
+		A64925C6248CCBDF0075FC2A /* SFUIText-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFUIText-Regular.ttf"; sourceTree = "<group>"; };
 		A68BCC63242F7BCC001E39AB /* Roboto-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Roboto-Regular.ttf"; path = "../src/assets/fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; };
 		A962D3E2AD054B6AA1791BC4 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		AD89AC0352A04FCA9961D0A0 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -183,6 +187,8 @@
 		780FEC485F1448E3A2017E75 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A64925C5248CCBDF0075FC2A /* SFUIText-Bold.ttf */,
+				A64925C6248CCBDF0075FC2A /* SFUIText-Regular.ttf */,
 				75A6D23A1D6C49D0A4728BDA /* AntDesign.ttf */,
 				C40CB87E6E274C58BDFFECFB /* Entypo.ttf */,
 				A962D3E2AD054B6AA1791BC4 /* EvilIcons.ttf */,
@@ -402,8 +408,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A64925C7248CCBDF0075FC2A /* SFUIText-Bold.ttf in Resources */,
 				A629964E2441CE12008799F0 /* Roboto-Regular.ttf in Resources */,
 				A629964F2441CE12008799F0 /* Roboto-Bold.ttf in Resources */,
+				A64925C8248CCBDF0075FC2A /* SFUIText-Regular.ttf in Resources */,
 				A62996502441CE12008799F0 /* Roboto-Light.ttf in Resources */,
 				A62996512441CE12008799F0 /* Roboto-Medium.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
@@ -763,7 +771,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = FR4XXWKAW3;
 				INFOPLIST_FILE = AppHumming/Info.plist;
@@ -789,7 +797,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = FR4XXWKAW3;
 				INFOPLIST_FILE = AppHumming/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;

@@ -2,9 +2,11 @@ import React, { PureComponent } from 'react';
 import { Text, View, Image, TouchableOpacity, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { styles } from './HomePagePost.style';
 import { AppStyle } from '../../App.style';
+import LinearGradient from 'react-native-linear-gradient';
 import AppConfig from '../../config/constants';
-import Toast from 'react-native-easy-toast'
+import { ButtonGradientColor1, ButtonGradientColor2 } from '../../config/constants';
 import ProgressiveImage from '../../ProgressiveImage'
+import { cos } from 'react-native-reanimated';
 
 export default class HomePagePost extends PureComponent {
     constructor(props) {
@@ -15,6 +17,7 @@ export default class HomePagePost extends PureComponent {
             postDetails: this.props.markerData,
             userData: this.props.userData,
             isMarkerAlreadyLiked: null,
+            menuTop: 0,
             likeorUnlikeImgUri: require('../../images/unlike-icon.png'),
             postLikesCount: this.props.markerData.markerlike !== null ? this.props.markerData.markerlike.length : 0
         };
@@ -113,10 +116,15 @@ export default class HomePagePost extends PureComponent {
             });
     };
 
+    showOptions = () => {
+        console.log("Menu Options")
+        this.props.showMenuOptions();
+    };
+
     render() {
         const postDetails = this.state.postDetails;
+        console.debug("Home Post Details", postDetails);
         const likeorUnlikeImgUri = this.state.likeorUnlikeImgUri;
-        // console.debug(postDetails);
         var tagName = postDetails.username;
         var firstName = postDetails['firstname'];
         var lastName = postDetails['lastname'];
@@ -124,15 +132,27 @@ export default class HomePagePost extends PureComponent {
         var category = postDetails.category;
         var postDesc = postDetails.description;
         var userdpUri = postDetails.userdp;
-        var postimageUri = postDetails.media
-        var markerlikeArray = this.state.postLikesArray
+        var postimagesAry = postDetails.media !== null ? postDetails.media : []
         var markercommentArray = postDetails.markercomments !== null ? postDetails.markercomments : []
         var markerLikesCount = this.state.postLikesCount;
         return (
             <View style={styles.container}>
-                <View style={styles.TopContainer}>
-                    <TouchableOpacity onPress={this.GotoPostUserProfile} style={styles.profile_photo}>
-                        <Image source={userdpUri == null ? require('../../images/logo.png') : { uri: userdpUri }} style={styles.profile_photo} resizeMode={userdpUri == null ? 'contain' : 'cover'} />
+                <View style={styles.TopContainer} ref="topView" onLayout={({ nativeEvent }) => {
+                    this.refs.topView.measure((x, y, width, height, pageX, pageY) => {
+                        console.log(x, y, width, height, pageX, pageY);
+                        this.setState({ menuTop: pageY });
+                    })
+                }}>
+                    <TouchableOpacity onPress={this.GotoPostUserProfile} style={{
+                        height: 60,
+                        width: 60,
+                        borderRadius: 30,
+                        marginLeft: 15,
+                        backgroundColor: '#F5F5F5',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
+                        <Image source={userdpUri == null ? require('../../images/profile_icon.png') : { uri: userdpUri }} style={{ height: (userdpUri == null ? 25 : 60), width: (userdpUri == null ? 25 : 60), borderRadius: (userdpUri == null ? 0 : 30) }} resizeMode={userdpUri == null ? 'contain' : 'cover'} />
                     </TouchableOpacity>
                     <View style={styles.container_text}>
                         <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 16, paddingBottom: 0, textTransform: 'capitalize' }]}>
@@ -141,36 +161,47 @@ export default class HomePagePost extends PureComponent {
                         <Text style={[AppStyle.light_TextColor, AppStyle.app_font, { fontSize: 14, paddingBottom: 5 }]}>
                             @{tagName}
                         </Text>
-                        <View style={styles.categoryContainer}>
+                        <LinearGradient
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            colors={[ButtonGradientColor1, ButtonGradientColor2]}
+                            style={styles.categoryContainer}>
                             <Image source={require('../../images/category_marker_icon.png')} style={{ height: 13, width: 13 }} />
                             <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 5, color: 'white', textTransform: 'capitalize' }]}>{category}</Text>
-                        </View>
+                        </LinearGradient>
                     </View>
+                    {/* <TouchableOpacity onPress={() => this.showOptions} style={{ padding: 8 }}>
+                        <Image source={require('../../images/horizontal_menu.png')} style={{ width: 15, height: 8, marginRight: 10, marginLeft: 10, alignSelf: 'baseline' }} resizeMode={'contain'} />
+                    </TouchableOpacity> */}
                 </View>
-                <View style={{ flexDirection: 'column' }}>
+                <View style={{ flexDirection: 'column', justifyContent: 'center' }}>
+                    {postDesc === '' ? null
+                        :
+                        <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 15, marginRight: 15, marginBottom: (postimagesAry.length === 0 || postimagesAry[0] === null ? 0 : 15) }]}>
+                            {postDesc}
+                        </Text>
+                    }
                     <FlatList
                         horizontal
-                        pagingEnabled={true}
-                        data={postimageUri}
+                        contentContainerStyle={{ paddingRight: 15 }}
+                        pagingEnabled={false}
+                        data={postimagesAry}
                         renderItem={({ item }) => {
-                            // console.debug(item);
                             let imageUri = item != null ? item : ''
-                            // console.debug(imageUri);
                             if (imageUri != '') {
                                 return (
-                                    < ProgressiveImage source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width, height: 200 }} />
+                                    <View style={{ marginLeft: 15 }}>
+                                        < ProgressiveImage source={{ uri: imageUri }} resizeMode={'cover'} style={{ flex: 1, width: Dimensions.get('window').width - 50, height: 200 }} />
+                                    </View>
                                 )
                             } else {
                                 return (
-                                    null//<View></View>
+                                    null
                                 )
                             }
                         }}
                         keyExtractor={(item, index) => index + ""}
                     />
-                    <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 15, marginLeft: 14, marginRight: 15, marginTop: 15 }]}>
-                        {postDesc}
-                    </Text>
                 </View>
                 <View style={styles.BottomContainer}>
                     <TouchableOpacity onPress={this.LikeOrUnlikePost} style={{
@@ -179,7 +210,7 @@ export default class HomePagePost extends PureComponent {
                         justifyContent: 'flex-start'
                     }}>
                         <Image source={likeorUnlikeImgUri}
-                            style={{ width: 32, height: 27, marginLeft: 15 }} resizeMode={'contain'} />
+                            style={{ width: 30, height: 25, marginLeft: 15 }} resizeMode={'contain'} />
                         <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10, marginRight: 25 }]}>
                             {markerLikesCount}
                         </Text>
@@ -190,7 +221,7 @@ export default class HomePagePost extends PureComponent {
                         justifyContent: 'flex-start'
                     }}>
                         <Image source={require('../../images/comment-icon.png')} resizeMode={'contain'}
-                            style={{ width: 27, height: 27 }} />
+                            style={{ width: 25, height: 25 }} />
                         <Text style={[AppStyle.dark_TextColor, AppStyle.app_font, { fontSize: 14, marginLeft: 10 }]}>
                             {markercommentArray.length}
                         </Text>
