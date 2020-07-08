@@ -182,7 +182,8 @@ android {
 }
 
 dependencies {
-    implementation project(':react-native-image-picker')
+    implementation project(':react-native-image-crop-picker')
+    implementation project(':react-native-action-sheet')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
