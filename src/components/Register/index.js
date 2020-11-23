@@ -482,7 +482,17 @@ export default class Register extends Component {
             />
             <TouchableOpacity
               style={{marginBottom: 60}}
-              onPress={() => this.makeRequesttoVerifyOTP()}>
+              onPress={() => {
+                this.makeRequesttoVerifyOTP();
+                // this.setState({
+                //   showStepOne: false,
+                //   showVerifyOTP: false,
+                //   showStepTwo: true,
+                //   showStepThree: false,
+                //   newPassword: '',
+                //   newConfirmPassword: '',
+                // });
+              }}>
               <LinearGradient
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 0}}

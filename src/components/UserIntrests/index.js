@@ -29,6 +29,7 @@ import {FlatList} from 'react-native-gesture-handler';
 export default class UserIntrests extends Component {
   constructor(props) {
     super(props);
+    console.log('Constructor isfromProfile', this.props.route.params);
     this.state = {
       showLoader: false,
       userData: {},
@@ -43,6 +44,7 @@ export default class UserIntrests extends Component {
   }
 
   async componentDidMount() {
+    console.log('Did mount isfromProfile', this.props.route.params);
     await AsyncStorage.getItem('userData').then(value => {
       const userData = JSON.parse(value);
       this.setState({
@@ -50,6 +52,13 @@ export default class UserIntrests extends Component {
       });
     });
     BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      // do something
+      console.log('Did mount focus isfromProfile', this.props.route.params);
+      // this.setState({
+      //   postsListArray: [],
+      // });
+    });
     this.netinfoSubscribe = NetInfo.addEventListener(state => {
       if (state.isInternetReachable) {
         this.setState({is_connected: true});
@@ -127,7 +136,9 @@ export default class UserIntrests extends Component {
         });
         if (responseData.status === 200) {
           let categoriesAry = responseData.data;
-          let userPreviousInterestsAry = this.state.userData.interests;
+
+          let userPreviousInterestsAry =
+            this.state.userData === null ? [] : this.state.userData.interests;
           for (var i = 0; i < categoriesAry.length; i++) {
             var obj1 = categoriesAry[i];
             obj1.isselected = false;

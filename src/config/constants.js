@@ -1,5 +1,5 @@
 const AppConfig = {
-  DOMAIN: 'https://humming-psql.herokuapp.com', // 'https://humming-api.herokuapp.com'
+  DOMAIN: 'https://humming-psql.herokuapp.com', // 'https://humming-api.herokuapp.com', //
   LOGIN: '/login',
   REGISTER: '/register',
   REGISTRATION_GET_EMAIL_OTP: '/otptoemail',
