@@ -67,6 +67,7 @@ export default class Search extends Component {
       if (dataAry.length > 1) {
         dataAry.shift();
       }
+      console.log('Data Array', dataAry);
       this.setState({
         searchedText: '',
         dataArray: dataAry,
@@ -121,22 +122,25 @@ export default class Search extends Component {
     })
       .then(response => response.json())
       .then(responseData => {
-        console.debug('Search page Search MARKERS response:', responseData);
+        console.debug(
+          'Search page Search MARKERS response:',
+          responseData.data,
+        );
         if (responseData.status === 200) {
           let responseAry = responseData.data;
           var categoriesAry = new Array();
           for (let obj of responseAry) {
-            if (categoriesAry.indexOf(obj.category) === -1) {
-              categoriesAry.push(obj.category);
+            if (categoriesAry.indexOf(obj.catname) === -1) {
+              categoriesAry.push(obj.catname);
             }
           }
-          //   console.debug('category array', categoriesAry);
+          // console.debug('category array', categoriesAry);
           var searchResultdataAry = new Array();
           for (var i = 0; i < categoriesAry.length; i++) {
             let category = categoriesAry[i];
             var categorywiseMarkersAry = new Array();
             for (let object of responseAry) {
-              if (object.category === category) {
+              if (object.catname === category) {
                 categorywiseMarkersAry.push(object);
               }
               continue;
@@ -176,7 +180,7 @@ export default class Search extends Component {
         }
       })
       .catch(error => {
-        console.debug('Home Posts response ERROR:', error);
+        console.debug('Search page Search MARKERS response ERROR:', error);
         this.setState({error, loading: false});
         this.refs.toast.show('Something went wrong. Please try again later');
       });
@@ -186,6 +190,11 @@ export default class Search extends Component {
     const {userData, is_connected} = this.state;
     const url = AppConfig.DOMAIN + AppConfig.SEARCH_TOP_MARKERS;
     console.debug(url);
+    console.debug('Headers', {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      token: userData.token,
+    });
     this.setState({loading: true});
     if (!is_connected) {
       this.setState({loading: false});
@@ -203,17 +212,18 @@ export default class Search extends Component {
     })
       .then(response => response.json())
       .then(responseData => {
-        console.debug('Search page TOP MARKERS response:', responseData);
+        // console.debug('Search page TOP MARKERS response:', responseData.data);
         if (responseData.status === 200) {
           let responseAry = responseData.data.markers;
-          // console.debug('Markers Response', responseAry);
           let categoriesAry = responseData.data.categories;
+          // console.debug('Markers Response category', categoriesAry);
           var dataAry = new Array();
           for (var i = 0; i < categoriesAry.length; i++) {
             let category = categoriesAry[i];
+            // console.log('Catgeory in loop', category);
             var categorywiseMarkersAry = new Array();
             for (let obj of responseAry) {
-              if (obj['category'] === category) {
+              if (obj['catname'] === category) {
                 categorywiseMarkersAry.push(obj);
               }
               continue;
@@ -232,7 +242,7 @@ export default class Search extends Component {
         }
       })
       .catch(error => {
-        console.debug('Home Posts response ERROR:', error);
+        console.debug('Search page TOP MARKERS response ERROR:', error);
         this.setState({error, loading: false});
         this.refs.toast.show('Something went wrong. Please try again later');
       });
@@ -259,6 +269,7 @@ export default class Search extends Component {
 
   render() {
     const {dataArray, loading, userDp, postDetails} = this.state;
+    console.log('Data Array', dataArray);
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: '#FBFBFB'}}>
         <View style={styles.headerstyle}>

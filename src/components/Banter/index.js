@@ -322,7 +322,7 @@ export default class Banter extends Component {
                             textTransform: 'capitalize',
                           },
                         ]}>
-                        {item.category}
+                        {item.catname}
                       </Text>
                     </LinearGradient>
                   </View>

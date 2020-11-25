@@ -255,7 +255,7 @@ export default class PostDetailsModal extends Component {
       postDetails['lastname'] !== undefined ? postDetails['lastname'] : '';
     var userName = firstName + ' ' + lastName;
     var category =
-      postDetails.category !== undefined ? postDetails.category : '---';
+      postDetails.catname !== undefined ? postDetails.catname : '---';
     var postDesc =
       postDetails.description !== undefined ? postDetails.description : '---';
     var userdpUri =

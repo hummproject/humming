@@ -157,7 +157,7 @@ export default class HomePagePost extends PureComponent {
     var firstName = postDetails['firstname'];
     var lastName = postDetails['lastname'];
     var userName = firstName + ' ' + lastName;
-    var category = postDetails.category;
+    var category = postDetails.catname;
     var postDesc = postDetails.description;
     var userdpUri = postDetails.userdp;
     var postimagesAry = postDetails.media !== null ? postDetails.media : [];
