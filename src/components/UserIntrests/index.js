@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   View,
@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   SafeAreaView,
-  BackHandler,
+  ToastAndroid,
+  Alert,
   PermissionsAndroid,
   Platform,
 } from 'react-native';
@@ -20,125 +21,95 @@ import {
   ButtonGradientColor2,
 } from '../../config/constants';
 import LinearGradient from 'react-native-linear-gradient';
-import Toast from 'react-native-easy-toast';
 import Geolocation from '@react-native-community/geolocation';
 import NetInfo from '@react-native-community/netinfo';
-import {StackActions, NavigationActions} from 'react-navigation';
 import {FlatList} from 'react-native-gesture-handler';
+import {useAuthDispatch} from '../../AuthContext';
 
-export default class UserIntrests extends Component {
-  constructor(props) {
-    super(props);
-    console.log('Constructor isfromProfile', this.props.route.params);
-    this.state = {
-      showLoader: false,
-      userData: {},
-      is_connected: false,
-      showiosBackButton: false,
-      interestsAry: [],
-      interestsSelectedAry: [],
-      registrationData: this.props.route.params.userData,
-      isfromProfile: this.props.route.params.isfromProfile,
-      error: null,
+const useInternetStatus = () => {
+  const [reachable, setReachable] = useState(false);
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setReachable(state.isInternetReachable);
+    });
+    return () => {
+      unsubscribe();
     };
-  }
+  }, [reachable]);
+  return reachable;
+};
 
-  async componentDidMount() {
-    console.log('Did mount isfromProfile', this.props.route.params);
-    await AsyncStorage.getItem('userData').then(value => {
-      const userData = JSON.parse(value);
-      this.setState({
-        userData: userData,
-      });
-    });
-    BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      // do something
-      console.log('Did mount focus isfromProfile', this.props.route.params);
-      // this.setState({
-      //   postsListArray: [],
-      // });
-    });
-    this.netinfoSubscribe = NetInfo.addEventListener(state => {
-      if (state.isInternetReachable) {
-        this.setState({is_connected: true});
-      } else {
-        this.setState({is_connected: false});
-      }
-    });
-    this.makeRequesttoFetchCategories();
-  }
+const UserIntrests = props => {
+  const dispatch = useAuthDispatch();
+  const isInternetReachable = useInternetStatus();
+  const [showLoader, setshowLoader] = useState(false);
+  const [userData, setuserData] = useState(null);
+  const [showiosBackButton, setshowiosBackButton] = useState(false);
+  const [interestsAry, setinterestsAry] = useState([]);
+  // const [interestsSelectedAry, setinterestsSelectedAry] = useState([]);
+  const [isfromProfile, setisfromProfile] = useState(
+    props.route.params.isfromProfile,
+  );
+  const [registrationData, setregistrationData] = useState(
+    props.route.params.userData,
+  );
+  const [refresh, setrefresh] = useState(false);
+  const [error, setError] = useState(null);
 
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
-    this.netinfoSubscribe();
-  }
-
-  handleBackButton = () => {
-    if (this.state.isfromProfile) {
-      this.props.navigation.goBack();
-    } else {
-      return true;
+  useEffect(() => {
+    async function fetchUserData() {
+      let uservalue = await AsyncStorage.getItem('userData');
+      let userData = JSON.parse(uservalue);
+      setuserData(userData);
+      makeRequesttoFetchCategories(userData);
     }
-  };
+    fetchUserData();
+  }, [isInternetReachable]);
 
-  saveIntrestsClicked() {
-    const {interestsAry, isfromProfile} = this.state;
+  const saveIntrestsClicked = () => {
     let interestsSelectedAry = interestsAry.filter(function(e) {
       return e.isselected === true;
     });
-    console.log('interestsSelectedAry ', interestsSelectedAry);
-    console.log(
-      'interestsSelectedAry ',
-      '{' + interestsSelectedAry.map(e => e.id).join(',') + '}',
-    );
     if (interestsSelectedAry.length === 0) {
-      this.refs.toast.show('Please choose your interests');
+      notifyMessage('Please choose your interests');
       return;
     }
     if (interestsSelectedAry.length < 3) {
-      this.refs.toast.show('Please choose atleast 3 interests');
+      notifyMessage('Please choose atleast 3 interests');
       return;
     }
-    this.setState({
-      interestsSelectedAry: interestsSelectedAry,
-      showLoader: true,
-    });
+    // setinterestsSelectedAry(interestsSelectedAry);
+    setshowLoader(true);
     if (isfromProfile) {
-      this.UpdateProfileInterests(interestsSelectedAry);
+      UpdateProfileInterests(interestsSelectedAry);
     } else {
       if (Platform.OS === 'ios') {
-        this.fetchLocation();
+        fetchLocation(interestsSelectedAry);
       } else {
-        this.requestLocationPermission();
+        requestLocationPermission(interestsSelectedAry);
       }
     }
-  }
+  };
 
-  makeRequesttoFetchCategories = () => {
-    const {is_connected} = this.state;
+  const makeRequesttoFetchCategories = userData => {
     const url = AppConfig.DOMAIN + AppConfig.GET_ALL_AVAILABLE_CATEGORIES;
-    this.setState({showLoader: true});
-    if (!is_connected) {
-      this.setState({
-        showLoader: false,
-      });
-      this.refs.toast.show('Internet is not connected, Please try again!');
+    setshowLoader(true);
+    if (!isInternetReachable) {
+      setshowLoader(false);
+      // notifyMessage('Internet is not connected, Please try again!');
       return;
     }
     console.debug(url);
+    console.debug('User Data', userData);
     fetch(url)
       .then(response => response.json())
       .then(responseData => {
         console.debug('Fetch Categories response:', responseData);
-        this.setState({
-          showLoader: false,
-        });
+        setshowLoader(false);
         if (responseData.status === 200) {
           let categoriesAry = responseData.data;
-
           let userPreviousInterestsAry =
-            this.state.userData === null ? [] : this.state.userData.interests;
+            userData === null ? [] : userData.interests;
           for (var i = 0; i < categoriesAry.length; i++) {
             var obj1 = categoriesAry[i];
             obj1.isselected = false;
@@ -150,59 +121,67 @@ export default class UserIntrests extends Component {
             }
             categoriesAry[i] = obj1;
           }
-          console.log('Categories array modified', categoriesAry);
-          this.setState({interestsAry: categoriesAry});
+          setinterestsAry(categoriesAry);
         } else {
-          this.refs.toast.show(responseData.message);
+          notifyMessage(responseData.message);
         }
       })
       .catch(error => {
         console.debug('Fetch Categories response ERROR:', error);
-        this.setState({error, showLoader: false});
-        this.refs.toast.show('Something went wrong. Please try again later');
+        setshowLoader(false);
+        setError(error);
+        notifyMessage('Something went wrong. Please try again later');
       });
   };
 
-  async requestLocationPermission() {
+  const requestLocationPermission = interestsSelectedAry => {
     try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Location Access Required',
-          message:
-            'This app requires access to your location to show you relevant posts based on location.',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        //To Check, If Permission is granted
-        this.fetchLocation();
-      } else {
-        console.log('Location Permission Denied');
-        this.callRegisterApi();
-      }
+      (async () => {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Access Required',
+            message:
+              'This app requires access to your location to show you relevant posts based on location.',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          //To Check, If Permission is granted
+          fetchLocation(interestsSelectedAry);
+        } else {
+          console.log('Location Permission Denied');
+          callRegisterApi(null, interestsSelectedAry);
+        }
+      })();
     } catch (err) {
       console.warn(err);
     }
-  }
+  };
 
-  fetchLocation() {
+  const fetchLocation = interestsSelectedAry => {
     Geolocation.getCurrentPosition(
       //Will give you the current location
       position => {
         console.log('GeoLocation Position:', position);
-        this.callRegisterApi(position);
+        callRegisterApi(position, interestsSelectedAry);
       },
       error => {
-        this.callRegisterApi();
+        callRegisterApi(null, interestsSelectedAry);
       },
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
     );
-  }
+  };
 
-  callRegisterApi(position) {
-    const {interestsSelectedAry, is_connected} = this.state;
-    var registrationData = this.state.registrationData;
+  const callRegisterApi = (position, interestsSelectedAry) => {
+    console.log(
+      'Registartion api',
+      position,
+      registrationData,
+      interestsSelectedAry,
+    );
+    var registrationdata = registrationData;
+    // console.log('Registartion api registration data', registrationdata);
     var locationData = position;
     var latlang = '0.000,0.000';
     if (locationData && locationData.coords) {
@@ -210,55 +189,50 @@ export default class UserIntrests extends Component {
       latlang = coords.latitude + ',' + coords.longitude;
     }
 
-    registrationData.latlang = latlang;
-    registrationData.interests =
+    registrationdata.latlang = latlang;
+    registrationdata.interests =
       '{' + interestsSelectedAry.map(e => e.id).join(',') + '}';
 
-    if (!is_connected) {
-      this.setState({showLoader: false});
-      this.refs.toast.show('Internet is not connected, Please try again!');
+    if (!isInternetReachable) {
+      setshowLoader(false);
+      notifyMessage('Internet is not connected, Please try again!');
       return;
     }
-
-    RegisterUser(registrationData)
+    setshowLoader(true);
+    RegisterUser(registrationdata)
       .then(res => {
         console.debug('Registration Response', res);
         if (res.status === 200) {
           const userData = res && res.data;
           AsyncStorage.setItem('userData', JSON.stringify(userData));
-          let resetAction = StackActions.reset({
-            index: 0,
-            key: null,
-            actions: [NavigationActions.navigate({routeName: 'TabBar'})],
+          dispatch({
+            type: 'SIGN_IN',
+            token: userData.token,
           });
-          this.props.navigation.dispatch(resetAction);
-          this.props.navigation.navigate('TabBar');
-          // this.props.navigation.navigate('TabBar', {userData: res.data});
         } else if (res.message === 'User already existed, please login.') {
-          this.refs.toast.show('Username is already taken. Please try another');
+          notifyMessage('Username is already taken. Please try another');
         } else {
-          this.refs.toast.show(res.message);
+          notifyMessage(res.message);
         }
         setTimeout(() => {
-          this.setState({showLoader: false});
+          setshowLoader(false);
         }, 1000);
       })
       .catch(err => {
-        console.debug('error', err);
-        this.refs.toast.show('Something went wrong. Please try again later');
+        console.debug('Registration Response Error', err);
+        notifyMessage('Something went wrong. Please try again later');
         setTimeout(() => {
-          this.setState({showLoader: false});
+          setshowLoader(false);
         }, 1000);
       });
-  }
+  };
 
-  UpdateProfileInterests = interestsSelectedAry => {
+  const UpdateProfileInterests = interestsSelectedAry => {
     const requestData = new FormData();
     requestData.append(
       'interests',
       '{' + interestsSelectedAry.map(e => e.id).join(',') + '}',
     );
-    const {userData, is_connected} = this.state;
     const url = AppConfig.DOMAIN + AppConfig.UPDATE_USER_PROFILE;
     console.debug('URL:', url);
     console.debug('Headers', {
@@ -267,13 +241,11 @@ export default class UserIntrests extends Component {
       token: userData.token,
     });
     console.debug('Request', requestData);
-    this.setState({showLoader: true});
-    if (!is_connected) {
-      this.setState({showLoader: false});
-      this.refs.toast.show('Internet is not connected, Please try again!');
+    if (!isInternetReachable) {
+      setshowLoader(false);
+      notifyMessage('Internet is not connected, Please try again!');
       return;
     }
-
     fetch(url, {
       method: 'POST',
       headers: {
@@ -286,9 +258,9 @@ export default class UserIntrests extends Component {
       .then(res => res.json())
       .then(resJson => {
         console.debug('Update Interests response', resJson);
-        this.setState({showLoader: false});
+        setshowLoader(false);
         if (resJson.status === 200) {
-          var userdata = this.state.userData;
+          var userdata = userData;
           userdata['userdp'] = resJson.data.userdp;
           userdata['usermobile'] = resJson.data.usermobile;
           userdata['userprofession'] = resJson.data.userprofession;
@@ -298,178 +270,213 @@ export default class UserIntrests extends Component {
           userdata['following'] = resJson.data.following;
           userdata['interests'] = resJson.data.interests;
           AsyncStorage.setItem('userData', JSON.stringify(userdata));
-          this.refs.toast.show('Interests updated successfully');
-          this.props.navigation.goBack();
+          if (Platform.OS === 'android') {
+            ToastAndroid.show(
+              'Interests updated successfully',
+              ToastAndroid.SHORT,
+            );
+            props.navigation.goBack();
+          } else {
+            Alert.alert(
+              '',
+              'Interests updated successfully',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK Pressed');
+                    props.navigation.goBack();
+                  },
+                },
+              ],
+              {cancelable: false},
+            );
+          }
         } else {
-          this.refs.toast.show(resJson.message);
+          notifyMessage(resJson.message);
         }
       })
       .catch(err => {
         console.debug('Update Interests response ERROR:', err);
-        this.setState({error: err, showLoader: false});
-        this.refs.toast.show('Something went wrong. Please try again later');
+        setshowLoader(false);
+        setError(err);
+        notifyMessage('Something went wrong. Please try again later');
       });
   };
 
-  returnBack = () => {
-    this.props.navigation.goBack();
+  const returnBack = () => {
+    props.navigation.goBack();
   };
 
-  interestItemSelected = item => {
+  const interestItemSelected = item => {
+    console.log('Interests selected item', item);
     var selectedItem = item;
     var isselected = selectedItem.isselected;
     selectedItem.isselected = !isselected;
-    var intrestsAry = this.state.interestsAry;
+    var intrestsAry = [...interestsAry];
     var index = intrestsAry.indexOf(({id}) => id === selectedItem.id);
     intrestsAry[index] = selectedItem;
-    this.setState({interestsAry: intrestsAry});
+    setinterestsAry(intrestsAry);
   };
 
-  render() {
-    return (
-      <SafeAreaView style={AppStyle.login_appContainer}>
-        {this.state.showiosBackButton ? (
-          <TouchableOpacity
-            onPress={this.returnBack}
+  const renderinterestItems = ({item}) => {
+    if (item.isselected === true) {
+      return (
+        <TouchableOpacity
+          style={{
+            marginLeft: 10,
+            marginTop: 10,
+            height: 50,
+            borderRadius: 8,
+            width: (Dimensions.get('window').width - 70) / 2,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onPress={() => interestItemSelected(item)}>
+          <LinearGradient
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
+            colors={[ButtonGradientColor1, ButtonGradientColor2]}
             style={{
-              padding: 8,
-              marginLeft: 10,
-              marginTop: 45,
-              position: 'absolute',
-              alignSelf: 'flex-start',
+              height: 50,
+              borderRadius: 8,
+              width: (Dimensions.get('window').width - 70) / 2,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
-            <Image
-              source={require('../../images/back.png')}
-              resizeMode={'contain'}
-              style={{width: 13, height: 20, marginLeft: 10}}
-            />
-          </TouchableOpacity>
-        ) : null}
-        <Image
-          style={AppStyle.Loginlogo}
-          source={require('../../images/logo.png')}
-        />
-        <View
+            <Text style={[AppStyle.app_font, {fontSize: 14, color: '#FFFFFF'}]}>
+              {item.catname}
+            </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      );
+    } else {
+      return (
+        <TouchableOpacity
           style={{
-            flex: 1,
+            backgroundColor: '#F2F2F2',
+            marginLeft: 10,
+            marginTop: 10,
+            height: 50,
+            borderRadius: 8,
+            width: (Dimensions.get('window').width - 70) / 2,
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: 30,
-            marginTop: 40,
-          }}>
+          }}
+          onPress={() => interestItemSelected(item)}>
           <Text
             style={[
-              AppStyle.app_font_heading,
-              AppStyle.dark_TextColor,
-              {fontSize: 23, marginBottom: 5},
+              AppStyle.app_font,
+              AppStyle.light_TextColor,
+              {fontSize: 14},
             ]}>
-            Interests
+            {item.catname}
           </Text>
-          <Text
-            style={[
-              AppStyle.app_font_heading,
-              AppStyle.light_blue_TextColor,
-              {fontSize: 15, marginBottom: 20},
-            ]}>
-            Select minimum three interests
-          </Text>
-          <FlatList
-            contentContainerStyle={{
-              paddingBottom: 10,
-              paddingRight: 10,
-            }}
-            numColumns={2}
-            data={this.state.interestsAry}
-            keyExtractor={(item, index) => item.id + index}
-            renderItem={({item}) => {
-              if (item.isselected === false) {
-                return (
-                  <TouchableOpacity
-                    style={{
-                      backgroundColor: '#F2F2F2',
-                      marginLeft: 10,
-                      marginTop: 10,
-                      height: 50,
-                      borderRadius: 8,
-                      width: (Dimensions.get('window').width - 70) / 2,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    onPress={this.interestItemSelected.bind(this, item)}>
-                    <Text
-                      style={[
-                        AppStyle.app_font,
-                        AppStyle.light_TextColor,
-                        {fontSize: 14},
-                      ]}>
-                      {item.catname}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              } else {
-                return (
-                  <TouchableOpacity
-                    style={{
-                      marginLeft: 10,
-                      marginTop: 10,
-                      height: 50,
-                      borderRadius: 8,
-                      width: (Dimensions.get('window').width - 70) / 2,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    onPress={this.interestItemSelected.bind(this, item)}>
-                    <LinearGradient
-                      start={{x: 0, y: 0}}
-                      end={{x: 1, y: 0}}
-                      colors={[ButtonGradientColor1, ButtonGradientColor2]}
-                      style={{
-                        height: 50,
-                        borderRadius: 8,
-                        width: (Dimensions.get('window').width - 70) / 2,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      <Text
-                        style={[
-                          AppStyle.app_font,
-                          {fontSize: 14, color: '#FFFFFF'},
-                        ]}>
-                        {item.catname}
-                      </Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                );
-              }
-            }}
-          />
-        </View>
+        </TouchableOpacity>
+      );
+    }
+  };
 
-        <View
+  return (
+    <SafeAreaView style={AppStyle.login_appContainer}>
+      {showiosBackButton ? (
+        <TouchableOpacity
+          onPress={returnBack}
           style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 40,
+            padding: 8,
+            marginLeft: 10,
+            marginTop: 45,
+            position: 'absolute',
+            alignSelf: 'flex-start',
           }}>
-          <TouchableOpacity onPress={() => this.saveIntrestsClicked()}>
-            <LinearGradient
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 0}}
-              colors={[ButtonGradientColor1, ButtonGradientColor2]}
-              style={AppStyle.appButton_background}>
-              <Text style={AppStyle.appButton_Text}>Save</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-        {this.state.showLoader ? (
-          <ActivityIndicator
-            animating={true}
-            style={AppStyle.activityIndicator}
-            size="large"
+          <Image
+            source={require('../../images/back.png')}
+            resizeMode={'contain'}
+            style={{width: 13, height: 20, marginLeft: 10}}
           />
-        ) : null}
-        <Toast ref="toast" style={AppStyle.toast_style} />
-      </SafeAreaView>
+        </TouchableOpacity>
+      ) : null}
+      <Image
+        style={AppStyle.Loginlogo}
+        source={require('../../images/logo.png')}
+      />
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 30,
+          marginTop: 40,
+        }}>
+        <Text
+          style={[
+            AppStyle.app_font_heading,
+            AppStyle.dark_TextColor,
+            {fontSize: 23, marginBottom: 5},
+          ]}>
+          Interests
+        </Text>
+        <Text
+          style={[
+            AppStyle.app_font_heading,
+            AppStyle.light_blue_TextColor,
+            {fontSize: 15, marginBottom: 20},
+          ]}>
+          Select minimum three interests
+        </Text>
+        <FlatList
+          contentContainerStyle={{
+            paddingBottom: 10,
+            paddingRight: 10,
+          }}
+          numColumns={2}
+          data={interestsAry}
+          keyExtractor={(item, index) => item.id + index}
+          renderItem={renderinterestItems}
+        />
+      </View>
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginBottom: 40,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            console.debug('Save intrests clicked');
+            saveIntrestsClicked();
+          }}>
+          <LinearGradient
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
+            colors={[ButtonGradientColor1, ButtonGradientColor2]}
+            style={AppStyle.appButton_background}>
+            <Text style={AppStyle.appButton_Text}>Save</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+      {showLoader ? (
+        <ActivityIndicator
+          animating={true}
+          style={AppStyle.activityIndicator}
+          size="large"
+        />
+      ) : null}
+    </SafeAreaView>
+  );
+};
+
+function notifyMessage(errorMessage) {
+  if (Platform.OS === 'android') {
+    ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+  } else {
+    Alert.alert(
+      '',
+      errorMessage,
+      [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+      {cancelable: false},
     );
   }
 }
+
+export default UserIntrests;

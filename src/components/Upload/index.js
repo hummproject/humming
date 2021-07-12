@@ -27,7 +27,6 @@ import {
   ButtonGradientColor1,
   ButtonGradientColor2,
 } from '../../config/constants';
-// import ImagePicker from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-crop-picker';
 import CustomiOSPicker from '../CustomiOSPicker';
 import Geolocation from '@react-native-community/geolocation';
@@ -57,7 +56,7 @@ export default class Upload extends Component {
     this.state = {
       choosenIndex: 0,
       hummDescription: '',
-      category: '',
+      categoryData: {},
       isImageUploaded: false,
       uploadImageArray: [],
       userData: {},
@@ -67,19 +66,7 @@ export default class Upload extends Component {
       showiOSPicker: false,
       latlang: '0.000,0.000',
       is_connected: false,
-      pickerData: [
-        'Add marker',
-        'Movies',
-        'Music',
-        'Sports',
-        'Travel',
-        'Politics',
-        'Art',
-        'Entertainment',
-        'Technology',
-        'Fashion',
-        'Food',
-      ],
+      pickerData: [],
     };
     this.uploadImage = this.uploadImage.bind(this);
   }
@@ -92,12 +79,13 @@ export default class Upload extends Component {
         userDp: userData.userdp,
       });
     });
+
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       // do something
       this.setState({
         choosenIndex: 0,
         hummDescription: '',
-        category: '',
+        categoryData: {},
         isImageUploaded: false,
         uploadImageArray: [],
         loading: false,
@@ -113,6 +101,7 @@ export default class Upload extends Component {
         this.setState({is_connected: false});
       }
     });
+    this.fetchCategoriesorMarkersforPosts();
   }
 
   componentWillUnmount() {
@@ -130,6 +119,42 @@ export default class Upload extends Component {
     this.setState({
       showiOSPicker: true,
     });
+  };
+
+  fetchCategoriesorMarkersforPosts = () => {
+    const {is_connected} = this.state;
+    const url = AppConfig.DOMAIN + AppConfig.GET_ALL_AVAILABLE_CATEGORIES;
+    console.debug(url);
+    this.setState({loading: true});
+    if (!is_connected) {
+      this.setState({loading: false});
+      this.refs.toast.show('Internet is not connected, Please try again!');
+      return;
+    }
+    fetch(url)
+      .then(response => response.json())
+      .then(responseData => {
+        console.debug('Categories or MARKERS response:', responseData);
+        this.setState({
+          loading: false,
+        });
+        if (responseData.status === 200) {
+          var categoriesData = responseData.data;
+          console.log('Response data', categoriesData);
+          console.log(
+            'Response data modifled',
+            categoriesData.unshift({catname: 'Add marker', id: 0}),
+          );
+          this.setState({pickerData: responseData.data});
+        } else {
+          this.refs.toast.show(responseData.message);
+        }
+      })
+      .catch(error => {
+        console.debug('Categories or MARKERS ERROR:', error);
+        this.setState({error, loading: false});
+        this.refs.toast.show('Something went wrong. Please try again later');
+      });
   };
 
   uploadImage = () => {
@@ -273,10 +298,17 @@ export default class Upload extends Component {
     }
   };
 
+  isEmpty(ob) {
+    for (var i in ob) {
+      return false;
+    }
+    return true;
+  }
+
   upload = () => {
     const {
       userData,
-      category,
+      categoryData,
       uploadImageArray,
       hummDescription,
       latlang,
@@ -285,7 +317,7 @@ export default class Upload extends Component {
     this.setState({
       showtoast: true,
     });
-    if (category === '') {
+    if (this.isEmpty(categoryData) === true) {
       this.refs.toast.show('Please add marker');
       return;
     }
@@ -308,7 +340,7 @@ export default class Upload extends Component {
       });
     }
     data.append('description', hummDescription);
-    data.append('category', category);
+    data.append('category', categoryData.id); // send category(Marker) id here // .toString()
     data.append('latitude', '0');
     data.append('longitude', '0');
     data.append('location', latlang); // latlang
@@ -344,7 +376,7 @@ export default class Upload extends Component {
             isImageUploaded: false,
             uploadImageArray: [],
             hummDescription: '',
-            category: '',
+            categoryData: {},
           });
           this.refs.toast.show('Marker uploaded successfully');
           this.props.navigation.navigate('Home');
@@ -362,16 +394,16 @@ export default class Upload extends Component {
   };
 
   callbackfromPicker = (data, index) => {
-    // console.debug('picker data', data);
+    console.debug('picker data', data);
     if (data !== 'Add marker') {
       this.setState({
-        category: data,
+        categoryData: data,
         choosenIndex: index,
         showiOSPicker: false,
       });
     } else {
       this.setState({
-        category: '',
+        categoryData: {},
         choosenIndex: 0,
         showiOSPicker: false,
       });
@@ -568,19 +600,24 @@ export default class Upload extends Component {
                       AppStyle.app_font,
                       {fontSize: 14, textAlign: 'center', color: '#9B9B9B'},
                     ]}
-                    selectedValue={this.state.category}
+                    selectedValue={this.state.categoryData}
                     onValueChange={(itemValue, itemPosition) => {
-                      if (itemValue !== 'Add marker') {
+                      // console.log('Category choosed', itemValue);
+                      if (itemValue.catname !== 'Add marker') {
                         this.setState({
-                          category: itemValue,
+                          categoryData: itemValue,
                           choosenIndex: itemPosition,
                         });
                       } else {
-                        this.setState({category: '', choosenIndex: 0});
+                        this.setState({categoryData: {}, choosenIndex: 0});
                       }
                     }}>
                     {this.state.pickerData.map((item, index) => (
-                      <Picker.Item label={item} value={item} key={index} />
+                      <Picker.Item
+                        label={item.catname}
+                        value={item}
+                        key={index}
+                      />
                     ))}
                   </Picker>
                 ) : (
@@ -597,9 +634,9 @@ export default class Upload extends Component {
                         {fontSize: 14},
                       ]}>
                       {' '}
-                      {this.state.category === ''
+                      {this.state.categoryData.catname === ''
                         ? 'Add marker'
-                        : this.state.category}
+                        : this.state.categoryData.catname}
                     </Text>
                   </View>
                 )}

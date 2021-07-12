@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import SplashScreen from 'react-native-splash-screen';
 import AppNavigator from './src/components/AppNavigator';
 import AsyncStorage from '@react-native-community/async-storage';
+import {AuthProvider} from './src/AuthContext';
+import SplashScreen from 'react-native-splash-screen';
 
 export default class App extends Component {
   constructor(props) {
@@ -14,60 +15,35 @@ export default class App extends Component {
   }
 
   _setup = async () => {
-    await AsyncStorage.getItem('userData').then(value => {
-      const userData = JSON.parse(value);
-      this.setState({
-        userData: userData,
-      });
-    });
     SplashScreen.hide();
-    if (this.state.userData === null) {
-      this.setState({
-        initalScreen: 'login',
-      });
-    } else {
-      this.setState({
-        initalScreen: 'TabBar',
-      });
-    }
+    // await AsyncStorage.getItem('userData').then(value => {
+    //   const userData = JSON.parse(value);
+    //   this.setState({
+    //     userData: userData,
+    //   });
+    // });
+    // if (this.state.userData === null) {
+    //   this.setState({
+    //     initalScreen: 'login',
+    //   });
+    // } else {
+    //   this.setState({
+    //     initalScreen: 'TabBar',
+    //   });
+    // }
   };
-
-  // async componentDidMount() {
-  // await AsyncStorage.getItem("userData").then(value => {
-  //   const userData = JSON.parse(value);
-  //   this.setState({
-  //     userData: userData
-  //   });
-  // });
-  // SplashScreen.hide();
-  // if (this.state.userData === null) {
-  //   this.setState({
-  //     initalScreen: 'login'
-  //   })
-  // } else {
-  //   this.setState({
-  //     initalScreen: 'TabBar'
-  //   })
-  // }
-  // }
 
   render() {
     console.debug('Inside render', this.state.initalScreen);
-    if (this.state.initalScreen !== null) {
-      return <AppNavigator initalScreen={this.state.initalScreen} />;
-    } else {
-      return null;
-    }
-
     // if (this.state.initalScreen !== null) {
-    //   return <Secured
-    //       onLogoutPress={() => this.setState({isLoggedIn: false})}
-    //     />;
+    //   return <AppNavigator initalScreen={this.state.initalScreen} />;
+    // } else {
+    //   return null;
     // }
-    // else {
-    //   return <Login
-    //       onLoginPress={() => this.setState({isLoggedIn: true})}
-    //     />;
-    // }
+    return (
+      <AuthProvider>
+        <AppNavigator />
+      </AuthProvider>
+    );
   }
 }
